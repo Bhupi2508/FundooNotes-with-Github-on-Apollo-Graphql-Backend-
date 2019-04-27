@@ -23,6 +23,10 @@ var userQueries = function () { }
 
 
 /*******************************************************************************************************************/
+/**
+ * @param {args}
+ * @param {context}
+ */
 userQueries.prototype.user = async (parent, args, context) => {
     var user = await userModel.find()
     console.log(user[0]);
