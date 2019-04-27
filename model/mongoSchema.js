@@ -1,0 +1,77 @@
+/******************************************************************************
+ *  Execution       : default node          : cmd> mongoSchema.js
+ *                      
+ * 
+ *  Purpose         : Create Schema for MongoDataBase
+ * 
+ *  @description    : save data in mongodb by using this schema
+ * 
+ *  @overview       : fundoo application
+ *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
+ *  @version        : 1.0
+ *  @since          : 27-april-2019
+ *
+ ******************************************************************************/
+/**
+ * @requires files
+ */
+var mongoose = require('mongoose')
+
+//create instance of Schema
+var mongoSchema = mongoose.Schema;
+
+
+/**
+ * @purpose : store data in database based on this schema
+ * @param {String} firstname
+ * @param {String} lastname
+ * @param {String} email
+ * @param {String} password
+ * @param {timestamps} timestamps
+ */
+var schemaData = new mongoSchema({
+    firstName: {
+        type: String,
+        // required: true,
+    },
+    lastName: {
+        type: String,
+        // required: true
+    },
+    email: {
+        type: String,
+        unique: true,
+        // required: true
+    },
+    password: {
+        type: String,
+        // required: true
+    },
+    verification: {
+        type: Boolean,
+        default: false
+    },
+    isGitVerify: {
+        type: Boolean,
+        default: false
+    },
+    loginName: {
+        type: String,
+    },
+    gitID: {
+        type: String,
+    },
+    access_Token: {
+        type: String,
+    },
+    ProfilePicUrl: {
+        type: String
+    }
+}, {
+        timestamps: true
+    })
+
+
+//connect database using mongoose
+var user = mongoose.model('user', schemaData);
+module.exports = user
