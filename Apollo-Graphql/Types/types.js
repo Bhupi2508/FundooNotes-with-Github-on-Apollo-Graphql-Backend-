@@ -43,7 +43,6 @@ type User {
  }
 `;
 
-module.exports = { typeDefs };
 
-//slkzfoshefojhseofhoes
-//elhfoeh foiih
+//exports typeDefs function
+module.exports = { typeDefs };
