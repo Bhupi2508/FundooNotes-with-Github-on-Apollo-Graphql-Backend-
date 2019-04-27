@@ -1,7 +1,7 @@
 /******************************************************************************
  *  @Execution      : default node          : cmd> types.js
  * 
- *  @Purpose        : Generate a resolver for type users
+ *  @Purpose        : Generate a resolver for typeDefs for users
  * 
  *  @description    : GraphQL query for specific fields on object and result will come exactly 
  *                    the same shape as request.
