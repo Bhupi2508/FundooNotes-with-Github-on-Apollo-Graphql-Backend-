@@ -28,7 +28,7 @@ const server = new ApolloServer({
     resolvers,
     context: ({ req }) => ({
         origin: req.headers.origin,
-        token: req.headers.authorization
+        token: req.query.token
         // code: req.query.code,
         // req: req
     }),
