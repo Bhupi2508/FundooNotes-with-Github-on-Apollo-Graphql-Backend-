@@ -40,11 +40,11 @@ var noteSchema = new mongoSchema({
     },
     title: {
         type: String,
-        required: [true, "title required"]
+        required: true
     },
     description: {
         type: String,
-        required: [true, "description required"]
+        required: true
     },
     reminder: {
         type: String

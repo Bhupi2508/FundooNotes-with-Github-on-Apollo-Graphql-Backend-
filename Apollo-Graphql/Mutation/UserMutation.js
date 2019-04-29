@@ -34,8 +34,8 @@ var userMutation = function () { }
 
 /*******************************************************************************************************************/
 /**
-@description : register a APIs for register a new user using apollo-graphql
-@purpose : For register a new data by using CURD operation
+* @description : register a APIs for register a new user using apollo-graphql
+* @purpose : For register a new data by using CURD operation
 */
 userMutation.prototype.signup = async (root, params, context) => {
 
@@ -114,8 +114,8 @@ userMutation.prototype.signup = async (root, params, context) => {
 
 /*******************************************************************************************************************/
 /**
-@description : emailverification APIs for verify a eamil that is valid or not using apollo-graphql
-@purpose : For regisemailverification by using CURD operation
+* @description : emailverification APIs for verify a eamil that is valid or not using apollo-graphql
+* @purpose : For regisemailverification by using CURD operation
 */
 userMutation.prototype.emailVerify = async (root, params, context) => {
     try {
@@ -272,10 +272,7 @@ userMutation.prototype.forgotPassword = async (root, params, context) => {
  * @param {*} params
  * @param {*} context 
  */
-/**
 
-
-*/
 userMutation.prototype.resetPassword = async (root, params, context) => {
     try {
 

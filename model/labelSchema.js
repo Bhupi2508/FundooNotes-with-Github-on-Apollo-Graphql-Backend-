@@ -32,7 +32,8 @@ var labelSchema = new mongoSchema({
         ref: 'schemaData'
     },
     labelName: {
-        type: String
+        type: String,
+        required: [true, "labelName is required"]
     }
 },
     {

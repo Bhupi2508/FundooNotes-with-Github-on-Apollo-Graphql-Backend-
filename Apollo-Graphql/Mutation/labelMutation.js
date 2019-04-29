@@ -31,7 +31,6 @@ var labelMutation = function () { }
  * @param {*} context
 */
 labelMutation.prototype.createLabel = async (root, params, context) => {
-
     try {
 
         /**

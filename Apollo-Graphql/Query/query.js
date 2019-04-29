@@ -18,6 +18,7 @@
  */
 var userModel = require('../../model/userSchema')
 var labelModel = require('../../model/labelSchema')
+var notesModel = require('../../model/noteSchema')
 
 //create a empty function
 var userQueries = function () { }
@@ -29,40 +30,32 @@ var userQueries = function () { }
  * @param {context}
  */
 //for user Queries
-userQueries.prototype.user = async (parent, args, context) => {
-    var user = (await userModel.find().exec() || await userModel.find({ "_id ": args.userID }).exec())
+userQueries.prototype.user = async (parent, args) => {
+    var user = await userModel.find({ "_id": args.userID }).exec()
     console.log(user[0]);
     return user
 }
 
 //for label quries
-userQueries.prototype.labelUser = {
-    args: {
-        userID: {
-            type: GraphQLString
-        }
-    },
-    async(parent, args, context) {
-        var labelUser = await labelModel.find({ "userID": args.userID })
-        console.log(labelUser[0]);
-        return labelUser
-    }
+userQueries.prototype.labelUser = async (parent, args) => {
+    var label_User = await labelModel.find({ "userID": args.userID }).exec()
+    console.log(label_User[0]);
+    return label_User
 }
 
-//for note queries
-userQueries.prototype.notesUser = {
-    args: {
-        userID: {
-            type: GraphQLString
-        }
-    },
-    async(parent, args, context) {
-        var noteUser = await userModel.find({ "userID": args.userID })
-        console.log(noteUser[0]);
-        return noteUser
-    }
+//for label quries
+userQueries.prototype.notesUser = async (parent, args) => {
+    var notes_User = await notesModel.find({ "userID": args.userID }).exec()
+    console.log(notes_User[0]);
+    return notes_User
 }
 
+//for gitAuth quries
+userQueries.prototype.gitUser = async (parent, args) => {
+    var gitUser = await userModel.find().exec()
+    console.log(gitUser[0]);
+    return gitUser
+}
 
 /**
  * @exports userQueries

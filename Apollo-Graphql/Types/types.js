@@ -29,27 +29,34 @@ type User {
     token : String!
  }
 
- type label {
+ type Label {
      _id : ID!
-     labelname : String!
- }
+     userID: ID!
+     labelName : String!
+     message : String!
+   }
 
- type notes {
-   _id : ID!
-   title : String!
-   description : String!
-   reminder : String!
-   color : String!
-   img : String!
-   archieve : Boolean!
-   trash : Boolean!
-   pin : Boolean!
- }
- 
+   type Notes {
+     _id: ID!
+     title: String!
+     description: String!
+     reminder: String!
+     color: String!
+     img: String!
+     archieve: Boolean!
+     trash: Boolean!
+     pin: Boolean!
+     message: String!
+     loginName: String!,
+     gitID:  String!,
+     access_Token: String!
+   }
+
  type Query {
-    user : [User]
-    userLabel : [label]
-    userNotes : [notes]  
+    user(userID:String): [User]
+    labelUser(userID:String): [Label]
+    notesUser(userID:String): [Notes]
+    gitUser(userID:String): [User]
 
  }
  
@@ -59,11 +66,16 @@ type User {
     login(email: String!, password: String!):User
     forgotPassword(email: String!):User
     resetPassword(newPassword: String!, confirmPassword: String!):User
-    createLabel(labelName: String!):label
-    editLabel(labelID: ID!,editlabelName: String!):label
-    removeLabel:label
- }
-`;
+    createLabel(labelName: String!):Label
+    editLabel(labelID: ID!, editlabelName: String!):Label
+    removeLabel(labelID: String!):Label
+    createNote(title: String!, description: String!, reminder: String, color: String, img: String):Notes
+    editNote(noteID: ID!, editTitle: String!):Notes
+    removeNote(noteID: ID!):Notes
+    saveLabelToNote(noteID: ID!, label_ID: ID!): Notes
+    removeLabelFromNote(noteID: ID!, label_ID: ID!): Notes
+
+ }`;
 
 
 //exports typeDefs function

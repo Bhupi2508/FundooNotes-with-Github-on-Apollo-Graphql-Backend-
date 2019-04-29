@@ -26,6 +26,11 @@ const resetPassword = require('../Mutation/UserMutation').resetPassword   //rese
 const createLabel = require('../Mutation/labelMutation').createLabel   //createLabel mutation
 const editLabel = require('../Mutation/labelMutation').editLabel  //editLabel mutation
 const removeLabel = require('../Mutation/labelMutation').removeLabel   //removeLabel mutation
+const createNote = require('../Mutation/noteMutation').createNote  //createNote mutation
+const editNote = require('../Mutation/noteMutation').editNote  //editNote mutation
+const removeNote = require('../Mutation/noteMutation').removeNote  //removeNote mutation
+const saveLabelToNote = require('../Mutation/noteMutation').saveLabelToNote  //saveLabelToNote mutation
+const removeLabelFromNote = require('../Mutation/noteMutation').removeLabelFromNote  //removeLabelFromNote mutation
 
 //create a empty function
 var userResolver = function () { }
@@ -50,7 +55,12 @@ userResolver.prototype.resolvers = {
         createLabel,
         editLabel,
         removeLabel,
-        
+        createNote,
+        editNote,
+        removeNote,
+        saveLabelToNote,
+        removeLabelFromNote
+
     }
 }
 
