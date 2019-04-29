@@ -27,14 +27,29 @@ type User {
     password : String!
     message : String!
     token : String!
-
  }
+
  type label {
+     _id : ID!
      labelname : String!
  }
+
+ type notes {
+   _id : ID!
+   title : String!
+   description : String!
+   reminder : String!
+   color : String!
+   img : String!
+   archieve : Boolean!
+   trash : Boolean!
+   pin : Boolean!
+ }
+ 
  type Query {
     user : [User]
-    userLabel : [label]  
+    userLabel : [label]
+    userNotes : [notes]  
 
  }
  

@@ -18,7 +18,7 @@
 var redis = require('redis')
 var bcrypt = require('bcrypt')
 const jsonwebtoken = require('jsonwebtoken')
-var userModel = require('../../model/mongoSchema')
+var userModel = require('../../model/userSchema')
 var sendMail = require('../../sendMailer/sendMail')
 var tokenVerify = require('../../Authentication/authenticationUser')
 

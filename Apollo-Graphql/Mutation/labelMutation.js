@@ -124,7 +124,7 @@ labelMutation.prototype.editLabel = async (root, params, context) => {
 
 /*******************************************************************************************************************/
 /**
-* @description : remove APIs for remove label for using graphql
+* @description : remove APIs for remove label for using apollo-graphql
 * @purpose : For fetch data by using CURD operation
 * @exports removeLabel
 * @param {*} root

@@ -17,36 +17,45 @@
  */
 const user = require('../Query/query').user;   //user queries
 const labelUser = require('../Query/query').labelUser;   //labelUser queries
+const notesUser = require('../Query/query').notesUser;   //notesUser queries
 const signUp = require('../Mutation/UserMutation').signup  //signUp mutation
 const emailVerify = require('../Mutation/UserMutation').emailVerify  //emailVerify mutation
 const login = require('../Mutation/UserMutation').login   //login mutation
 const forgotPassword = require('../Mutation/UserMutation').forgotPassword   //forgotPassword mutation
 const resetPassword = require('../Mutation/UserMutation').resetPassword   //resetPassword mutation
+const createLabel = require('../Mutation/labelMutation').createLabel   //createLabel mutation
+const editLabel = require('../Mutation/labelMutation').editLabel  //editLabel mutation
+const removeLabel = require('../Mutation/labelMutation').removeLabel   //removeLabel mutation
 
 //create a empty function
-var userMutation = function () { }
+var userResolver = function () { }
 
 /*******************************************************************************************************************/
 /**
  * @param {Query}
  * @param {Mutation}
  */
-userMutation.prototype.resolvers = {
+userResolver.prototype.resolvers = {
     Query: {
         user,
-        labelUser
+        labelUser,
+        notesUser
     },
     Mutation: {
         signUp,
         emailVerify,
         login,
         forgotPassword,
-        resetPassword
+        resetPassword,
+        createLabel,
+        editLabel,
+        removeLabel,
+        
     }
 }
 
 
 /**
-* @exports userMutation
+* @exports userResolver
 */
-module.exports = new userMutation()
+module.exports = new userResolver()

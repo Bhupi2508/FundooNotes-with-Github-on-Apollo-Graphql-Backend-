@@ -16,7 +16,7 @@
 /**
  * @requires files
  */
-var userModel = require('../../model/mongoSchema')
+var userModel = require('../../model/userSchema')
 var labelModel = require('../../model/labelSchema')
 
 //create a empty function
@@ -28,16 +28,39 @@ var userQueries = function () { }
  * @param {args}
  * @param {context}
  */
+//for user Queries
 userQueries.prototype.user = async (parent, args, context) => {
-    var user = await userModel.find()
+    var user = (await userModel.find().exec() || await userModel.find({ "_id ": args.userID }).exec())
     console.log(user[0]);
     return user
 }
 
-userQueries.prototype.labelUser = async (parent, args, context) => {
-    var labelUser = await labelModel.find()
-    console.log(labelUser[0]);
-    return labelUser
+//for label quries
+userQueries.prototype.labelUser = {
+    args: {
+        userID: {
+            type: GraphQLString
+        }
+    },
+    async(parent, args, context) {
+        var labelUser = await labelModel.find({ "userID": args.userID })
+        console.log(labelUser[0]);
+        return labelUser
+    }
+}
+
+//for note queries
+userQueries.prototype.notesUser = {
+    args: {
+        userID: {
+            type: GraphQLString
+        }
+    },
+    async(parent, args, context) {
+        var noteUser = await userModel.find({ "userID": args.userID })
+        console.log(noteUser[0]);
+        return noteUser
+    }
 }
 
 
