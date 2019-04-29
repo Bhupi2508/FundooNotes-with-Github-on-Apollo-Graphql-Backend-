@@ -30,31 +30,31 @@ var userQueries = function () { }
  * @param {context}
  */
 //for user Queries
-userQueries.prototype.user = async (parent, args) => {
+userQueries.prototype.user = async (root, args) => {
     var user = await userModel.find({ "_id": args.userID }).exec()
     console.log(user[0]);
     return user
 }
 
 //for label quries
-userQueries.prototype.labelUser = async (parent, args) => {
+userQueries.prototype.labelUser = async (root, args) => {
     var label_User = await labelModel.find({ "userID": args.userID }).exec()
     console.log(label_User[0]);
     return label_User
 }
 
 //for label quries
-userQueries.prototype.notesUser = async (parent, args) => {
+userQueries.prototype.notesUser = async (root, args) => {
     var notes_User = await notesModel.find({ "userID": args.userID }).exec()
     console.log(notes_User[0]);
     return notes_User
 }
 
 //for gitAuth quries
-userQueries.prototype.gitUser = async (parent, args) => {
-    var gitUser = await userModel.find().exec()
-    console.log(gitUser[0]);
-    return gitUser
+userQueries.prototype.gitUser = async (root, args) => {
+    var git_User = await userModel.find().exec()
+    console.log(git_User[0]);
+    return git_User
 }
 
 /**

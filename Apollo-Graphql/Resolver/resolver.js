@@ -18,6 +18,7 @@
 const user = require('../Query/query').user;   //user queries
 const labelUser = require('../Query/query').labelUser;   //labelUser queries
 const notesUser = require('../Query/query').notesUser;   //notesUser queries
+const gitUser = require('../Query/query').gitUser;   //gitUser queries
 const signUp = require('../Mutation/UserMutation').signup  //signUp mutation
 const emailVerify = require('../Mutation/UserMutation').emailVerify  //emailVerify mutation
 const login = require('../Mutation/UserMutation').login   //login mutation
@@ -31,6 +32,10 @@ const editNote = require('../Mutation/noteMutation').editNote  //editNote mutati
 const removeNote = require('../Mutation/noteMutation').removeNote  //removeNote mutation
 const saveLabelToNote = require('../Mutation/noteMutation').saveLabelToNote  //saveLabelToNote mutation
 const removeLabelFromNote = require('../Mutation/noteMutation').removeLabelFromNote  //removeLabelFromNote mutation
+const GithubAuth = require('../Mutation/gitAuthMutation').GithubAuth    //GithubAuth mutation
+const codeVerify = require('../Mutation/gitAuthMutation').codeVerify   //codeVerify mutation
+const GitAuthTokenVerify = require('../Mutation/gitAuthMutation').GitAuthTokenVerify   //GitAuthTokenVerify mutation
+const picUpload = require('../Mutation/uploadPicMutation').picUpload   //picUpload mutation
 
 //create a empty function
 var userResolver = function () { }
@@ -44,7 +49,8 @@ userResolver.prototype.resolvers = {
     Query: {
         user,
         labelUser,
-        notesUser
+        notesUser,
+        gitUser
     },
     Mutation: {
         signUp,
@@ -59,7 +65,11 @@ userResolver.prototype.resolvers = {
         editNote,
         removeNote,
         saveLabelToNote,
-        removeLabelFromNote
+        removeLabelFromNote,
+        GithubAuth,
+        codeVerify,
+        GitAuthTokenVerify,
+        picUpload
 
     }
 }

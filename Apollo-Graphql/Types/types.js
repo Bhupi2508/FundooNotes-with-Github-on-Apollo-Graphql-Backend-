@@ -52,11 +52,25 @@ type User {
      access_Token: String!
    }
 
+   type GitHub {
+      _id: ID!
+      loginName: String!
+      gitID: String!
+      access_Token: String!
+      message: String!
+   }
+
+   type UploadPic {
+      uploadURL: String!
+      Key: String!
+   }
+
  type Query {
     user(userID:String): [User]
     labelUser(userID:String): [Label]
     notesUser(userID:String): [Notes]
-    gitUser(userID:String): [User]
+    gitUser: [GitHub]
+    PicUser: [UploadPic]
 
  }
  
@@ -74,6 +88,10 @@ type User {
     removeNote(noteID: ID!):Notes
     saveLabelToNote(noteID: ID!, label_ID: ID!): Notes
     removeLabelFromNote(noteID: ID!, label_ID: ID!): Notes
+    GithubAuth(email: String!): GitHub
+    codeVerify: GitHub
+    GitAuthTokenVerify: GitHub
+    picUpload: UploadPic
 
  }`;
 
