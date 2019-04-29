@@ -37,7 +37,7 @@ var userMutation = function () { }
 @description : register a APIs for register a new user using apollo-graphql
 @purpose : For register a new data by using CURD operation
 */
-userMutation.prototype.signup = async(root,params,context) => {
+userMutation.prototype.signup = async (root, params, context) => {
 
     try {
 
@@ -102,8 +102,6 @@ userMutation.prototype.signup = async(root,params,context) => {
              */
             var url = `${context.origin}?token=${token}`
 
-            console.log(context.origin);
-            
             sendMail.sendEmailFunction(url, params.email)
             return { "message": "Register successfull" }
         }
@@ -119,9 +117,9 @@ userMutation.prototype.signup = async(root,params,context) => {
 @description : emailverification APIs for verify a eamil that is valid or not using apollo-graphql
 @purpose : For regisemailverification by using CURD operation
 */
-userMutation.prototype.emailVerify = async(root,params,context) => {
+userMutation.prototype.emailVerify = async (root, params, context) => {
     try {
-  
+
         /**
          * @param {token}, send token for verify
          * @returns {String} message, token verification
@@ -149,6 +147,176 @@ userMutation.prototype.emailVerify = async(root,params,context) => {
         return { "message": err }
     }
 }
+
+/*******************************************************************************************************************/
+/**
+ * @description : Login APIs for login user using apollo-graphql
+ * @purpose : For login new user by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ */
+userMutation.prototype.login = async (root, params, context) => {
+
+    try {
+        var emailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+        /**
+         * @return {String} message
+         */
+        if (!emailformat.test(params.email)) {
+            return { "message": "not valid email" }
+        }
+
+        //find email that is present in database or not
+        user = await userModel.find({ "email": params.email })
+        if (!user.length > 0) {
+            return { "message": "email is not present" }
+        }
+        if (user[0].verification === false) {
+            return { "message": "Email not verified" }
+        }
+
+        /**
+         * @param {token}, generate a token with expire time and provide a secret key
+         */
+        var token = jsonwebtoken.sign({ email: params.email, userID: user[0].id }, process.env.secretKey, { expiresIn: 86400000 })
+
+        //take id for current user from database
+        var id = user[0].id
+
+        //compare password that is present in database or not
+        const valid = await bcrypt.compare(params.password, user[0].password)
+
+        if (!valid) {
+            return { "message": "unauthonticate password" }
+        }
+
+        /**
+         * @return {token}
+         * @return {number} id
+         * @return {String} message
+         */
+        return {
+            "token": token,
+            "id": id,
+            "message": "!Login....Successfully"
+        }
+
+    } catch (err) {
+        console.log("!Error")
+        return { "message": err }
+    }
+}
+
+/*******************************************************************************************************************/
+/**
+ * @description : forgotPassword APIs for updatePassword user using apollo-graphql
+ * @purpose : For deletion by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ */
+
+userMutation.prototype.forgotPassword = async (root, params, context) => {
+
+    try {
+        var emailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+        /**
+         * @purpose : check that email is valid or not
+         * @return {String} message
+         */
+        if (!emailformat.test(params.email)) {
+            return { "message": "not valid email" }
+        }
+
+        /**
+         * @purpose : find email that is present in database or not
+         * @return {String} message
+         */
+        user = await userModel.find({ "email": params.email })
+        if (!user.length > 0) {
+            return { "message": "email is not present in database" }
+        }
+
+        /**
+         * @purpose : generate a token for send a mail
+         */
+        var token = jsonwebtoken.sign({ email: params.email }, process.env.secretKey, { expiresIn: 86400000 });
+
+        //send token to sendmail function, which is send to the link(token)
+        var url = `${context.origin}?token=${token}`
+        //var url = `${context.origin}/graphql?token=${token}`
+
+        /**
+         * @param {token}, for sending mail to the mail
+         * @returns {String} message
+         */
+        var mail = sendMail.sendEmailFunction(url, params.email)
+        if (!mail > 0) {
+            return { "mesage": "!Error, mail not send " }
+        }
+        return { "message": "Mail sent to your given email id" }
+
+    } catch (err) {
+        console.log("!Error")
+        return { "message": err }
+    }
+}
+
+
+/*******************************************************************************************************************/
+/**
+ * @description : resetPassword APIs for resetPassword user using apollo-graphql
+ * @purpose : For resetPassword by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} context 
+ */
+/**
+
+
+*/
+userMutation.prototype.resetPassword = async (root, params, context) => {
+    try {
+
+        /**
+         * @purpose : for token verification
+         * @returns {String} message
+         */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        //password matching
+        if (params.newPassword != params.confirmPassword) {
+            return { "message": "password and confirm password are not match" }
+        }
+
+        //bcrypt new password
+        params.newPassword = await bcrypt.hashSync(params.newPassword, saltRounds)
+
+        /**
+         * @purpose : for updated password
+         * @param {String}, message
+         * @param {$set}, new passowrd in database
+         * @returns {String} message
+         */
+        var update = await userModel.updateOne({ "email": afterVerify.email },
+            { $set: { password: params.newPassword } },
+            { new: true })
+
+        if (!update) {
+            return { "message": "Password not reset" }
+        }
+        return { "message": "resetPassword Successfully" }
+
+    } catch (err) {
+        console.log("!Error")
+        return { "message": err }
+    }
+}
+
 
 /**
  * @exports userMutation

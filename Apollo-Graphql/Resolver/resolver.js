@@ -15,9 +15,13 @@
 /**
  * @requires files
  */
-const signUp = require('../Mutation/UserMutation').signup
-const user = require('../Query/query').user;
-const emailVerify = require('../Mutation/UserMutation').emailVerify
+const user = require('../Query/query').user;   //user queries
+const labelUser = require('../Query/query').labelUser;   //labelUser queries
+const signUp = require('../Mutation/UserMutation').signup  //signUp mutation
+const emailVerify = require('../Mutation/UserMutation').emailVerify  //emailVerify mutation
+const login = require('../Mutation/UserMutation').login   //login mutation
+const forgotPassword = require('../Mutation/UserMutation').forgotPassword   //forgotPassword mutation
+const resetPassword = require('../Mutation/UserMutation').resetPassword   //resetPassword mutation
 
 //create a empty function
 var userMutation = function () { }
@@ -29,11 +33,15 @@ var userMutation = function () { }
  */
 userMutation.prototype.resolvers = {
     Query: {
-        user
+        user,
+        labelUser
     },
     Mutation: {
         signUp,
-        emailVerify
+        emailVerify,
+        login,
+        forgotPassword,
+        resetPassword
     }
 }
 

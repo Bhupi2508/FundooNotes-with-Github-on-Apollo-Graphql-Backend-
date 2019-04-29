@@ -33,13 +33,20 @@ type User {
      labelname : String!
  }
  type Query {
-    user :[User]  
+    user : [User]
+    userLabel : [label]  
 
  }
  
  type Mutation{
     signUp(firstName: String!,lastName: String!,email: String!, password: String!):User
     emailVerify:User
+    login(email: String!, password: String!):User
+    forgotPassword(email: String!):User
+    resetPassword(newPassword: String!, confirmPassword: String!):User
+    createLabel(labelName: String!):label
+    editLabel(labelID: ID!,editlabelName: String!):label
+    removeLabel:label
  }
 `;
 

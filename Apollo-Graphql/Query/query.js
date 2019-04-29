@@ -17,6 +17,7 @@
  * @requires files
  */
 var userModel = require('../../model/mongoSchema')
+var labelModel = require('../../model/labelSchema')
 
 //create a empty function
 var userQueries = function () { }
@@ -31,6 +32,12 @@ userQueries.prototype.user = async (parent, args, context) => {
     var user = await userModel.find()
     console.log(user[0]);
     return user
+}
+
+userQueries.prototype.labelUser = async (parent, args, context) => {
+    var labelUser = await labelModel.find()
+    console.log(labelUser[0]);
+    return labelUser
 }
 
 
