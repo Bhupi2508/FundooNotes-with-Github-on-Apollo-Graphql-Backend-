@@ -16,15 +16,15 @@
  * @requires files
  */
 const { ApolloServer, gql } = require('apollo-server');
+require('dotenv').config();
 const { typeDefs } = require('./Apollo-Graphql/Types/types');
 const resolvers = require('./Apollo-Graphql/Resolver/resolver').resolvers
 const mongoose = require('./Mongoconfig/mongoose')
 const db = mongoose()
-require('dotenv').config();
 
 
 //create a middleware using apollo-graphql
-const server = new ApolloServer({
+var server = new ApolloServer({
     typeDefs,
     resolvers,
     context: ({ req }) => ({
@@ -35,6 +35,9 @@ const server = new ApolloServer({
     })
 });
 
+//create a emptry function
+
+
 //listen the given port
 var userPort = (process.env.port)
 server.listen(userPort, () => {
@@ -42,5 +45,6 @@ server.listen(userPort, () => {
     console.log('##############          STARTING SERVER at port : ', userPort, '               ##############');
     console.log('#####################################################################################');
 });
+
 
 module.exports = server

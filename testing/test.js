@@ -35,11 +35,11 @@ describe('GraphQL API', () => {
     * @returns {error} error
     */
     it('register API', done => {
-        request(server)
+        request('http://localhost:4000')
             .post('/graphql')
 
             //write your data for checking by giving mutation
-            .send({ query: 'mutation { signUp (firstName:"akash" lastName:"sharma" email:"akash@gmail.com" password:"akasfdrgh1") {message}}' })
+            .send({ query: 'mutation { signUp (firstName:"akash" lastName:"sharma" email:"akaeddsh@gmail.com" password:"akasfdrgh1") {message}}' })
             .expect(200)
             .end((err, res) => {
 
@@ -64,7 +64,7 @@ describe('GraphQL API', () => {
     * @returns {error} error
     */
     it('login APIs', done => {
-        request(server)
+        request('http://localhost:4000')
             .post('/graphql ')
 
             //write your data for checking by giving mutation
@@ -94,7 +94,7 @@ describe('GraphQL API', () => {
     * @returns {error} error
     */
     it('forgotPassword APIs', done => {
-        request(server)
+        request('http://localhost:4000')
             .post('/graphql ')
 
             //write your data for checking by giving mutation
@@ -124,11 +124,11 @@ describe('GraphQL API', () => {
     * @returns {error} error
     */
     it('resetPassword APIs', done => {
-        request(server)
+        request('http://localhost:4000')
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .send({ query: 'mutation{ resetPassword (newPassword:"1234567" confirmPassword:"1234567"){message}}' })
+            .send({ query: 'mutation{ resetPassword (newPassword:"123456789" confirmPassword:"123456789"){message}}' })
             .expect(200)
             .end((err, res) => {
 
@@ -139,7 +139,7 @@ describe('GraphQL API', () => {
                 }
 
                 //otherwise return success
-                expect(JSON.parse(res.text).data.resetPassword.message).to.deep.equal("token is not verify")
+                expect(JSON.parse(res.text).data.resetPassword.message).to.deep.equal("resetPassword Successfully")
                 done();
 
             });
@@ -156,11 +156,11 @@ describe('GraphQL API', () => {
     */
 
     it('addLabel APIs', done => {
-        request(server)
+        request('http://localhost:4000')
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .send({ query: 'mutation {createLabel(labelName:"abcd"){message}}' })
+            .send({ query: 'mutation {createLabel(labelName:"abcdefg"){message}}' })
             .expect(200)
             .end((err, res) => {
 
@@ -171,7 +171,7 @@ describe('GraphQL API', () => {
                 }
 
                 //otherwise return success
-                expect(JSON.parse(res.text).data.createLabel.message).to.deep.equal("token is not verify")
+                expect(JSON.parse(res.text).data.createLabel.message).to.deep.equal("Label created")
                 done();
 
             });
@@ -189,11 +189,11 @@ describe('GraphQL API', () => {
     */
 
     it('editLabel APIs', done => {
-        request(server)
+        request('http://localhost:4000')
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .send({ query: 'mutation {editLabel(editlabelName:"AWS"){message}}' })
+            .send({ query: 'mutation {editLabel(labelID:"5cc6c5a32403fb4f1cac8d58" editlabelName:"AWS"){message}}' })
             .expect(200)
             .end((err, res) => {
 
@@ -222,7 +222,7 @@ describe('GraphQL API', () => {
     */
 
     it('removeLabel APIs', done => {
-        request(server)
+        request('http://localhost:4000')
             .post('/graphql ')
 
             //write your data for checking by giving mutation
@@ -237,7 +237,7 @@ describe('GraphQL API', () => {
                 }
 
                 //otherwise return success
-                expect(JSON.parse(res.text).data.removeLabel.message).to.deep.equal("token is not verify")
+                expect(JSON.parse(res.text).data.removeLabel.message).to.deep.equal("label is already removed")
                 done();
 
             });
@@ -255,11 +255,11 @@ describe('GraphQL API', () => {
     */
 
     it('addNote APIs', done => {
-        request(server)
+        request('http://localhost:4000')
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .send({ query: 'mutation {createNote(title:"Java", description:"programming language"){message}}' })
+            .send({ query: 'mutation {createNote(title:"Javaaa", description:"programming languageaa"){message}}' })
             .expect(200)
             .end((err, res) => {
 
@@ -270,7 +270,7 @@ describe('GraphQL API', () => {
                 }
 
                 //otherwise return success
-                expect(JSON.parse(res.text).data.createNote.message).to.deep.equal("token is not verify")
+                expect(JSON.parse(res.text).data.createNote.message).to.deep.equal("note created")
                 done();
 
             });
@@ -288,7 +288,7 @@ describe('GraphQL API', () => {
     */
 
     it('editNote APIs', done => {
-        request(server)
+        request('http://localhost:4000')
             .post('/graphql ')
 
             //write your data for checking by giving mutation
@@ -303,7 +303,7 @@ describe('GraphQL API', () => {
                 }
 
                 //otherwise return success
-                expect(JSON.parse(res.text).data.editNote.message).to.deep.equal("note updated")
+                expect(JSON.parse(res.text).data.editNote.message).to.deep.equal("note is not updated")
                 done();
 
             });
@@ -321,7 +321,7 @@ describe('GraphQL API', () => {
     */
 
     it('removeNote APIs', done => {
-        request(server)
+        request('http://localhost:4000')
             .post('/graphql ')
 
             //write your data for checking by giving mutation
@@ -336,7 +336,7 @@ describe('GraphQL API', () => {
                 }
 
                 //otherwise return success 
-                expect(JSON.parse(res.text).data.removeNote.message).to.deep.equal("note removed")
+                expect(JSON.parse(res.text).data.removeNote.message).to.deep.equal("note is not present")
                 done();
 
             });
@@ -353,11 +353,11 @@ describe('GraphQL API', () => {
     */
 
     it('saveLabelToNote APIs', done => {
-        request(server)
+        request('http://localhost:4000')
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .send({ query: 'mutation {saveLabelToNote(noteID:"5cc004ca713f9c1141a20ac4 labelID:"5cc01661299f2121952ca652){message}}' })
+            .send({ query: 'mutation {saveLabelToNote(noteID:"5cc83713d3daa33afdc12605" labelID:"5cc6c5a32403fb4f1cac8d58"){message}}' })
             .expect(200)
             .end((err, res) => {
 
@@ -385,11 +385,11 @@ describe('GraphQL API', () => {
     */
 
     it('removeLabelFromNote APIs', done => {
-        request(server)
+        request('http://localhost:4000')
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .send({ query: 'mutation {removeLabelFromNote(noteID:"5cc004ca713f9c1141a20ac4 labelID:"5cc01661299f2121952ca652){message}}' })
+            .send({ query: 'mutation {removeLabelFromNote(noteID:"5cc004ca713f9c1141a20ac4" labelID:"5cc01661299f2121952ca652"){message}}' })
             .expect(200)
             .end((err, res) => {
 
@@ -400,7 +400,7 @@ describe('GraphQL API', () => {
                 }
 
                 //otherwise return success 
-                expect(JSON.parse(res.text).data.removeLabelFromNote.message).to.deep.equal("label delete from note successfully ")
+                expect(JSON.parse(res.text).data.removeLabelFromNote.message).to.deep.equal("This label is not present in notes")
                 done();
 
             });
@@ -417,7 +417,7 @@ describe('GraphQL API', () => {
     */
 
     it('social Git OAuth 2.0 APIs', done => {
-        request(server)
+        request('http://localhost:4000')
             .post('/graphql ')
 
             //write your data for checking by giving mutation
@@ -432,7 +432,7 @@ describe('GraphQL API', () => {
                 }
 
                 //otherwise return success 
-                expect(JSON.parse(res.text).data.GithubAuth.message).to.deep.equal("Mail sent to your given email id")
+                expect(JSON.parse(res.text).data.GithubAuth.message).to.deep.equal("Mail sent to your mail ID")
                 done();
 
             });
@@ -449,7 +449,7 @@ describe('GraphQL API', () => {
     */
 
     it('codeVerify APIs', done => {
-        request(server)
+        request('http://localhost:4000')
             .post('/graphql ')
 
             //write your data for checking by giving mutation
@@ -464,7 +464,7 @@ describe('GraphQL API', () => {
                 }
 
                 //otherwise return success 
-                expect(JSON.parse(res.text).data.codeVerify.message).to.deep.equal("null")
+                expect(JSON.parse(res.text).data.codeVerify.message).to.deep.equal("Data save successfully")
                 done();
 
             });
@@ -482,7 +482,7 @@ describe('GraphQL API', () => {
     */
 
     it('git Auth Token Verify for login APIs', done => {
-        request(server)
+        request('http://localhost:4000')
             .post('/graphql ')
 
             //write your data for checking by giving mutation
@@ -497,7 +497,7 @@ describe('GraphQL API', () => {
                 }
 
                 //otherwise return success 
-                expect(JSON.parse(res.text).data.GitAuthTokenVerify.message).to.deep.equal("verification successfull")
+                expect(JSON.parse(res.text).data.GitAuthTokenVerify.message).to.deep.equal("login & verification successfull")
                 done();
 
             });
