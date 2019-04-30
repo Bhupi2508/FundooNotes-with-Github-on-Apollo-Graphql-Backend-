@@ -31,7 +31,7 @@ var userQueries = function () { }
  */
 //for user Queries
 userQueries.prototype.user = async (root, args) => {
-    var user = await userModel.find({ "_id": args.userID }).exec()
+    var user = await userModel.find().exec()
     console.log(user[0]);
     return user
 }

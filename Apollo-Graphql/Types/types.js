@@ -27,6 +27,8 @@ type User {
     password : String!
     message : String!
     token : String!
+    labels : [Label]
+
  }
 
  type Label {
