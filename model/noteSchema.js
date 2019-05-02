@@ -40,20 +40,14 @@ var noteSchema = new mongoSchema({
     },
     title: {
         type: String,
-        required: true
+        required: [true, "title is required"]
     },
     description: {
         type: String,
-        required: true
+        //required: true
     },
     reminder: {
         type: Date
-    },
-    color: {
-        type: String
-    },
-    img: {
-        type: String
     },
     archieve: {
         type: Boolean,

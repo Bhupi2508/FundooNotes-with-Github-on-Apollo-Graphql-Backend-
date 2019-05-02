@@ -36,6 +36,7 @@ const saveLabelToNote = require('../Mutation/noteMutation').saveLabelToNote  //s
 const removeLabelFromNote = require('../Mutation/noteMutation').removeLabelFromNote  //removeLabelFromNote mutation
 const GithubAuth = require('../Mutation/gitAuthMutation').GithubAuth    //GithubAuth mutation
 const codeVerify = require('../Mutation/gitAuthMutation').codeVerify   //codeVerify mutation
+const pullGitRepository = require('../Mutation/gitAuthMutation').pullGitRepository    //pullGitRepository mutation
 const GitAuthTokenVerify = require('../Mutation/gitAuthMutation').GitAuthTokenVerify   //GitAuthTokenVerify mutation
 const picUpload = require('../Mutation/uploadPicMutation').picUpload   //picUpload mutation
 
@@ -70,6 +71,7 @@ userResolver.prototype.resolvers = {
         removeLabelFromNote,
         GithubAuth,
         codeVerify,
+        pullGitRepository,
         GitAuthTokenVerify,
         picUpload
 
@@ -78,9 +80,7 @@ userResolver.prototype.resolvers = {
         async labels(root, params, context) {
             var labels = await labelModel.find({ userID: root._id })
             return labels
-        }
-    },
-    User: {
+        },
         async notes(root, params, context) {
             var notes = await noteModel.find({ userID: root._id })
             return notes

@@ -92,6 +92,7 @@ type User {
     removeLabelFromNote(noteID: ID!, label_ID: ID!): Notes
     GithubAuth(email: String!): GitHub
     codeVerify(firstName: String, lastName: String, email: String): GitHub
+    pullGitRepository: GitHub
     GitAuthTokenVerify: GitHub
     picUpload: UploadPic
 

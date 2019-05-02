@@ -105,15 +105,8 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
                 console.log("\nRepository details", response.data.repos_url);
 
 
-                //take data in a function and use ahead
-                getRepo(response.data.repos_url)
-
-
                 //save those data in user database
                 var gituser = new model({
-                    firstName: params.firstName,
-                    lastName: params.lastName,
-                    email: params.email,
                     loginName: response.data.login,
                     gitID: response.data.id,
                     access_Token: access_token
@@ -123,6 +116,8 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
                 //save data into database
                 var saveuser = await gituser.save();
                 console.log("\nData : ", saveuser)
+
+
 
                 //token created for gitAuth login verification and send to git mail
                 var token = await jwt.sign({ "userID": saveuser.id, "id": response.data.id, "login": response.data.login }, process.env.secretKey, { expiresIn: 86400000 })
@@ -141,38 +136,36 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
                 console.log(error)
             })
     }
-    function getRepo(repo) {
-        axios({
-            method: 'get',
-            url: repo,
-            headers: {
-                accept: 'application/json'
-            }
-        }).then((res) => {
-            for (var i = 0; i < res.data.length; i++) {
-                console.log("\n", i, ". Repository Names : ", res.data[i].name)
-                console.log(i, ". Repository Description : ", res.data[i].description)
-            }
 
-            // //save those data in user database
-            // var model = new noteModel({
-            //     title: params.res.data[0].name,
-            //     description: params.res.data[0].description,
-            //     reminder: params.reminder,
-            //     color: params.color,
-            //     img: params.img,
-            //     //userID: payload.userID
-            // });
 
-            // //save data in database
-            // const note = model.save()
 
-            // if (!note) {
-            //     return { "message": "note is not created" }
-            // }
-        })
-        return { "message": "Data save successfully" }
-    }
+    // //create a function
+    // function getRepo(repo, saveUser) {
+    //     axios({
+    //         method: 'get',
+    //         url: repo,
+    //         headers: {
+    //             accept: 'application/json'
+    //         }
+    //     }).then((res) => {
+    //         for (var i = 0; i < res.data.length; i++) {
+    //             console.log("\n", i, ". Repository Names : ", res.data[i].name)
+    //             console.log(i, ". Repository Description : ", res.data[i].description)
+
+    //             //save those data in user database
+    //             var model = new noteModel({
+    //                 title: res.data[i].name,
+    //                 description: res.data[i].description,
+    //                 userID: saveUser._id
+    //             });
+
+    //             //save data in database
+    //             const note = model.save()
+
+    //         }
+    //     })
+    // }
+    return { "message": "Data save successfully" }
 }
 
 
@@ -205,6 +198,8 @@ gitAuthMutation.prototype.GitAuthTokenVerify = async (root, params, context) => 
 
             //find data from model that is present or not
             var login = await model.find({ "gitID": afterVerify.id, "loginName": afterVerify.login })
+            console.log(afterVerify.id);
+
             if (!login) {
                 return { "message": "Login unsucessful" }
             }
@@ -218,6 +213,68 @@ gitAuthMutation.prototype.GitAuthTokenVerify = async (root, params, context) => 
 
 }
 
+/*******************************************************************************************************************/
+/**
+@description : pullGitRepository APIs for fetching repository Details using apollo-graphql
+@purpose : For gitAuth verification by using CURD operation
+*/
+gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+        // Access_token
+        var access_token = user[0].access_Token;
+
+
+
+        //get response from given url
+        axios({
+            method: 'get',
+            url: `https://api.github.com/user/repos?access_token=${access_token}`,
+            headers: {
+                accept: 'application/json'
+            }
+        }).then((res) => {
+
+            for (var i = 0; i < res.data.length; i++) {
+                console.log("\n", i, ". Repository Names : ", res.data[i].name)
+                console.log(i, ". Repository Description : ", res.data[i].description)
+
+                //save those data in user database
+                var model = new noteModel({
+                    title: res.data[i].name,
+                    description: res.data[i].description,
+                    userID: afterVerify.userID
+                });
+
+                //save data in database
+                const note = model.save()
+
+            }
+        })
+
+        return { "message": "note added successfully" }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": err }
+    }
+}
 
 
 /**
