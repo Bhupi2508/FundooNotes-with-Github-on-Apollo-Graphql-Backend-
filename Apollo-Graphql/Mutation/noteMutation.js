@@ -112,7 +112,8 @@ noteMutation.prototype.editNote = async (root, params) => {
         var note = await noteModel.findOneAndUpdate({ _id: params.noteID },
             {
                 $set: {
-                    title: params.editTitle
+                    title: params.editTitle,
+                    description: params.editDescription
                 }
             })
 

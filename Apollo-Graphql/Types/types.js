@@ -28,7 +28,7 @@ type User {
     message : String!
     token : String!
     labels : [Label]
-
+    notes : [Notes]
  }
 
  type Label {
@@ -86,12 +86,12 @@ type User {
     editLabel(labelID: ID!, editlabelName: String!):Label
     removeLabel(labelID: String!):Label
     createNote(title: String!, description: String!, reminder: String, color: String, img: String):Notes
-    editNote(noteID: ID!, editTitle: String!):Notes
+    editNote(noteID: ID!, editTitle: String, editDescription: String):Notes
     removeNote(noteID: ID!):Notes
     saveLabelToNote(noteID: ID!, label_ID: ID!): Notes
     removeLabelFromNote(noteID: ID!, label_ID: ID!): Notes
     GithubAuth(email: String!): GitHub
-    codeVerify: GitHub
+    codeVerify(firstName: String, lastName: String, email: String): GitHub
     GitAuthTokenVerify: GitHub
     picUpload: UploadPic
 

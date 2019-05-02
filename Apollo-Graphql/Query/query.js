@@ -32,20 +32,20 @@ var userQueries = function () { }
 //for user Queries
 userQueries.prototype.user = async (root, args) => {
     var user = await userModel.find().exec()
-    console.log(user[0]);
+    console.log(user);
     return user
 }
 
 //for label quries
 userQueries.prototype.labelUser = async (root, args) => {
-    var label_User = await labelModel.find({ "userID": args.userID }).exec()
-    console.log(label_User[0]);
+    var label_User = await labelModel.find().exec()
+    console.log(label_User);
     return label_User
 }
 
 //for label quries
 userQueries.prototype.notesUser = async (root, args) => {
-    var notes_User = await notesModel.find({ "userID": args.userID }).exec()
+    var notes_User = await notesModel.find().exec()
     console.log(notes_User[0]);
     return notes_User
 }

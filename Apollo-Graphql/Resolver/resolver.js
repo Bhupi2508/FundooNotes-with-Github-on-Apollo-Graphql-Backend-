@@ -15,6 +15,8 @@
 /**
  * @requires files
  */
+const labelModel = require('../../model/labelSchema')
+const noteModel = require('../../model/noteSchema')
 const user = require('../Query/query').user;   //user queries
 const labelUser = require('../Query/query').labelUser;   //labelUser queries
 const notesUser = require('../Query/query').notesUser;   //notesUser queries
@@ -71,7 +73,20 @@ userResolver.prototype.resolvers = {
         GitAuthTokenVerify,
         picUpload
 
+    },
+    User: {
+        async labels(root, params, context) {
+            var labels = await labelModel.find({ userID: root._id })
+            return labels
+        }
+    },
+    User: {
+        async notes(root, params, context) {
+            var notes = await noteModel.find({ userID: root._id })
+            return notes
+        }
     }
+
 }
 
 

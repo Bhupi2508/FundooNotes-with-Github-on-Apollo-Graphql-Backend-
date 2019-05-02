@@ -17,6 +17,7 @@
  */
 var sendMail = require('../../sendMailer/sendMail')
 var model = require('../../model/userSchema')
+var noteModel = require('../../model/noteSchema')
 var axios = require('axios')
 var jwt = require('jsonwebtoken')
 var tokenVerify = require('../../Authentication/authenticationUser')
@@ -104,11 +105,15 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
                 console.log("\nRepository details", response.data.repos_url);
 
 
+                //take data in a function and use ahead
                 getRepo(response.data.repos_url)
 
 
                 //save those data in user database
                 var gituser = new model({
+                    firstName: params.firstName,
+                    lastName: params.lastName,
+                    email: params.email,
                     loginName: response.data.login,
                     gitID: response.data.id,
                     access_Token: access_token
@@ -145,11 +150,29 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
             }
         }).then((res) => {
             for (var i = 0; i < res.data.length; i++) {
-                console.log("\n",i, ". Repository Names : ", res.data[i].name)
+                console.log("\n", i, ". Repository Names : ", res.data[i].name)
+                console.log(i, ". Repository Description : ", res.data[i].description)
             }
+
+            // //save those data in user database
+            // var model = new noteModel({
+            //     title: params.res.data[0].name,
+            //     description: params.res.data[0].description,
+            //     reminder: params.reminder,
+            //     color: params.color,
+            //     img: params.img,
+            //     //userID: payload.userID
+            // });
+
+            // //save data in database
+            // const note = model.save()
+
+            // if (!note) {
+            //     return { "message": "note is not created" }
+            // }
         })
+        return { "message": "Data save successfully" }
     }
-    return { "message": "Data save successfully" }
 }
 
 
@@ -169,8 +192,6 @@ gitAuthMutation.prototype.GitAuthTokenVerify = async (root, params, context) => 
         if (!afterVerify > 0) {
             return { "message": "token is not verify" }
         }
-
-        console.log("id", afterVerify.id);
 
         /**
          * @param {String} email
