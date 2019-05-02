@@ -137,34 +137,6 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
             })
     }
 
-
-
-    // //create a function
-    // function getRepo(repo, saveUser) {
-    //     axios({
-    //         method: 'get',
-    //         url: repo,
-    //         headers: {
-    //             accept: 'application/json'
-    //         }
-    //     }).then((res) => {
-    //         for (var i = 0; i < res.data.length; i++) {
-    //             console.log("\n", i, ". Repository Names : ", res.data[i].name)
-    //             console.log(i, ". Repository Description : ", res.data[i].description)
-
-    //             //save those data in user database
-    //             var model = new noteModel({
-    //                 title: res.data[i].name,
-    //                 description: res.data[i].description,
-    //                 userID: saveUser._id
-    //             });
-
-    //             //save data in database
-    //             const note = model.save()
-
-    //         }
-    //     })
-    // }
     return { "message": "Data save successfully" }
 }
 
@@ -255,16 +227,20 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
                 console.log("\n", i, ". Repository Names : ", res.data[i].name)
                 console.log(i, ". Repository Description : ", res.data[i].description)
 
-                //save those data in user database
-                var model = new noteModel({
-                    title: res.data[i].name,
-                    description: res.data[i].description,
-                    userID: afterVerify.userID
-                });
+                for (var j = 0; j < res.data.length; j++) {
+                    var findRepo = noteModel.find({ "title": res.data[j].name })
 
+                    //save those data in user database
+                    var model = new noteModel({
+                        title: res.data[i].name,
+                        description: res.data[i].description,
+                        userID: afterVerify.userID
+                    });
+
+                    continue
+                }
                 //save data in database
                 const note = model.save()
-
             }
         })
 
