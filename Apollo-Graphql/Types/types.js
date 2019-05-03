@@ -88,6 +88,8 @@ type User {
     createNote(title: String!, description: String!, reminder: String, color: String, img: String):Notes
     editNote(noteID: ID!, editTitle: String, editDescription: String):Notes
     removeNote(noteID: ID!):Notes
+    Archieve(noteID: ID!):Notes
+    Trash(noteID: ID!):Notes
     saveLabelToNote(noteID: ID!, label_ID: ID!): Notes
     removeLabelFromNote(noteID: ID!, label_ID: ID!): Notes
     GithubAuth(email: String!): GitHub

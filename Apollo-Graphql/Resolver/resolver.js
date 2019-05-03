@@ -32,6 +32,8 @@ const removeLabel = require('../Mutation/labelMutation').removeLabel   //removeL
 const createNote = require('../Mutation/noteMutation').createNote  //createNote mutation
 const editNote = require('../Mutation/noteMutation').editNote  //editNote mutation
 const removeNote = require('../Mutation/noteMutation').removeNote  //removeNote mutation
+const Archieve = require('../Mutation/noteMutation').Archieve   //Archieve mutation
+const Trash = require('../Mutation/noteMutation').Trash   //Trash mutation
 const saveLabelToNote = require('../Mutation/noteMutation').saveLabelToNote  //saveLabelToNote mutation
 const removeLabelFromNote = require('../Mutation/noteMutation').removeLabelFromNote  //removeLabelFromNote mutation
 const GithubAuth = require('../Mutation/gitAuthMutation').GithubAuth    //GithubAuth mutation
@@ -67,6 +69,8 @@ userResolver.prototype.resolvers = {
         createNote,
         editNote,
         removeNote,
+        Archieve,
+        Trash,
         saveLabelToNote,
         removeLabelFromNote,
         GithubAuth,

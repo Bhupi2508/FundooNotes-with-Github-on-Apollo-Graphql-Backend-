@@ -213,7 +213,6 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
         var access_token = user[0].access_Token;
 
 
-
         //get response from given url
         axios({
             method: 'get',
@@ -223,24 +222,33 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
             }
         }).then((res) => {
 
+            console.log("afterVerify", afterVerify);
+
+
+            //find title from database
+            var findRepo = noteModel.find({ _id: afterVerify.userID })
+            console.log("findrepo", findRepo);
+            console.log("findrepo.title", findRepo[0].title);
+
+
             for (var i = 0; i < res.data.length; i++) {
                 console.log("\n", i, ". Repository Names : ", res.data[i].name)
                 console.log(i, ". Repository Description : ", res.data[i].description)
 
                 for (var j = 0; j < res.data.length; j++) {
-                    var findRepo = noteModel.find({ "title": res.data[j].name })
+                    if (findRepo[i].title != res.data[j].name) {
 
-                    //save those data in user database
-                    var model = new noteModel({
-                        title: res.data[i].name,
-                        description: res.data[i].description,
-                        userID: afterVerify.userID
-                    });
+                        //save those data in user database
+                        var model = new noteModel({
+                            title: res.data[i].name,
+                            description: res.data[i].description,
+                            userID: afterVerify.userID
+                        });
 
-                    continue
+                        //save data in database
+                        const note = model.save()
+                    }
                 }
-                //save data in database
-                const note = model.save()
             }
         })
 
