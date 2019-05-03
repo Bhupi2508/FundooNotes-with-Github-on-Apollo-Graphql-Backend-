@@ -35,8 +35,6 @@ var server = new ApolloServer({
     })
 });
 
-//create a emptry function
-
 
 //listen the given port
 var userPort = (process.env.port)

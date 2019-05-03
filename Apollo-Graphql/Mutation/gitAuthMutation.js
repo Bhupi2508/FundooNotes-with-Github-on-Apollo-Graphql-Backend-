@@ -220,39 +220,32 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
             headers: {
                 accept: 'application/json'
             }
-        }).then((res) => {
-
-            console.log("afterVerify", afterVerify);
+        }).then(async (res) => {
 
 
-            //find title from database
-            var findRepo = noteModel.find({ _id: afterVerify.userID })
-            console.log("findrepo", findRepo);
-            console.log("findrepo.title", findRepo[0].title);
-
-
+            //for loop for save the repository in database
             for (var i = 0; i < res.data.length; i++) {
                 console.log("\n", i, ". Repository Names : ", res.data[i].name)
                 console.log(i, ". Repository Description : ", res.data[i].description)
 
-                for (var j = 0; j < res.data.length; j++) {
-                    if (findRepo[i].title != res.data[j].name) {
+                //find title from database
+                var findRepo = await noteModel.find({ title: res.data[i].name })
+                if (!findRepo.length > 0) {
+                    
+                    //save those data in user database
+                    var model = new noteModel({
+                        title: res.data[i].name,
+                        description: res.data[i].description,
+                        userID: afterVerify.userID
+                    });
 
-                        //save those data in user database
-                        var model = new noteModel({
-                            title: res.data[i].name,
-                            description: res.data[i].description,
-                            userID: afterVerify.userID
-                        });
-
-                        //save data in database
-                        const note = model.save()
-                    }
+                    //save data in database
+                    const note = model.save()
                 }
             }
         })
 
-        return { "message": "note added successfully" }
+        return { "message": "git  repository fetch Successfully" }
 
     } catch (err) {
         console.log("!Error", err)
