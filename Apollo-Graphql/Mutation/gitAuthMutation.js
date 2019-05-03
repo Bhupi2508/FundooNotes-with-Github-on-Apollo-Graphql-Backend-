@@ -39,7 +39,7 @@ gitAuthMutation.prototype.GithubAuth = async (root, params) => {
          * @param {String}, create a code, which is redirect in graphiql
          * @returns {String} message
          */
-        var url = `https://github.com/login/oauth/authorize?client_id=${process.env.ClientID}&redirect_uri=${process.env.Git_Link}`
+        var url = `${process.env.gitCode}?client_id=${process.env.ClientID}&redirect_uri=${process.env.Git_Link}`
 
         //sent mail to the mail id
         var mail = sendMail.sendEmailFunction(url, params.email)
@@ -69,7 +69,7 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
      */
     axios({
         method: 'post',
-        url: `https://github.com/login/oauth/access_token?client_id=${process.env.ClientID}&client_secret=${process.env.ClientSecret}&code=${context.code}`,
+        url: `${process.env.gitAccess}client_id=${process.env.ClientID}&client_secret=${process.env.ClientSecret}&code=${context.code}`,
         headers: {
             accept: 'application/json',
         }
@@ -95,7 +95,7 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
     function getToken(access_token) {
         axios({
             method: 'get',
-            url: `https://api.github.com/user?access_token=${access_token}`,
+            url: `${process.env.getResponse}access_token=${access_token}`,
             headers: {
                 accept: 'application/json',
             }
@@ -216,7 +216,7 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
         //get response from given url
         axios({
             method: 'get',
-            url: `https://api.github.com/user/repos?access_token=${access_token}`,
+            url: `${process.env.gitRepository}access_token=${access_token}`,
             headers: {
                 accept: 'application/json'
             }
@@ -231,7 +231,7 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
                 //find title from database
                 var findRepo = await noteModel.find({ title: res.data[i].name })
                 if (!findRepo.length > 0) {
-                    
+
                     //save those data in user database
                     var model = new noteModel({
                         title: res.data[i].name,

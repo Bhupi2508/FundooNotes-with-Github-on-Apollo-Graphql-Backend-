@@ -26,7 +26,7 @@ type User {
     email : String!
     password : String!
     message : String!
-    token : String!
+    token : String
     labels : [Label]
     notes : [Notes]
  }
@@ -88,6 +88,7 @@ type User {
     createNote(title: String!, description: String!, reminder: String, color: String, img: String):Notes
     editNote(noteID: ID!, editTitle: String, editDescription: String):Notes
     removeNote(noteID: ID!):Notes
+    Reminder(noteID: ID!, reminder: String!):Notes
     Archieve(noteID: ID!):Notes
     Trash(noteID: ID!):Notes
     saveLabelToNote(noteID: ID!, label_ID: ID!): Notes
