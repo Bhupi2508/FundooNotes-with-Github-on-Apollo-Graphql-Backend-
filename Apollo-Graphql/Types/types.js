@@ -1,10 +1,10 @@
 /******************************************************************************
  *  @Execution      : default node          : cmd> types.js
  * 
- *  @Purpose        : Generate a resolver for typeDefs for users
+ *  @Purpose        : apollo-graphql Schema for all users
  * 
- *  @description    : GraphQL query for specific fields on object and result will come exactly 
- *                    the same shape as request.
+ *  @description    : types has apollo-graphql schema which we used to fetch data for
+ *                    users or do some CURD operation for manipulate data.
  * 
  *  @overview       : fundoo application 
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
@@ -15,9 +15,17 @@
 /**
  * @requires files
  */
-
 const { gql } = require('apollo-server');
 
+/**
+ * @type {User}
+ * @type {Label}
+ * @type {Notes}
+ * @type {Github}
+ * @type {UploadPic}
+ * @type {Query}
+ * @type {MutationRecord}
+ */
 const typeDefs = gql`
 type User {
     _id : ID!
@@ -89,6 +97,7 @@ type User {
     editNote(noteID: ID!, editTitle: String, editDescription: String):Notes
     removeNote(noteID: ID!):Notes
     Reminder(noteID: ID!, reminder: String!):Notes
+    deleteReminder(noteID: ID!):Notes
     Archieve(noteID: ID!):Notes
     Trash(noteID: ID!):Notes
     saveLabelToNote(noteID: ID!, label_ID: ID!): Notes
@@ -102,5 +111,7 @@ type User {
  }`;
 
 
-//exports typeDefs function
+/**
+ * @exports typeDefs
+ */
 module.exports = { typeDefs };

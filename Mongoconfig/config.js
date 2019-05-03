@@ -2,9 +2,9 @@
  *  @Execution      : default node          : cmd> nodemon dbConfig.js
  *                      
  * 
- *  @Purpose        : save data in mongoDB in graphql collection
+ *  @Purpose        : connect mongoDB
  * 
- *  @description    : Connected with mongoDB database
+ *  @description    : Using this database we connect mondodb to server
  * 
  *  @overview       : MongoDB connections
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>

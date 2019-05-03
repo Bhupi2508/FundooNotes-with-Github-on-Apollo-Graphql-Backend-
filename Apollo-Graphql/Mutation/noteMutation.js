@@ -256,12 +256,57 @@ noteMutation.prototype.removeLabelFromNote = async (root, params) => {
 
 
 
+// /*******************************************************************************************************************/
+// /**
+//  * @description : set Reminder APIs in notes for using apollo-graphql
+//  * @purpose : For fetch data by using CURD operation
+//  */
+// noteMutation.prototype.Reminder = async (root, params) => {
+//     try {
+
+//         //find labelID from noteModel Schema
+//         var id = await noteModel.find({ "_id": params.noteID })
+
+//         //if id is already present
+//         if (!id.length > 0) {
+//             return { "message": "This noteID is not present in notes" }
+//         }
+
+//         var date = new Date(params.reminder)
+//         console.log(date)
+//         //find id from noteModel and update(push) into notes
+//         var note = await noteModel.findOneAndUpdate({ _id: params.noteID },
+//             {
+//                 $set: {
+//                     reminder: date
+//                 }
+//             })
+
+//         //time set for reminder time
+
+
+//         /**
+//      * @return {String}, message
+//      */
+//         if (!note) {
+//             return { "message": "reminder not set " }
+//         }
+//         return { "message": "reminder set in note successfully " }
+
+
+//     } catch (error) {
+//         console.log("error in catch")
+//         return { "message": err }
+//     }
+// }
+
+
 /*******************************************************************************************************************/
 /**
- * @description : save label into notes APIs for updated notes for using graphql
+ * @description : deleteReminder APIs from notes for using apollo-graphql
  * @purpose : For fetch data by using CURD operation
  */
-noteMutation.prototype.Reminder = async (root, params) => {
+noteMutation.prototype.deleteReminder = async (root, params) => {
     try {
 
         //find labelID from noteModel Schema
@@ -272,26 +317,16 @@ noteMutation.prototype.Reminder = async (root, params) => {
             return { "message": "This noteID is not present in notes" }
         }
 
-        var date = new Date(params.reminder)
-        console.log(date)
         //find id from noteModel and update(push) into notes
-        var note = await noteModel.findOneAndUpdate({ _id: params.noteID },
-            {
-                $set: {
-                    reminder: date
-                }
-            })
-
-        //time set for reminder time
-
+        var note = await noteModel.findOneAndRemove({ _id: params.noteID }, { reminder })
 
         /**
-     * @return {String}, message
-     */
+         * @return {String}, message
+         */
         if (!note) {
-            return { "message": "reminder not set " }
+            return { "message": "reminder not remove " }
         }
-        return { "message": "reminder set in note successfully " }
+        return { "message": "reminder remove successfully " }
 
 
     } catch (error) {

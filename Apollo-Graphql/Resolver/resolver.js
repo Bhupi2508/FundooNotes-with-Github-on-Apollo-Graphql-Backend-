@@ -1,10 +1,9 @@
 /******************************************************************************
  *  @Execution      : default node          : cmd> resolver.js
  * 
- *  @Purpose        : Generate a resolver for type users
+ *  @Purpose        : resolvers
  * 
- *  @description    : GraphQL query for specific fields on object and result will come exactly 
- *                    the same shape as request.
+ *  @description    : Inseide resolvers we write business logics and also fetch data
  * 
  *  @overview       : fundoo application 
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
@@ -33,6 +32,7 @@ const createNote = require('../Mutation/noteMutation').createNote  //createNote 
 const editNote = require('../Mutation/noteMutation').editNote  //editNote mutation
 const removeNote = require('../Mutation/noteMutation').removeNote  //removeNote mutation
 const Reminder = require('../Mutation/noteMutation').Reminder   //Reminder mutation
+const deleteReminder = require('../Mutation/noteMutation').deleteReminder   //deleteReminder mutation
 const Archieve = require('../Mutation/noteMutation').Archieve   //Archieve mutation
 const Trash = require('../Mutation/noteMutation').Trash   //Trash mutation
 const saveLabelToNote = require('../Mutation/noteMutation').saveLabelToNote  //saveLabelToNote mutation
@@ -50,6 +50,8 @@ var userResolver = function () { }
 /**
  * @param {Query}
  * @param {Mutation}
+ * @param {User}
+ * 
  */
 userResolver.prototype.resolvers = {
     Query: {
@@ -71,6 +73,7 @@ userResolver.prototype.resolvers = {
         editNote,
         removeNote,
         Reminder,
+        deleteReminder,
         Archieve,
         Trash,
         saveLabelToNote,

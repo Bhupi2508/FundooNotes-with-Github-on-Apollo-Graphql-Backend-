@@ -4,7 +4,7 @@
  * 
  *  @Purpose        : upload a pic on aws-s3 services 
  * 
- *  @description    : using apollo-graphql upload a pic in s3
+ *  @description    : using apollo-graphql upload a pic in s3 services for gitHub
  * 
  *  @overview       : fundoo application  
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
@@ -27,8 +27,12 @@ var s3 = new aws.S3({
     secretAccessKey: process.env.awsSecret
 })
 
-//create a uplaod file for given aws information
-var upload = multer({  
+/**
+ * @description : create a uplaod file for given aws information
+ *                and use multer for upload image
+ * @purpose : for github profile
+ */
+var upload = multer({
     storage: multerS3({
         s3: s3,
         bucket: 'myfundoo',

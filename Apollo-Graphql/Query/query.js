@@ -24,38 +24,58 @@ var notesModel = require('../../model/noteSchema')
 var userQueries = function () { }
 
 
-/*******************************************************************************************************************/
+/***********************************************************************************/
 /**
+ * @purpose : for user Query
  * @param {args}
  * @param {context}
  */
-//for user Queries
 userQueries.prototype.user = async (root, args) => {
     var user = await userModel.find().exec()
     console.log(user);
     return user
 }
 
-//for label quries
+
+/***********************************************************************************/
+/**
+ * @purpose : for labelUser Query
+ * @param {args}
+ * @param {context}
+ */
 userQueries.prototype.labelUser = async (root, args) => {
     var label_User = await labelModel.find().exec()
     console.log(label_User);
     return label_User
 }
 
-//for label quries
+
+/***********************************************************************************/
+/**
+ * @purpose : for notesUser Query
+ * @param {args}
+ * @param {context}
+ */
 userQueries.prototype.notesUser = async (root, args) => {
     var notes_User = await notesModel.find().exec()
     console.log(notes_User[0]);
     return notes_User
 }
 
-//for gitAuth quries
+
+/***********************************************************************************/
+/**
+ * @purpose : for gituser Query
+ * @param {args}
+ * @param {context}
+ */
 userQueries.prototype.gitUser = async (root, args) => {
     var git_User = await userModel.find().exec()
     console.log(git_User[0]);
     return git_User
 }
+
+
 
 /**
  * @exports userQueries

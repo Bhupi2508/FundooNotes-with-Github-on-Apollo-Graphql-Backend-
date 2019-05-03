@@ -4,7 +4,7 @@
  * 
  *  @Purpose        : perform operations by using users
  * 
- *  @description    : By mutation create a new files
+ *  @description    : By using mutation we can manipulate the data (CURD)
  * 
  *  @overview       : fundoo application  
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
@@ -34,9 +34,12 @@ var userMutation = function () { }
 
 /*******************************************************************************************************************/
 /**
-* @description : register a APIs for register a new user using apollo-graphql
-* @purpose : For register a new data by using CURD operation
-*/
+ * @description : register APIs for register a new user using apollo-graphql
+ * @purpose : register user in database
+ * @param {root}, which has data information
+ * @param {params}, input by users
+ * @param {context}, req from queries, headers, server
+ */
 userMutation.prototype.signup = async (root, params, context) => {
 
     try {
@@ -112,11 +115,16 @@ userMutation.prototype.signup = async (root, params, context) => {
 }
 
 
+
+
 /*******************************************************************************************************************/
 /**
-* @description : emailverification APIs for verify a eamil that is valid or not using apollo-graphql
-* @purpose : For regisemailverification by using CURD operation
-*/
+ * @description : emailverification APIs for verify a eamil that is valid or not using apollo-graphql
+ * @purpose : For register emailverification by using CURD operation
+ * @param {root}, which has data information
+ * @param {params}, input by users
+ * @param {context}, req from queries, headers, server
+ */
 userMutation.prototype.emailVerify = async (root, params, context) => {
     try {
 
@@ -148,12 +156,17 @@ userMutation.prototype.emailVerify = async (root, params, context) => {
     }
 }
 
+
+
+
+
 /*******************************************************************************************************************/
 /**
  * @description : Login APIs for login user using apollo-graphql
- * @purpose : For login new user by using CURD operation
- * @param {*} root
- * @param {*} params
+ * @purpose : For login user by which is already exists in database using CURD operation
+ * @param {root}, which has data information
+ * @param {params}, input by users
+ * @param {context}, req from queries, headers, server
  */
 userMutation.prototype.login = async (root, params, context) => {
 
@@ -208,6 +221,10 @@ userMutation.prototype.login = async (root, params, context) => {
     }
 }
 
+
+
+
+
 /*******************************************************************************************************************/
 /**
  * @description : forgotPassword APIs for updatePassword user using apollo-graphql
@@ -215,7 +232,6 @@ userMutation.prototype.login = async (root, params, context) => {
  * @param {*} root
  * @param {*} params
  */
-
 userMutation.prototype.forgotPassword = async (root, params, context) => {
 
     try {
@@ -264,6 +280,8 @@ userMutation.prototype.forgotPassword = async (root, params, context) => {
 }
 
 
+
+
 /*******************************************************************************************************************/
 /**
  * @description : resetPassword APIs for resetPassword user using apollo-graphql
@@ -272,7 +290,6 @@ userMutation.prototype.forgotPassword = async (root, params, context) => {
  * @param {*} params
  * @param {*} context 
  */
-
 userMutation.prototype.resetPassword = async (root, params, context) => {
     try {
 

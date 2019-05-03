@@ -2,9 +2,9 @@
  *  @Execution      : default node          : cmd> nodemon authenticationUser.js
  *                      
  * 
- *  @Purpose        : verify the token 
+ *  @Purpose        : verification 
  * 
- *  @description    : token verification
+ *  @description    : token verification by using jsonWebToken
  * 
  *  @overview       : fundoo application
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
@@ -16,6 +16,7 @@
  * @requires files
  */
 var jwt = require('jsonwebtoken');
+
 
 /**
  * @exports verification

@@ -2,9 +2,9 @@
  *  @Execution      : default node          : cmd> noteSchema.js
  *                      
  * 
- *  @Purpose        : Create Schema for notes
+ *  @Purpose        : MongoDB schema for notes
  * 
- *  @description    : Create a note schema which store in Database
+ *  @description    : using this schema we store notes data in database
  * 
  *  @overview       : fundoo application
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
@@ -17,6 +17,7 @@
  */
 var mongoose = require('mongoose');
 
+//connect the schema with database
 var mongoSchema = mongoose.Schema;
 
 /**
@@ -25,8 +26,6 @@ var mongoSchema = mongoose.Schema;
  * @param {String} title  
  * @param {String} description 
  * @param {String} reminder  
- * @param {String} color 
- * @param {String} img
  * @param {String} archieve
  * @param {String} trash
  * @param {String} pin
@@ -70,8 +69,10 @@ var noteSchema = new mongoSchema({
         timestamps: true
     })
 
+
 //connect database using mongoose
 var notes_Schema = mongoose.model('notes', noteSchema);
+
 
 /**
  * @exports userLabel

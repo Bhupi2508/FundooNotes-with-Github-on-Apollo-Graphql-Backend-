@@ -2,9 +2,9 @@
  *  Execution       : default node          : cmd> mongoSchema.js
  *                      
  * 
- *  Purpose         : Create Schema for MongoDataBase
+ *  Purpose         : MongoDB schema for Users
  * 
- *  @description    : save data in mongodb by using this schema
+ *  @description    : using this schema we store users data in database
  * 
  *  @overview       : fundoo application
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
@@ -28,24 +28,26 @@ var mongoSchema = mongoose.Schema;
  * @param {String} email
  * @param {String} password
  * @param {timestamps} timestamps
+ * @param {Boolean} verification
+ * @param {Boolean} isGitVerify
+ * @param {String} loginName
+ * @param {String} gitID
+ * @param {String} access_Token
+ * @param {String} ProfilePicUrl 
  */
 var schemaData = new mongoSchema({
     firstName: {
         type: String,
-        // required: true,
     },
     lastName: {
         type: String,
-        // required: true
     },
     email: {
         type: String,
         unique: true,
-        // required: true
     },
     password: {
         type: String,
-        // required: true
     },
     verification: {
         type: Boolean,
@@ -74,4 +76,8 @@ var schemaData = new mongoSchema({
 
 //connect database using mongoose
 var user = mongoose.model('user', schemaData);
+
+/**
+ * @exports user
+ */
 module.exports = user

@@ -2,9 +2,9 @@
  *  @Execution      : default node          : cmd> labelSchema.js
  *                      
  * 
- *  @Purpose        : Create Schema for labelData
+ *  @Purpose        : MongoDB schema for labels
  * 
- *  @description    : Create a label schema which store in Database
+ *  @description    : using this schema we store labels data in database
  * 
  *  @overview       : fundoo application
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
@@ -17,6 +17,7 @@
  */
 var mongoose = require('mongoose');
 
+//connect the schema with database
 var mongoSchema = mongoose.Schema;
 
 
@@ -39,6 +40,7 @@ var labelSchema = new mongoSchema({
     {
         timestamps: true
     })
+    
 
 //connect database using mongoose
 var userLabel = mongoose.model('label', labelSchema);

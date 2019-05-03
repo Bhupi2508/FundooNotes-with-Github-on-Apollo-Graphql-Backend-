@@ -2,9 +2,9 @@
  *  @Execution      : default node          : cmd> nodemon sendMail.js
  *                      
  * 
- *  @Purpose        : sendMail to the user for forgot password
+ *  @Purpose        : send a mail 
  * 
- *  @description    : For sending mail
+ *  @description    : send mail for verifications token, url, response, etc.
  * 
  *  @overview       : fundoo app
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
