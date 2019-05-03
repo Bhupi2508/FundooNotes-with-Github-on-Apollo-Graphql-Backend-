@@ -296,7 +296,7 @@ noteMutation.prototype.Reminder = async (root, params) => {
 
     } catch (error) {
         console.log("error in catch")
-        return { "message": err }
+        return { "message": error }
     }
 }
 
@@ -318,7 +318,10 @@ noteMutation.prototype.deleteReminder = async (root, params) => {
         }
 
         //find id from noteModel and update(push) into notes
-        var note = await noteModel.findOneAndRemove({ _id: params.noteID }, { reminder })
+        var note = await noteModel.findOneAndUpdate({ _id: params.noteID }, { $set: { reminder: "" } })
+
+        console.log(note);
+
 
         /**
          * @return {String}, message
