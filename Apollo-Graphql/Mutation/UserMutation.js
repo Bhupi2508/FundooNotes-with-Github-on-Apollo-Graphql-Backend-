@@ -338,6 +338,66 @@ userMutation.prototype.resetPassword = async (root, params, context) => {
 }
 
 
+
+
+/*******************************************************************************************************************/
+/**
+ * @description : update APIs for updateUser data using apollo-graphql
+ * @purpose : For updation by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ */
+userMutation.prototype.update = async (root, params) => {
+
+    try {
+        var update = await userModel.findByIdAndUpdate(params.id,
+            {
+                $set:
+                {
+                    firstName: params.firstName,
+                }
+            },
+            { new: true }
+        )
+        if (!update) {
+            return { "message": "check user id or name, try again" }
+        }
+        return { "message": "user update successfully" };
+
+
+    } catch (err) {
+        console.log("!Error")
+        return { "message": err }
+    }
+}
+
+
+
+
+/*******************************************************************************************************************/
+/**
+ * @description : REMOVE APIs for remove data from database using apollo-graphql
+ * @purpose : remove user from database by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @returns {number} remove user id
+ */
+userMutation.prototype.remove = async (root, params) => {
+
+    try {
+        //find id and remove from the user Data
+        const removeduser = await userModel.findByIdAndRemove(params.id).exec();
+        if (!removeduser) {
+            return { "message": "check user id, try again" }
+        }
+        return { "message": "user delete successfully" };
+
+    } catch (err) {
+        console.log("!Error")
+        return { "message": err }
+    }
+}
+
 /**
  * @exports userMutation
  */

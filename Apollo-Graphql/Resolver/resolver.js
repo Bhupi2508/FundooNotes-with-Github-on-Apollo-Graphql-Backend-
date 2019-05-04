@@ -25,6 +25,8 @@ const emailVerify = require('../Mutation/UserMutation').emailVerify  //emailVeri
 const login = require('../Mutation/UserMutation').login   //login mutation
 const forgotPassword = require('../Mutation/UserMutation').forgotPassword   //forgotPassword mutation
 const resetPassword = require('../Mutation/UserMutation').resetPassword   //resetPassword mutation
+const update = require('../Mutation/UserMutation').update   //update mutation
+const remove = require('../Mutation/UserMutation').remove   //remove mutation
 const createLabel = require('../Mutation/labelMutation').createLabel   //createLabel mutation
 const editLabel = require('../Mutation/labelMutation').editLabel  //editLabel mutation
 const removeLabel = require('../Mutation/labelMutation').removeLabel   //removeLabel mutation
@@ -66,6 +68,8 @@ userResolver.prototype.resolvers = {
         login,
         forgotPassword,
         resetPassword,
+        update,
+        remove,
         createLabel,
         editLabel,
         removeLabel,

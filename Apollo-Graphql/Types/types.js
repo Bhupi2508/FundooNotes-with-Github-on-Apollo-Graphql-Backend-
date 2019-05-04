@@ -90,6 +90,8 @@ type User {
     login(email: String!, password: String!):User
     forgotPassword(email: String!):User
     resetPassword(newPassword: String!, confirmPassword: String!):User
+    update(id: String!, firstName: String!):User
+    remove(id: String!):User
     createLabel(labelName: String!):Label
     editLabel(labelID: ID!, editlabelName: String!):Label
     removeLabel(labelID: String!):Label

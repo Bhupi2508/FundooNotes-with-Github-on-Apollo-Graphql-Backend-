@@ -37,6 +37,10 @@ var server = new ApolloServer({
 });
 
 
+
+// server.applyMiddleware(upload.single('picture'))
+
+
 // //middleware for s3 APIs
 // server.express.use('/graphql', upload.single('picture'))
 
