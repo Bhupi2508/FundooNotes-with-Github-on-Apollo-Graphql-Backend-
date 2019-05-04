@@ -347,10 +347,20 @@ userMutation.prototype.resetPassword = async (root, params, context) => {
  * @param {*} root
  * @param {*} params
  */
-userMutation.prototype.update = async (root, params) => {
+userMutation.prototype.update = async (root, params, context) => {
 
     try {
-        var update = await userModel.findByIdAndUpdate(params.id,
+
+        /**
+        * @purpose : for token verification
+        * @returns {String} message
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        var update = await userModel.updateOne({ _id: afterVerify.userID },
             {
                 $set:
                 {
@@ -366,7 +376,7 @@ userMutation.prototype.update = async (root, params) => {
 
 
     } catch (err) {
-        console.log("!Error")
+        console.log("!Error in catch")
         return { "message": err }
     }
 }
