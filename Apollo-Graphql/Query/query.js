@@ -44,7 +44,7 @@ userQueries.prototype.user = async (root, args) => {
  * @param {context}
  */
 userQueries.prototype.labelUser = async (root, args) => {
-    var label_User = await labelModel.find().exec().sort({ "labelName": 1 })
+    var label_User = await labelModel.find().sort({ "labelName": 1 })
     console.log(label_User);
     return label_User
 }

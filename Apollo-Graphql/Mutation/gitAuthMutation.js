@@ -243,6 +243,7 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
             for (var i = 0; i < res.data.length; i++) {
                 console.log("\n", i, ". Repository Names : ", res.data[i].name)
                 console.log(i, ". Repository Description : ", res.data[i].description)
+                console.log(i, ". Repository watchers : ", res.data[i].watchers)
 
                 //find title from database
                 var findRepo = await noteModel.find({ title: res.data[i].name })
@@ -317,7 +318,7 @@ gitAuthMutation.prototype.gitBranch = async (root, params, context) => {
         }).then((res) => {
 
 
-            console.log("res", res);
+            console.log("Repository Branch Name : ", res.data[0].name);
         })
 
         return { "message": "git branch fetch Successfully" }
