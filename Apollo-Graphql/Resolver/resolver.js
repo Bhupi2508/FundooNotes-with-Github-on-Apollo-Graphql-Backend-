@@ -1,7 +1,7 @@
 /******************************************************************************
  *  @Execution      : default node          : cmd> resolver.js
  * 
- *  @Purpose        : resolvers
+ *  @Purpose        : resolvers(Programs logic)
  * 
  *  @description    : Inseide resolvers we write business logics and also fetch data
  * 
@@ -14,8 +14,8 @@
 /**
  * @requires files
  */
-const labelModel = require('../../model/labelSchema')
-const noteModel = require('../../model/noteSchema')
+const labelModel = require('../../model/labelSchema')  //labelModels  
+const noteModel = require('../../model/noteSchema')   //noteModel
 const user = require('../Query/query').user;   //user queries
 const labelUser = require('../Query/query').labelUser;   //labelUser queries
 const notesUser = require('../Query/query').notesUser;   //notesUser queries
@@ -43,7 +43,9 @@ const GithubAuth = require('../Mutation/gitAuthMutation').GithubAuth    //Github
 const codeVerify = require('../Mutation/gitAuthMutation').codeVerify   //codeVerify mutation
 const pullGitRepository = require('../Mutation/gitAuthMutation').pullGitRepository    //pullGitRepository mutation
 const GitAuthTokenVerify = require('../Mutation/gitAuthMutation').GitAuthTokenVerify   //GitAuthTokenVerify mutation
+const gitBranch = require('../Mutation/gitAuthMutation').gitBranch   //gitBranch mutation
 const picUpload = require('../Mutation/uploadPicMutation').picUpload   //picUpload mutation
+
 
 //create a empty function
 var userResolver = function () { }
@@ -86,6 +88,7 @@ userResolver.prototype.resolvers = {
         codeVerify,
         pullGitRepository,
         GitAuthTokenVerify,
+        gitBranch,
         picUpload
 
     },

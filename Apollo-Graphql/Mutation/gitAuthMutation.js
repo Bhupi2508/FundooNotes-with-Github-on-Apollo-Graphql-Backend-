@@ -25,6 +25,7 @@ var tokenVerify = require('../../Authentication/authenticationUser')
 //create a empty function
 var gitAuthMutation = function () { }
 
+
 /*******************************************************************************************************************/
 /**
  * @description : social auth2.0 for github login using apollo-graphql
@@ -52,6 +53,10 @@ gitAuthMutation.prototype.GithubAuth = async (root, params) => {
         console.log("!Error")
     }
 }
+
+
+
+
 
 
 /*******************************************************************************************************************/
@@ -141,6 +146,10 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
 }
 
 
+
+
+
+
 /*******************************************************************************************************************/
 /**
 @description : tokenverification APIs for verify a eamil that is valid or not using apollo-graphql
@@ -185,11 +194,18 @@ gitAuthMutation.prototype.GitAuthTokenVerify = async (root, params, context) => 
 
 }
 
+
+
+
+
 /*******************************************************************************************************************/
 /**
-@description : pullGitRepository APIs for fetching repository Details using apollo-graphql
-@purpose : For gitAuth verification by using CURD operation
-*/
+ * @description : pullGitRepository APIs for fetching repository Details using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
 gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
     try {
 
@@ -246,6 +262,65 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
         })
 
         return { "message": "git  repository fetch Successfully" }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": err }
+    }
+}
+
+
+
+
+
+
+
+/*******************************************************************************************************************/
+/**
+ * @description : Get branch APIs for fetching repository branch Details using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+gitAuthMutation.prototype.gitBranch = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+        // Access_token
+        var access_token = user[0].access_Token;
+        console.log("access_token", access_token)
+
+
+        //get response from given url
+        axios({
+            method: 'get',
+            url: `${process.env.gitBranch}access_token=${access_token}`,
+            headers: {
+                accept: 'application/json'
+            }
+        }).then((res) => {
+
+
+            console.log("res", res);
+        })
+
+        return { "message": "git branch fetch Successfully" }
 
     } catch (err) {
         console.log("!Error", err)

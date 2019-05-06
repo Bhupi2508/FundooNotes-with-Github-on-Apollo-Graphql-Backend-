@@ -18,6 +18,7 @@
     "chai": "^4.2.0",
     "dotenv": "^7.0.0",
     "env": "0.0.2",
+    "express": "^4.16.4",
     "graphql": "^14.2.1",
     "graphql-tools": "^4.0.4",
     "jsonwebtoken": "^8.5.1",

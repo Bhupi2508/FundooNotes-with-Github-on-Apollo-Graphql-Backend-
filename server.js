@@ -17,11 +17,13 @@
  */
 const { ApolloServer, gql } = require('apollo-server');
 require('dotenv').config();
+const express = require('express')
 const { typeDefs } = require('./Apollo-Graphql/Types/types');
 const resolvers = require('./Apollo-Graphql/Resolver/resolver').resolvers
 const mongoose = require('./Mongoconfig/mongoose')
 const upload = require('./services/s3-services')
 const db = mongoose()
+var app = express()
 
 
 //create a middleware using apollo-graphql
@@ -37,12 +39,9 @@ var server = new ApolloServer({
 });
 
 
-
-// server.applyMiddleware(upload.single('picture'))
-
-
 // //middleware for s3 APIs
-// server.express.use('/graphql', upload.single('picture'))
+// app.use('/graphql', upload.single('picture'))
+// server.applyMiddleware({ app })
 
 
 //listen the given port

@@ -108,6 +108,7 @@ type User {
     codeVerify(firstName: String, lastName: String, email: String): GitHub
     pullGitRepository: GitHub
     GitAuthTokenVerify: GitHub
+    gitBranch: GitHub
     picUpload: UploadPic
 
  }`;
