@@ -76,7 +76,6 @@ userQueries.prototype.gitUser = async (root, args) => {
 }
 
 
-
 /**
  * @exports userQueries
  */

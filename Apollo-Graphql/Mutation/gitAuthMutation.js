@@ -330,6 +330,63 @@ gitAuthMutation.prototype.gitBranch = async (root, params, context) => {
 }
 
 
+
+
+
+/*******************************************************************************************************************/
+/**
+ * @description : Get repository watchers APIs for fetching repository Details using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+gitAuthMutation.prototype.gitWatchers = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+        // Access_token
+        var access_token = user[0].access_Token;
+        console.log("access_token", access_token)
+
+
+        //get response from given url
+        axios({
+            method: 'get',
+            url: `${process.env.gitWatchers}access_token=${access_token}`,
+            headers: {
+                accept: 'application/json'
+            }
+        }).then((res) => {
+
+
+            console.log("Repository Branch Name : ", res);
+        })
+
+        return { "message": "git branch fetch Successfully" }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": err }
+    }
+}
+
+
 /**
 * @exports gitAuthMutation
 */

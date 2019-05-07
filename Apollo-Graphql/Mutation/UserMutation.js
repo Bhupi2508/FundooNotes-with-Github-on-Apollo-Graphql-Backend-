@@ -15,15 +15,16 @@
 /**
  * @requires files
  */
-var redis = require('redis')
+var redis = require('async-redis')
 var bcrypt = require('bcrypt')
 const jsonwebtoken = require('jsonwebtoken')
 var userModel = require('../../model/userSchema')
+var labelModel = require('../../model/labelSchema')
 var sendMail = require('../../sendMailer/sendMail')
 var tokenVerify = require('../../Authentication/authenticationUser')
 
 //create a redis client
-var client = redis.createClient()
+ var client = redis.createClient()
 
 //saltrounds for hash password
 var saltRounds = 10;
@@ -79,18 +80,6 @@ userMutation.prototype.signup = async (root, params, context) => {
              */
             var token = jsonwebtoken.sign({ email: params.email }, process.env.secretKey, { expiresIn: 86400000 })
 
-            /**
-             * @purpose : redis cache, save data in ram
-             * @returns {String} message
-             */
-            client.set('token', token)
-            client.get('token', function (error, result) {
-
-                if (error) {
-                    return { "message": "Redis cache cannot get result" }
-                }
-                // console.log('Get result from redis -> ' + result);
-            });
 
             /**
              * @param {token}, send token for verification to the mail
@@ -198,7 +187,7 @@ userMutation.prototype.login = async (root, params, context) => {
         var url = `${context.origin}?token=${token}`
 
         //send to mail
-        sendMail.sendEmailFunction(url, params.email)
+        //sendMail.sendEmailFunction(url, params.email)
 
         //take id for current user from database
         var id = user[0].id
@@ -209,6 +198,14 @@ userMutation.prototype.login = async (root, params, context) => {
         if (!valid) {
             return { "message": "unauthonticate password" }
         }
+
+
+        //find user Id from database
+        var labelFind = await labelModel.find({ userID: user[0]._id })
+
+        //set the labels in redis
+       await client.set('labels' + user[0]._id, JSON.stringify(labelFind))
+
 
         /**
          * @return {token}

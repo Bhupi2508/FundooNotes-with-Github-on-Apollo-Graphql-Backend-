@@ -15,6 +15,8 @@
 /**
  * @requires files
  */
+const redis = require("async-redis");
+const client = redis.createClient()
 var labelModel = require('../../model/labelSchema')
 var tokenVerify = require('../../Authentication/authenticationUser')
 
@@ -60,6 +62,9 @@ labelMutation.prototype.createLabel = async (root, params, context) => {
         //find id from users models
         const model = new labelModel({ labelName: params.labelName, userID: payload.userID })
         const label = model.save()
+
+        // delete labels from redis
+        client.del("labels" + payload.userID)
 
         /**
          * @return {String}, message

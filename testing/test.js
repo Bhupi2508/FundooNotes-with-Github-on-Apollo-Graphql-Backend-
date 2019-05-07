@@ -23,7 +23,7 @@ var server = require('../server')
 /**
  * @param {function()}
  */
-describe('GraphQL API', () => {
+describe('Apollo-GraphQL API', () => {
 
     /***************************************************************************************************************/
     /**

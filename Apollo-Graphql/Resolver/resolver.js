@@ -14,9 +14,12 @@
 /**
  * @requires files
  */
+const redis = require("async-redis");
+const client = redis.createClient()
 const labelModel = require('../../model/labelSchema')  //labelModels  
 const noteModel = require('../../model/noteSchema')   //noteModel
 const user = require('../Query/query').user;   //user queries
+const gitHubRepository = require('../Query/query').gitHubRepository;   //user queries
 const labelUser = require('../Query/query').labelUser;   //labelUser queries
 const notesUser = require('../Query/query').notesUser;   //notesUser queries
 const gitUser = require('../Query/query').gitUser;   //gitUser queries
@@ -44,6 +47,7 @@ const codeVerify = require('../Mutation/gitAuthMutation').codeVerify   //codeVer
 const pullGitRepository = require('../Mutation/gitAuthMutation').pullGitRepository    //pullGitRepository mutation
 const GitAuthTokenVerify = require('../Mutation/gitAuthMutation').GitAuthTokenVerify   //GitAuthTokenVerify mutation
 const gitBranch = require('../Mutation/gitAuthMutation').gitBranch   //gitBranch mutation
+const gitWatchers = require('../Mutation/gitAuthMutation').gitWatchers   //gitWatchers mutation
 const picUpload = require('../Mutation/uploadPicMutation').picUpload   //picUpload mutation
 
 
@@ -89,20 +93,28 @@ userResolver.prototype.resolvers = {
         pullGitRepository,
         GitAuthTokenVerify,
         gitBranch,
+        gitWatchers,
         picUpload
 
     },
     User: {
         async labels(root, params, context) {
-            var labels = await labelModel.find({ userID: root._id })
-            return labels
+            var labels = await client.get('labels' + root._id)
+            if (labels) {
+                var value = JSON.parse(labels)
+                return value
+            }
+            else {
+                var labels = await labelModel.find({userID:root._id})
+                return labels
+            }
+
         },
         async notes(root, params, context) {
             var notes = await noteModel.find({ userID: root._id })
             return notes
         }
-    }
-
+    },
 }
 
 

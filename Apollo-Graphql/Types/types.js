@@ -81,8 +81,10 @@ type User {
     notesUser(userID:String): [Notes]
     gitUser: [GitHub]
     PicUser: [UploadPic]
+    gitHubRepository: [User]
 
  }
+
  
  type Mutation{
     signUp(firstName: String!,lastName: String!,email: String!, password: String!):User
@@ -109,6 +111,7 @@ type User {
     pullGitRepository: GitHub
     GitAuthTokenVerify: GitHub
     gitBranch: GitHub
+    gitWatchers: GitHub
     picUpload: UploadPic
 
  }`;
