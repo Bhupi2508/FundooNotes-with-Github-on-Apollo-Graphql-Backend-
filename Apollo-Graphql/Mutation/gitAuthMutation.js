@@ -341,7 +341,7 @@ gitAuthMutation.prototype.gitBranch = async (root, params, context) => {
  * @param {*} params
  * @param {*} token
  */
-gitAuthMutation.prototype.gitWatchers = async (root, params, context) => {
+gitAuthMutation.prototype.createBranch = async (root, params, context) => {
     try {
 
 
@@ -368,17 +368,45 @@ gitAuthMutation.prototype.gitWatchers = async (root, params, context) => {
         //get response from given url
         axios({
             method: 'get',
-            url: `${process.env.gitWatchers}access_token=${access_token}`,
+            url: `${process.env.getCreateBranch}access_token=${access_token}`,
             headers: {
                 accept: 'application/json'
-            }
+            },
         }).then((res) => {
 
 
-            console.log("Repository Branch Name : ", res);
+            console.log("Repository Branch Response Data : ", res.data);
+            console.log("\nRepository Branch Object Data : ", res.data[0].object.sha);
+
+
+            hashSha(res.data[0].object.sha, res.data[0].object.url)
+
         })
 
-        return { "message": "git branch fetch Successfully" }
+        function hashSha(sha, objectUrl) {
+
+            console.log("sha", sha);
+             console.log("url",objectUrl);
+
+            //get response from given url
+            axios({
+                method: 'post',
+                url: `${objectUrl}?access_token=${access_token}`,
+                headers: {
+                    accept: 'application/json'
+                },
+                // data: {
+                //     'ref': 'refs/heads/'+params.newBranch,
+                //     'sha': 'developer'
+                // }
+            }).then((res) => {
+
+
+                console.log("Repository Branch after post Data : ", res);
+            })
+        }
+
+        return { "message": "git branch create Successfully" }
 
     } catch (err) {
         console.log("!Error", err)

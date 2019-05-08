@@ -47,7 +47,7 @@ const codeVerify = require('../Mutation/gitAuthMutation').codeVerify   //codeVer
 const pullGitRepository = require('../Mutation/gitAuthMutation').pullGitRepository    //pullGitRepository mutation
 const GitAuthTokenVerify = require('../Mutation/gitAuthMutation').GitAuthTokenVerify   //GitAuthTokenVerify mutation
 const gitBranch = require('../Mutation/gitAuthMutation').gitBranch   //gitBranch mutation
-const gitWatchers = require('../Mutation/gitAuthMutation').gitWatchers   //gitWatchers mutation
+const createBranch = require('../Mutation/gitAuthMutation').createBranch   //createBranch mutation
 const picUpload = require('../Mutation/uploadPicMutation').picUpload   //picUpload mutation
 
 
@@ -93,7 +93,7 @@ userResolver.prototype.resolvers = {
         pullGitRepository,
         GitAuthTokenVerify,
         gitBranch,
-        gitWatchers,
+        createBranch,
         picUpload
 
     },
@@ -105,7 +105,7 @@ userResolver.prototype.resolvers = {
                 return value
             }
             else {
-                var labels = await labelModel.find({userID:root._id})
+                var labels = await labelModel.find({ userID: root._id })
                 return labels
             }
 

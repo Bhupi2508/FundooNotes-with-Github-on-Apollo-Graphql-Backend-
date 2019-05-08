@@ -111,7 +111,7 @@ type User {
     pullGitRepository: GitHub
     GitAuthTokenVerify: GitHub
     gitBranch: GitHub
-    gitWatchers: GitHub
+    createBranch(newBranch: String!): GitHub
     picUpload: UploadPic
 
  }`;
