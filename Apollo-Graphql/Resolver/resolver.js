@@ -46,7 +46,7 @@ const GithubAuth = require('../Mutation/gitAuthMutation').GithubAuth    //Github
 const codeVerify = require('../Mutation/gitAuthMutation').codeVerify   //codeVerify mutation
 const pullGitRepository = require('../Mutation/gitAuthMutation').pullGitRepository    //pullGitRepository mutation
 const GitAuthTokenVerify = require('../Mutation/gitAuthMutation').GitAuthTokenVerify   //GitAuthTokenVerify mutation
-const gitBranch = require('../Mutation/gitAuthMutation').gitBranch   //gitBranch mutation
+const watchGitBranch = require('../Mutation/gitAuthMutation').watchGitBranch   //gitBranch mutation
 const createBranch = require('../Mutation/gitAuthMutation').createBranch   //createBranch mutation
 const picUpload = require('../Mutation/uploadPicMutation').picUpload   //picUpload mutation
 
@@ -92,7 +92,7 @@ userResolver.prototype.resolvers = {
         codeVerify,
         pullGitRepository,
         GitAuthTokenVerify,
-        gitBranch,
+        watchGitBranch,
         createBranch,
         picUpload
 

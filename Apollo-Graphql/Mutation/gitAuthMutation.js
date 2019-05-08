@@ -284,7 +284,7 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
  * @param {*} params
  * @param {*} token
  */
-gitAuthMutation.prototype.gitBranch = async (root, params, context) => {
+gitAuthMutation.prototype.watchGitBranch = async (root, params, context) => {
     try {
 
 
@@ -375,35 +375,54 @@ gitAuthMutation.prototype.createBranch = async (root, params, context) => {
         }).then((res) => {
 
 
-            console.log("Repository Branch Response Data : ", res.data);
+            console.log("\nRepository Branch Response Data : ", res.data);
             console.log("\nRepository Branch Object Data : ", res.data[0].object.sha);
 
 
+            //take those value in a value
             hashSha(res.data[0].object.sha, res.data[0].object.url)
 
         })
 
+        //use this function which have some value 
         function hashSha(sha, objectUrl) {
 
-            console.log("sha", sha);
-             console.log("url",objectUrl);
+            console.log("sha: ", sha);
+            console.log("url : ", objectUrl);
+            var value = objectUrl
 
-            //get response from given url
+            //get response from given url, when we post the url
             axios({
                 method: 'post',
-                url: `${objectUrl}?access_token=${access_token}`,
+                // url: `${objectUrl}?access_token=${access_token}`,
+                // url: `${value}?access_token=${access_token}`
+                url: `${value}`,
                 headers: {
                     accept: 'application/json'
                 },
                 // data: {
-                //     'ref': 'refs/heads/'+params.newBranch,
-                //     'sha': 'developer'
+                //     'ref': 'refs/heads/' + params.newBranch,
+                //     'sha': '74625f7688ca1db78decf3c693a035d7e5e0dd26'
+                // },
+                // body: {
+                //     query: {
+                //         'ref': 'refs/heads/master',
+                //         'sha': '74625f7688ca1db78decf3c693a035d7e5e0dd26'
+                //     }
                 // }
+                data: JSON.stringify({
+                    'ref': 'refs/heads/' + params.newBranch,
+                    'sha': '74625f7688ca1db78decf3c693a035d7e5e0dd26'
+                }),
+
             }).then((res) => {
 
+                //console.log("Repository Branch after post Data : ", res);
 
-                console.log("Repository Branch after post Data : ", res);
             })
+                .catch(error => {
+                    console.log(error)
+                })
         }
 
         return { "message": "git branch create Successfully" }
