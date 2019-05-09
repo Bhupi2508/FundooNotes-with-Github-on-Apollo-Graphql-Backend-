@@ -47,6 +47,7 @@ const codeVerify = require('../Mutation/gitAuthMutation').codeVerify   //codeVer
 const pullGitRepository = require('../Mutation/gitAuthMutation').pullGitRepository    //pullGitRepository mutation
 const fetchRepository = require('../Mutation/gitAuthMutation').fetchRepository    //fetchRepository mutation
 const starRepository = require('../Mutation/gitAuthMutation').starRepository    //starRepository mutation
+const removeStarRepository = require('../Mutation/gitAuthMutation').removeStarRepository    //removeStarRepository mutation
 const GitAuthTokenVerify = require('../Mutation/gitAuthMutation').GitAuthTokenVerify   //GitAuthTokenVerify mutation
 const watchGitBranch = require('../Mutation/gitAuthMutation').watchGitBranch   //gitBranch mutation
 const createBranch = require('../Mutation/gitAuthMutation').createBranch   //createBranch mutation
@@ -96,6 +97,7 @@ userResolver.prototype.resolvers = {
         pullGitRepository,
         fetchRepository,
         starRepository,
+        removeStarRepository,
         GitAuthTokenVerify,
         watchGitBranch,
         createBranch,

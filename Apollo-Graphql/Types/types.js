@@ -115,9 +115,10 @@ type User {
     removeLabelFromNote(noteID: ID!, label_ID: ID!): Notes
     GithubAuth(email: String!): GitHub
     codeVerify(firstName: String, lastName: String, email: String): GitHub
-    pullGitRepository: GitHub
+    pullGitRepository:GitHub
     fetchRepository:GitHub
     starRepository:GitHub
+    removeStarRepository:GitHub
     GitAuthTokenVerify: GitHub
     watchGitBranch: GitHub
     createBranch(newBranch: String!): GitHub

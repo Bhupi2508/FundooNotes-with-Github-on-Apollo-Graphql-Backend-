@@ -617,11 +617,13 @@ gitAuthMutation.prototype.starRepository = async (root, params, context) => {
         var access_token = user[0].access_Token;
 
 
-        //get response from given url
+        //fetch repository data from github
         const fetch = createApolloFetch({
             uri: `https://api.github.com/graphql?access_token=${access_token}`
         });
 
+
+        //pass the query mutation for data fetching
         const res = await fetch({
             query: 'mutation {addStar(input: {starrableId: "MDEwOlJlcG9zaXRvcnkxODU1NDM1ODk=", clientMutationId:"MDQ6VXNlcjQ3NjM5NjM2"}) { clientMutationId}}',
         })
@@ -645,7 +647,7 @@ gitAuthMutation.prototype.starRepository = async (root, params, context) => {
 
 /*******************************************************************************************************************/
 /**
- * @description : pullGitRepository APIs for fetching repository Details using apollo-graphql
+ * @description : remove star APIs for remove star from git repository using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
  * @param {*} root
  * @param {*} params
@@ -675,11 +677,12 @@ gitAuthMutation.prototype.removeStarRepository = async (root, params, context) =
         var access_token = user[0].access_Token;
 
 
-        //get response from given url
+        //fetch repository data from github
         const fetch = createApolloFetch({
             uri: `https://api.github.com/graphql?access_token=${access_token}`
         });
 
+        //pass the query mutation for data fetching
         const res = await fetch({
             query: `mutation {addStar(input: {starrableId: "MDEwOlJlcG9zaXRvcnkxODU1NDM1ODk=", clientMutationId:${gitNodeID}}) { clientMutationId}}`,
         })
