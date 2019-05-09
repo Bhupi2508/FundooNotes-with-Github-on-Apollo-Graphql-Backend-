@@ -176,7 +176,10 @@ noteMutation.prototype.saveLabelToNote = async (root, params) => {
     try {
 
         //find labelID from noteModel Schema
-        var id = await noteModel.find({ "labelID": params.label_ID })
+        var id = await noteModel.find({ _id: params.noteID, "labelID": params.label_ID })
+        if (id) {
+
+        }
 
         //if id is already present
         if (id.length > 0) {
