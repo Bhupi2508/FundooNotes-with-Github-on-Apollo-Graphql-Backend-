@@ -45,9 +45,12 @@ const removeLabelFromNote = require('../Mutation/noteMutation').removeLabelFromN
 const GithubAuth = require('../Mutation/gitAuthMutation').GithubAuth    //GithubAuth mutation
 const codeVerify = require('../Mutation/gitAuthMutation').codeVerify   //codeVerify mutation
 const pullGitRepository = require('../Mutation/gitAuthMutation').pullGitRepository    //pullGitRepository mutation
+const fetchRepository = require('../Mutation/gitAuthMutation').fetchRepository    //fetchRepository mutation
+const starRepository = require('../Mutation/gitAuthMutation').starRepository    //starRepository mutation
 const GitAuthTokenVerify = require('../Mutation/gitAuthMutation').GitAuthTokenVerify   //GitAuthTokenVerify mutation
 const watchGitBranch = require('../Mutation/gitAuthMutation').watchGitBranch   //gitBranch mutation
 const createBranch = require('../Mutation/gitAuthMutation').createBranch   //createBranch mutation
+const deleteBranch = require('../Mutation/gitAuthMutation').deleteBranch   //deleteBranch mutation
 const picUpload = require('../Mutation/uploadPicMutation').picUpload   //picUpload mutation
 
 
@@ -91,9 +94,12 @@ userResolver.prototype.resolvers = {
         GithubAuth,
         codeVerify,
         pullGitRepository,
+        fetchRepository,
+        starRepository,
         GitAuthTokenVerify,
         watchGitBranch,
         createBranch,
+        deleteBranch,
         picUpload
 
     },

@@ -15,6 +15,7 @@
 /**
  * @requires files
  */
+const { createApolloFetch } = require('apollo-fetch')
 var sendMail = require('../../sendMailer/sendMail')
 var model = require('../../model/userSchema')
 var noteModel = require('../../model/noteSchema')
@@ -114,6 +115,7 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
                 var gituser = new model({
                     loginName: response.data.login,
                     gitID: response.data.id,
+                    gitNodeID: response.data.node_id,
                     access_Token: access_token
 
                 });
@@ -335,7 +337,7 @@ gitAuthMutation.prototype.watchGitBranch = async (root, params, context) => {
 
 /*******************************************************************************************************************/
 /**
- * @description : Get repository watchers APIs for fetching repository Details using apollo-graphql
+ * @description : create APIs for create Branch in github using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
  * @param {*} root
  * @param {*} params
@@ -401,7 +403,7 @@ gitAuthMutation.prototype.createBranch = async (root, params, context) => {
                     accept: 'application/json'
                 },
                 // data: {
-                //     'ref': 'refs/heads/' + params.newBranch,
+                //     'query': 'refs/heads/' + params.newBranch,
                 //     'sha': '74625f7688ca1db78decf3c693a035d7e5e0dd26'
                 // },
                 // body: {
@@ -432,6 +434,267 @@ gitAuthMutation.prototype.createBranch = async (root, params, context) => {
         return { "message": err }
     }
 }
+
+
+
+
+
+
+/*******************************************************************************************************************/
+/**
+ * @description : delete Branch APIs for delete branch from github repository using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+gitAuthMutation.prototype.deleteBranch = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+        // Access_token
+        var access_token = user[0].access_Token;
+        console.log("access_token", access_token)
+
+
+        //get response from given url
+        // axios({
+        //     method: 'DELETE',
+        //     url: `${process.env.deleteBranch}access_token=${access_token}`,
+        //     // headers: {
+        //     //     accept: 'application/json'
+        //     // },
+        // })
+        axios.delete(`${process.env.deleteBranch}access_token=${access_token}`, {
+            // data: {
+            //     'ref': 'refs/heads/developer',
+            //     'sha': '74625f7688ca1db78decf3c693a035d7e5e0dd26'
+            // }
+        }).then((res) => {
+
+            console.log("\nRepository Branch Response Data : ", res.data);
+
+        })
+            .catch(error => {
+                console.log(error)
+            })
+
+        return { "message": "git branch create Successfully" }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": err }
+    }
+}
+
+
+
+
+
+
+/*******************************************************************************************************************/
+/**
+ * @description : pullGitRepository APIs for fetching repository Details using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+gitAuthMutation.prototype.fetchRepository = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+        // Access_token
+        var access_token = user[0].access_Token;
+
+
+        //get response from given url
+        const fetch = createApolloFetch({
+            uri: `https://api.github.com/graphql?access_token=${access_token}`
+        });
+
+        const res = await fetch({
+            query: '{ repositoryOwner(login: Bhupi2508) { id login avatarUrl repositories(first:10){ nodes{ isPrivate name description} } } }',
+        })
+
+        //for loop for save the repository in database
+        for (var i = 0; i < res.data.repositoryOwner.repositories.nodes.length; i++) {
+            console.log("\n", i, ". Repository Names : ", res.data.repositoryOwner.repositories.nodes[i].name)
+            console.log(i, ". Repository Description : ", res.data.repositoryOwner.repositories.nodes[i].description)
+            // console.log(i, ". Repository watchers : ", res.data.repositoryOwner.repositories.nodes[i].watchers)
+
+            //find title from database
+            var findRepo = await noteModel.find({ title: res.data.repositoryOwner.repositories.nodes[i].name })
+            if (!findRepo.length > 0) {
+
+                //save those data in user database
+                var notesmodel = new noteModel({
+                    title: res.data.repositoryOwner.repositories.nodes[i].name,
+                    description: res.data.repositoryOwner.repositories.nodes[i].description,
+                    userID: afterVerify.userID
+                });
+
+                //save data in database
+                const note = notesmodel.save()
+            }
+        }
+
+        return {
+            "message": "git  repository fetch Successfully",
+            "repo": res.data.repositoryOwner.repositories.nodes
+        }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": err }
+    }
+}
+
+
+
+
+
+
+/*******************************************************************************************************************/
+/**
+ * @description : pullGitRepository APIs for fetching repository Details using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+gitAuthMutation.prototype.starRepository = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+        // Access_token and Git Node ID
+        var gitNodeID = user[0].gitNodeID;
+        var access_token = user[0].access_Token;
+
+
+        //get response from given url
+        const fetch = createApolloFetch({
+            uri: `https://api.github.com/graphql?access_token=${access_token}`
+        });
+
+        const res = await fetch({
+            query: 'mutation {addStar(input: {starrableId: "MDEwOlJlcG9zaXRvcnkxODU1NDM1ODk=", clientMutationId:"MDQ6VXNlcjQ3NjM5NjM2"}) { clientMutationId}}',
+        })
+
+        console.log(res)
+        return {
+            "message": "Star the repository Successfully",
+            // "clientMutationId": res.data.addStar.clientMutationId
+        }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": err }
+    }
+}
+
+
+
+
+
+
+/*******************************************************************************************************************/
+/**
+ * @description : pullGitRepository APIs for fetching repository Details using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+gitAuthMutation.prototype.removeStarRepository = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+        // Access_token and Git Node ID
+        var gitNodeID = user[0].gitNodeID;
+        var access_token = user[0].access_Token;
+
+
+        //get response from given url
+        const fetch = createApolloFetch({
+            uri: `https://api.github.com/graphql?access_token=${access_token}`
+        });
+
+        const res = await fetch({
+            query: `mutation {addStar(input: {starrableId: "MDEwOlJlcG9zaXRvcnkxODU1NDM1ODk=", clientMutationId:${gitNodeID}}) { clientMutationId}}`,
+        })
+
+        console.log(res)
+        return {
+            "message": "remove Star from repository Successfully",
+        }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": err }
+    }
+}
+
 
 
 /**

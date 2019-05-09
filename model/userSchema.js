@@ -63,6 +63,9 @@ var schemaData = new mongoSchema({
     gitID: {
         type: String,
     },
+    gitNodeID: {
+        type: String,
+    },
     access_Token: {
         type: String,
     },

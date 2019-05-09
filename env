@@ -14,3 +14,4 @@ getResponse=
 gitRepository=
 gitBranch=
 getCreateBranch=
+deleteBranch=

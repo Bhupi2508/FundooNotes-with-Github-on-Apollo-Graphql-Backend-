@@ -61,6 +61,11 @@ type User {
      gitID:  String!,
      access_Token: String!
    }
+   
+   type repo {
+       name : String!
+       description : String
+   }
 
    type GitHub {
       _id: ID!
@@ -68,6 +73,8 @@ type User {
       gitID: String!
       access_Token: String!
       message: String!
+      clientMutationId : String
+      repo:[repo]
    }
 
    type UploadPic {
@@ -109,9 +116,12 @@ type User {
     GithubAuth(email: String!): GitHub
     codeVerify(firstName: String, lastName: String, email: String): GitHub
     pullGitRepository: GitHub
+    fetchRepository:GitHub
+    starRepository:GitHub
     GitAuthTokenVerify: GitHub
     watchGitBranch: GitHub
     createBranch(newBranch: String!): GitHub
+    deleteBranch: GitHub
     picUpload: UploadPic
 
  }`;
