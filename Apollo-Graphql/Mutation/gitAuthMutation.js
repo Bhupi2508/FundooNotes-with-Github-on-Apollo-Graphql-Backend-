@@ -407,7 +407,6 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
          * @purpose : use this function which have some value
          */
         function hashSha(sha) {
-
             /**
              * @function (Axios), which is used to handle http request
              * @method (post), DELETE data from response when hit the url
@@ -487,28 +486,20 @@ gitAuthMutation.prototype.deleteGitBranch = async (root, params, context) => {
          * @param {headers}
          * @purpose : get response from given url
          */
-        axios({
+        var res = await axios({
             method: 'DELETE',
             url: `${process.env.deleteBranch}${params.DeleteBranch}?access_token=${access_token}`,
             headers: {
                 accept: 'application/json'
             },
-
-        }).then((res) => {
-            console.log("\nRepository Branch Response Data : ", res);
-
         })
-            .catch(error => {
-                console.log(error)
-                return { "message": error }
-
-            })
+        console.log("\nRepository Branch Response Data : ", res);
 
         return { "message": "git branch delete Successfully" }
 
     } catch (err) {
         console.log("!Error", err)
-        return { "message": err }
+        return { "message": "This branch not present in Repository" }
     }
 }
 
