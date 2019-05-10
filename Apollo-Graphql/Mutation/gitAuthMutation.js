@@ -231,13 +231,19 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
         var access_token = user[0].access_Token;
 
 
-        //get response from given url
+        /**
+        * @function (Axios), which is used to handle http request
+        * @method (get), Get data from response when hit the url
+        * @param {headers}
+        * @purpose : get response from given url
+        */
         axios({
             method: 'get',
             url: `${process.env.gitRepository}access_token=${access_token}`,
             headers: {
                 accept: 'application/json'
             }
+
         }).then(async (res) => {
 
 
@@ -280,7 +286,7 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
 
 /*******************************************************************************************************************/
 /**
- * @description : Get branch APIs for fetching repository branch Details using apollo-graphql
+ * @description : watchGitBranch APIs for watch repository branch Details using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
  * @param {*} root
  * @param {*} params
@@ -310,16 +316,20 @@ gitAuthMutation.prototype.watchGitBranch = async (root, params, context) => {
         console.log("access_token", access_token)
 
 
-        //get response from given url
+        /**
+         * @function (Axios), which is used to handle http request
+         * @method (get), Get data from response when hit the url
+         * @param {headers}
+         * @purpose : get response from given url
+         */
         axios({
             method: 'get',
             url: `${process.env.gitBranch}access_token=${access_token}`,
             headers: {
                 accept: 'application/json'
             }
+
         }).then((res) => {
-
-
             console.log("Repository Branch Name : ", res.data[0].name);
         })
 
@@ -337,7 +347,7 @@ gitAuthMutation.prototype.watchGitBranch = async (root, params, context) => {
 
 /*******************************************************************************************************************/
 /**
- * @description : create APIs for create Branch in github using apollo-graphql
+ * @description : createGitBranch APIs for create Branch in github using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
  * @param {*} root
  * @param {*} params
@@ -369,7 +379,7 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
 
         /**
          * @function (Axios), which is used to handle http request
-         * @method (get), get data in response when hit the url
+         * @method (get), Get data in response when hit the url
          * @param {headers}
          * @purpose : get response from given url
          */
@@ -379,9 +389,8 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
             headers: {
                 accept: 'application/json'
             },
+
         }).then((res) => {
-
-
             console.log("\nRepository Branch Response Data : ", res.data);
             console.log("\nRepository Branch Object Data : ", res.data[0].object.sha);
 
@@ -399,7 +408,13 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
          */
         function hashSha(sha) {
 
-            //get response from given url, when we post the url with Data
+            /**
+             * @function (Axios), which is used to handle http request
+             * @method (post), DELETE data from response when hit the url
+             * @param {headers}
+             * @Data : send the given data depend on what you doing
+             * @purpose : get response from given url
+             */
             axios({
                 method: 'post',
                 url: `${process.env.postCreateBranch}access_token=${access_token}`,
@@ -436,13 +451,13 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
 
 /*******************************************************************************************************************/
 /**
- * @description : delete Branch APIs for delete branch from github repository using apollo-graphql
+ * @description : deleteGitBranch APIs for delete branch from github repository using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
  * @param {*} root
  * @param {*} params
  * @param {*} token
  */
-gitAuthMutation.prototype.deleteBranch = async (root, params, context) => {
+gitAuthMutation.prototype.deleteGitBranch = async (root, params, context) => {
     try {
 
 
@@ -462,33 +477,34 @@ gitAuthMutation.prototype.deleteBranch = async (root, params, context) => {
         }
 
         // Access_token
-        var access_token = user[0].access_Token;
+        var access_token = process.env.gitCreateBranchToken;
         console.log("access_token", access_token)
 
 
-        //get response from given url
-        // axios({
-        //     method: 'DELETE',
-        //     url: `${process.env.deleteBranch}access_token=${access_token}`,
-        //     // headers: {
-        //     //     accept: 'application/json'
-        //     // },
-        // })
-        axios.delete(`${process.env.deleteBranch}access_token=${access_token}`, {
-            // data: {
-            //     'ref': 'refs/heads/developer',
-            //     'sha': '74625f7688ca1db78decf3c693a035d7e5e0dd26'
-            // }
-        }).then((res) => {
+        /**
+         * @function (Axios), which is used to handle http request
+         * @method (DELETE), DELETE data from response when hit the url
+         * @param {headers}
+         * @purpose : get response from given url
+         */
+        axios({
+            method: 'DELETE',
+            url: `${process.env.deleteBranch}${params.DeleteBranch}?access_token=${access_token}`,
+            headers: {
+                accept: 'application/json'
+            },
 
-            console.log("\nRepository Branch Response Data : ", res.data);
+        }).then((res) => {
+            console.log("\nRepository Branch Response Data : ", res);
 
         })
             .catch(error => {
                 console.log(error)
+                return { "message": error }
+
             })
 
-        return { "message": "git branch create Successfully" }
+        return { "message": "git branch delete Successfully" }
 
     } catch (err) {
         console.log("!Error", err)
@@ -503,7 +519,7 @@ gitAuthMutation.prototype.deleteBranch = async (root, params, context) => {
 
 /*******************************************************************************************************************/
 /**
- * @description : pullGitRepository APIs for fetching repository Details using apollo-graphql
+ * @description : fetchRepository APIs for fetching repository Details using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
  * @param {*} root
  * @param {*} params
@@ -581,7 +597,7 @@ gitAuthMutation.prototype.fetchRepository = async (root, params, context) => {
 
 /*******************************************************************************************************************/
 /**
- * @description : pullGitRepository APIs for fetching repository Details using apollo-graphql
+ * @description : starRepository APIs for give the star for selected repository Details using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
  * @param {*} root
  * @param {*} params
@@ -623,6 +639,7 @@ gitAuthMutation.prototype.starRepository = async (root, params, context) => {
         })
 
         console.log(res)
+
         return {
             "message": "Star the repository Successfully",
             // "clientMutationId": res.data.addStar.clientMutationId
@@ -641,7 +658,7 @@ gitAuthMutation.prototype.starRepository = async (root, params, context) => {
 
 /*******************************************************************************************************************/
 /**
- * @description : remove star APIs for remove star from git repository using apollo-graphql
+ * @description : removeStarRepository APIs for remove star from git repository using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
  * @param {*} root
  * @param {*} params

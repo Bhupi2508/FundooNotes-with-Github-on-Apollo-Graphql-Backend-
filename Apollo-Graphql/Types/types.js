@@ -122,7 +122,7 @@ type User {
     GitAuthTokenVerify: GitHub
     watchGitBranch: GitHub
     createGitBranch(newBranch: String!): GitHub
-    deleteBranch: GitHub
+    deleteGitBranch(DeleteBranch: String!): GitHub
     picUpload: UploadPic
 
  }`;
