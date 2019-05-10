@@ -121,7 +121,7 @@ type User {
     removeStarRepository:GitHub
     GitAuthTokenVerify: GitHub
     watchGitBranch: GitHub
-    createBranch(newBranch: String!): GitHub
+    createGitBranch(newBranch: String!): GitHub
     deleteBranch: GitHub
     picUpload: UploadPic
 

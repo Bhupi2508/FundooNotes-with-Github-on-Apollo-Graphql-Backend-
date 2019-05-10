@@ -50,7 +50,7 @@ const starRepository = require('../Mutation/gitAuthMutation').starRepository    
 const removeStarRepository = require('../Mutation/gitAuthMutation').removeStarRepository    //removeStarRepository mutation
 const GitAuthTokenVerify = require('../Mutation/gitAuthMutation').GitAuthTokenVerify   //GitAuthTokenVerify mutation
 const watchGitBranch = require('../Mutation/gitAuthMutation').watchGitBranch   //gitBranch mutation
-const createBranch = require('../Mutation/gitAuthMutation').createBranch   //createBranch mutation
+const createGitBranch = require('../Mutation/gitAuthMutation').createGitBranch   //createBranch mutation
 const deleteBranch = require('../Mutation/gitAuthMutation').deleteBranch   //deleteBranch mutation
 const picUpload = require('../Mutation/uploadPicMutation').picUpload   //picUpload mutation
 
@@ -100,7 +100,7 @@ userResolver.prototype.resolvers = {
         removeStarRepository,
         GitAuthTokenVerify,
         watchGitBranch,
-        createBranch,
+        createGitBranch,
         deleteBranch,
         picUpload
 

@@ -343,7 +343,7 @@ gitAuthMutation.prototype.watchGitBranch = async (root, params, context) => {
  * @param {*} params
  * @param {*} token
  */
-gitAuthMutation.prototype.createBranch = async (root, params, context) => {
+gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
     try {
 
 
@@ -363,11 +363,16 @@ gitAuthMutation.prototype.createBranch = async (root, params, context) => {
         }
 
         // Access_token
-        var access_token = user[0].access_Token;
+        var access_token = process.env.gitCreateBranchToken;
         console.log("access_token", access_token)
 
 
-        //get response from given url
+        /**
+         * @function (Axios), which is used to handle http request
+         * @method (get), get data in response when hit the url
+         * @param {headers}
+         * @purpose : get response from given url
+         */
         axios({
             method: 'get',
             url: `${process.env.getCreateBranch}access_token=${access_token}`,
@@ -381,56 +386,45 @@ gitAuthMutation.prototype.createBranch = async (root, params, context) => {
             console.log("\nRepository Branch Object Data : ", res.data[0].object.sha);
 
 
-            //take those value in a value
-            hashSha(res.data[0].object.sha, res.data[0].object.url)
+            //take those value in a object
+            hashSha(res.data[0].object.sha)
 
         })
 
-        //use this function which have some value 
-        function hashSha(sha, objectUrl) {
 
-            console.log("sha: ", sha);
-            console.log("url : ", objectUrl);
-            var value = objectUrl
+        /**
+         * @function (hashSha), which has some value from previous same name object
+         * @param {String} sha 
+         * @purpose : use this function which have some value
+         */
+        function hashSha(sha) {
 
-            //get response from given url, when we post the url
+            //get response from given url, when we post the url with Data
             axios({
                 method: 'post',
-                // url: `${objectUrl}?access_token=${access_token}`,
-                // url: `${value}?access_token=${access_token}`
-                url: `${value}`,
+                url: `${process.env.postCreateBranch}access_token=${access_token}`,
                 headers: {
                     accept: 'application/json'
                 },
-                // data: {
-                //     'query': 'refs/heads/' + params.newBranch,
-                //     'sha': '74625f7688ca1db78decf3c693a035d7e5e0dd26'
-                // },
-                // body: {
-                //     query: {
-                //         'ref': 'refs/heads/master',
-                //         'sha': '74625f7688ca1db78decf3c693a035d7e5e0dd26'
-                //     }
-                // }
                 data: JSON.stringify({
-                    'ref': 'refs/heads/' + params.newBranch,
-                    'sha': '74625f7688ca1db78decf3c693a035d7e5e0dd26'
+                    'ref': `refs/heads/${params.newBranch}`,
+                    'sha': `${sha}`
                 }),
 
             }).then((res) => {
-
-                //console.log("Repository Branch after post Data : ", res);
+                console.log("\nRepository Branch after post Data : ", res.data);
 
             })
                 .catch(error => {
                     console.log(error)
+                    return { "message": error }
                 })
         }
 
         return { "message": "git branch create Successfully" }
 
     } catch (err) {
-        console.log("!Error", err)
+        console.log("!Error in catch : ", err)
         return { "message": err }
     }
 }
