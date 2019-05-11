@@ -383,63 +383,44 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
          * @param {headers}
          * @purpose : get response from given url
          */
-        axios({
+        var res = await axios({
             method: 'get',
-            url: `${process.env.getCreateBranch}access_token=${access_token}`,
+            url: `${process.env.getCreateBranch}${params.gitUsername}/${params.repoName}/git/refs/heads?access_token=${access_token}`,
             headers: {
                 accept: 'application/json'
             },
 
-        }).then((res) => {
-            console.log("\nRepository Branch Response Data : ", res.data);
-            console.log("\nRepository Branch Object Data : ", res.data[0].object.sha);
-
-
-            //take those value in a object
-            hashSha(res.data[0].object.sha)
-
         })
-
+        // .then((res) => {
+        console.log("\nRepository Branch Response Data : ", res.data);
+        console.log("\nRepository Branch Object Data : ", res.data[0].object.sha);
 
         /**
-         * @function (hashSha), which has some value from previous same name object
-         * @param {String} sha 
-         * @purpose : use this function which have some value
+         * @function (Axios), which is used to handle http request
+         * @method (post), DELETE data from response when hit the url
+         * @param {headers}
+         * @Data : send the given data depend on what you doing
+         * @purpose : get response from given url
          */
-        function hashSha(sha) {
-            /**
-             * @function (Axios), which is used to handle http request
-             * @method (post), DELETE data from response when hit the url
-             * @param {headers}
-             * @Data : send the given data depend on what you doing
-             * @purpose : get response from given url
-             */
-            axios({
-                method: 'post',
-                url: `${process.env.postCreateBranch}access_token=${access_token}`,
-                headers: {
-                    accept: 'application/json'
-                },
-                data: JSON.stringify({
-                    'ref': `refs/heads/${params.newBranch}`,
-                    'sha': `${sha}`
-                }),
+        var branchResponse = await axios({
+            method: 'post',
+            url: `${process.env.postCreateBranch}${params.gitUsername}/${params.repoName}/git/refs?access_token=${access_token}`,
+            headers: {
+                accept: 'application/json'
+            },
+            data: JSON.stringify({
+                'ref': `refs/heads/${params.newBranch}`,
+                'sha': `${res.data[0].object.sha}`
+            }),
 
-            }).then((res) => {
-                console.log("\nRepository Branch after post Data : ", res.data);
-
-            })
-                .catch(error => {
-                    console.log(error)
-                    return { "message": error }
-                })
-        }
+        })
+        console.log("\nRepository Branch after post Data : ", branchResponse.data);
 
         return { "message": "git branch create Successfully" }
 
     } catch (err) {
         console.log("!Error in catch : ", err)
-        return { "message": err }
+        return { "message": "This branch already exists in Repository" }
     }
 }
 
@@ -488,7 +469,7 @@ gitAuthMutation.prototype.deleteGitBranch = async (root, params, context) => {
          */
         var res = await axios({
             method: 'DELETE',
-            url: `${process.env.deleteBranch}${params.DeleteBranch}?access_token=${access_token}`,
+            url: `${process.env.deleteBranch}${params.gitUsername}/${params.repoName}/git/refs/heads/${params.DeleteBranch}?access_token=${access_token}`,
             headers: {
                 accept: 'application/json'
             },
