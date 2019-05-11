@@ -30,8 +30,8 @@ var userQueries = function () { }
  * @param {args}
  * @param {context}
  */
-userQueries.prototype.user = async (root, args) => {
-    var user = await userModel.find().exec()
+userQueries.prototype.user = async (root, params) => {
+    var user = await userModel.find().limit(params.first).skip(params.offset)
     console.log(user);
     return user
 }
@@ -43,8 +43,8 @@ userQueries.prototype.user = async (root, args) => {
  * @param {args}
  * @param {context}
  */
-userQueries.prototype.labelUser = async (root, args) => {
-    var label_User = await labelModel.find().sort({ "labelName": 1 })
+userQueries.prototype.labelUser = async (root, params) => {
+    var label_User = await labelModel.find().sort({ "labelName": 1 }).limit(params.first).skip(params.offset)
     console.log(label_User);
     return label_User
 }
@@ -56,8 +56,8 @@ userQueries.prototype.labelUser = async (root, args) => {
  * @param {args}
  * @param {context}
  */
-userQueries.prototype.notesUser = async (root, args) => {
-    var notes_User = await notesModel.find().exec()
+userQueries.prototype.notesUser = async (root, params) => {
+    var notes_User = await notesModel.find().limit(params.first).skip(params.offset)
     console.log(notes_User[0]);
     return notes_User
 }
@@ -69,8 +69,8 @@ userQueries.prototype.notesUser = async (root, args) => {
  * @param {args}
  * @param {context}
  */
-userQueries.prototype.gitUser = async (root, args) => {
-    var git_User = await userModel.find().exec()
+userQueries.prototype.gitUser = async (root, params) => {
+    var git_User = await userModel.find().exec().limit(params.first).skip(params.offset)
     console.log(git_User[0]);
     return git_User
 }

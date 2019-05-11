@@ -83,13 +83,12 @@ type User {
    }
 
  type Query {
-    user(userID:String): [User]
-    labelUser(userID:String): [Label]
-    notesUser(userID:String): [Notes]
+    user(userID:String, first: Int, offset: Int): [User]
+    labelUser(userID:String, first: Int, offset: Int): [Label]
+    notesUser(userID:String, first: Int, offset: Int): [Notes]
     gitUser: [GitHub]
     PicUser: [UploadPic]
     gitHubRepository: [User]
-
  }
 
  
