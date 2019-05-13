@@ -282,8 +282,6 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
 
 
 
-
-
 /*******************************************************************************************************************/
 /**
  * @description : watchGitBranch APIs for watch repository branch Details using apollo-graphql
@@ -319,7 +317,7 @@ gitAuthMutation.prototype.addWatchInGitRepo = async (root, params, context) => {
 
         /**
          * @function (Axios), which is used to handle http request
-         * @method (get), Get data from response when hit the url
+         * @method (PUT), Get data from response when hit the url
          * @param {headers}
          * @purpose : get response from given url
          */
@@ -341,6 +339,71 @@ gitAuthMutation.prototype.addWatchInGitRepo = async (root, params, context) => {
         return { "message": "Watch is not added in Github" }
     }
 }
+
+
+
+
+
+
+
+/*******************************************************************************************************************/
+/**
+ * @description : watchGitBranch APIs for watch repository branch Details using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+gitAuthMutation.prototype.deleteWatchInGitRepo = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+        // Access_token
+        //var access_token = user[0].access_Token;
+        var access_token = process.env.gitCreateBranchToken
+        console.log("access_token", access_token)
+
+
+        /**
+         * @function (Axios), which is used to handle http request
+         * @method (DELETE), Get data from response when hit the url
+         * @param {headers}
+         * @purpose : get response from given url
+         */
+        axios({
+            method: 'DELETE',
+            url: `${process.env.deleteWatchInGitRepo}${params.gitUsername}/${params.repoName}/subscription?access_token=${access_token}`,
+            headers: {
+                accept: 'application/json'
+            }
+
+        }).then((res) => {
+            console.log("Repository Branch Name : ", res);
+        })
+
+        return { "message": "Watch Remove successfully from Git Repository" }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": "Watch is not removed from Github" }
+    }
+}
+
 
 
 

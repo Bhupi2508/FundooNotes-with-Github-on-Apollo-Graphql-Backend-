@@ -120,6 +120,7 @@ type User {
     removeStarRepository:GitHub
     GitAuthTokenVerify: GitHub
     addWatchInGitRepo(gitUsername: String!, repoName: String!): GitHub
+    deleteWatchInGitRepo(gitUsername: String!, repoName: String!): GitHub
     createGitBranch(newBranch: String!, gitUsername: String!, repoName: String!): GitHub
     deleteGitBranch(DeleteBranch: String!, gitUsername: String!, repoName: String!): GitHub
     picUpload: UploadPic
