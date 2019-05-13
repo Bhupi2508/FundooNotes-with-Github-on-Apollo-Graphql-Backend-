@@ -292,7 +292,7 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
  * @param {*} params
  * @param {*} token
  */
-gitAuthMutation.prototype.watchGitBranch = async (root, params, context) => {
+gitAuthMutation.prototype.addWatchInGitRepo = async (root, params, context) => {
     try {
 
 
@@ -312,7 +312,8 @@ gitAuthMutation.prototype.watchGitBranch = async (root, params, context) => {
         }
 
         // Access_token
-        var access_token = user[0].access_Token;
+        //var access_token = user[0].access_Token;
+        var access_token = process.env.gitCreateBranchToken
         console.log("access_token", access_token)
 
 
@@ -323,21 +324,21 @@ gitAuthMutation.prototype.watchGitBranch = async (root, params, context) => {
          * @purpose : get response from given url
          */
         axios({
-            method: 'get',
-            url: `${process.env.gitBranch}access_token=${access_token}`,
+            method: 'PUT',
+            url: `${process.env.addWatchInGit}${params.gitUsername}/${params.repoName}?access_token=${access_token}`,
             headers: {
                 accept: 'application/json'
             }
 
         }).then((res) => {
-            console.log("Repository Branch Name : ", res.data[0].name);
+            console.log("Repository Branch Name : ", res);
         })
 
-        return { "message": "git branch fetch Successfully" }
+        return { "message": "Watch add successfully in Git Repository" }
 
     } catch (err) {
         console.log("!Error", err)
-        return { "message": err }
+        return { "message": "Watch is not added in Github" }
     }
 }
 
@@ -518,6 +519,8 @@ gitAuthMutation.prototype.fetchRepository = async (root, params, context) => {
 
         // Access_token
         var access_token = user[0].access_Token;
+        console.log("acccess_token", access_token);
+
 
 
         //get response from given url

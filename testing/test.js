@@ -461,6 +461,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
+            .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI1Y2Q0MDY1MDI1ZDA4ZjNjODg0MjUzOTUiLCJpZCI6NDc2Mzk2MzYsImxvZ2luIjoiQmh1cGkyNTA4IiwiaWF0IjoxNTU3Mzk5MTIwLCJleHAiOjE2NDM3OTkxMjB9.nidKhPCHXubIosxpueDGynYMMv5qtpd5oDCHKediXo8' })
             .send({ query: 'mutation {codeVerify{message}}' })
             .expect(200)
             .end((err, res) => {
@@ -494,6 +495,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
+            .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI1Y2Q0MDY1MDI1ZDA4ZjNjODg0MjUzOTUiLCJpZCI6NDc2Mzk2MzYsImxvZ2luIjoiQmh1cGkyNTA4IiwiaWF0IjoxNTU3Mzk5MTIwLCJleHAiOjE2NDM3OTkxMjB9.nidKhPCHXubIosxpueDGynYMMv5qtpd5oDCHKediXo8' })
             .send({ query: 'mutation {GitAuthTokenVerify{message}}' })
             .expect(200)
             .end((err, res) => {
@@ -506,6 +508,41 @@ describe('Apollo-GraphQL API', () => {
 
                 //otherwise return success 
                 expect(JSON.parse(res.text).data.GitAuthTokenVerify.message).to.deep.equal("login & verification successfull")
+                done();
+
+            });
+    });
+
+
+
+    /****************************************************************************************************************/
+    /**
+    * @purpose : Testing for users APIs
+    * @property {request} request has do request for server
+    * @property {post} post has post the function to the given path
+    * @property {send} send has send the parameter to the mutation
+    * @property {expect} expect has pass the ok means all are fine
+    * @returns {error} error
+    */
+
+    it('Repository fetching', done => {
+        request('http://localhost:4000')
+            .post('/graphql ')
+
+            //write your data for checking by giving mutation
+            .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI1Y2Q0MDY1MDI1ZDA4ZjNjODg0MjUzOTUiLCJpZCI6NDc2Mzk2MzYsImxvZ2luIjoiQmh1cGkyNTA4IiwiaWF0IjoxNTU3Mzk5MTIwLCJleHAiOjE2NDM3OTkxMjB9.nidKhPCHXubIosxpueDGynYMMv5qtpd5oDCHKediXo8' })
+            .send({ query: 'mutation {pullGitRepository{message}}' })
+            .expect(200)
+            .end((err, res) => {
+
+
+                //if any error the return error
+                if (err) {
+                    return done(err);
+                }
+
+                //otherwise return success 
+                expect(JSON.parse(res.text).data.GitAuthTokenVerify.message).to.deep.equal("git  repository fetch Successfully")
                 done();
 
             });
