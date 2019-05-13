@@ -41,7 +41,7 @@ gitAuthMutation.prototype.GithubAuth = async (root, params) => {
          * @param {String}, create a code, which is redirect in graphiql
          * @returns {String} message
          */
-        var url = `${process.env.gitCode}?client_id=${process.env.ClientID}&redirect_uri=${process.env.Git_Link}`
+        var url = `${process.env.gitCode}?client_id=${process.env.ClientID}&redirect_uri=${process.env.Git_Link}&scope=repo`
 
         //sent mail to the mail id
         var mail = sendMail.sendEmailFunction(url, params.email)
@@ -284,7 +284,7 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
 
 /*******************************************************************************************************************/
 /**
- * @description : watchGitBranch APIs for watch repository branch Details using apollo-graphql
+ * @description : addWatchInGitRepo APIs for add watch repository Details using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
  * @param {*} root
  * @param {*} params
@@ -310,8 +310,7 @@ gitAuthMutation.prototype.addWatchInGitRepo = async (root, params, context) => {
         }
 
         // Access_token
-        //var access_token = user[0].access_Token;
-        var access_token = process.env.gitCreateBranchToken
+        var access_token = user[0].access_Token;
         console.log("access_token", access_token)
 
 
@@ -323,9 +322,9 @@ gitAuthMutation.prototype.addWatchInGitRepo = async (root, params, context) => {
          */
         axios({
             method: 'PUT',
-            url: `${process.env.addWatchInGit}${params.gitUsername}/${params.repoName}?access_token=${access_token}`,
+            url: `${process.env.addWatchInGit}${params.gitUsername}/${params.repoName}`,
             headers: {
-                accept: 'application/json'
+                Authorization: `Bearer ${access_token}`
             }
 
         }).then((res) => {
@@ -348,7 +347,7 @@ gitAuthMutation.prototype.addWatchInGitRepo = async (root, params, context) => {
 
 /*******************************************************************************************************************/
 /**
- * @description : watchGitBranch APIs for watch repository branch Details using apollo-graphql
+ * @description : deleteWatchInGitRepo APIs for delete watch from repository Details using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
  * @param {*} root
  * @param {*} params
@@ -374,8 +373,7 @@ gitAuthMutation.prototype.deleteWatchInGitRepo = async (root, params, context) =
         }
 
         // Access_token
-        //var access_token = user[0].access_Token;
-        var access_token = process.env.gitCreateBranchToken
+        var access_token = user[0].access_Token
         console.log("access_token", access_token)
 
 
@@ -387,10 +385,10 @@ gitAuthMutation.prototype.deleteWatchInGitRepo = async (root, params, context) =
          */
         axios({
             method: 'DELETE',
-            url: `${process.env.deleteWatchInGitRepo}${params.gitUsername}/${params.repoName}/subscription?access_token=${access_token}`,
+            url: `${process.env.deleteWatchInGitRepo}${params.gitUsername}/${params.repoName}/subscription`,
             headers: {
-                accept: 'application/json'
-            }
+                Authorization: `Bearer ${access_token}`
+            },
 
         }).then((res) => {
             console.log("Repository Branch Name : ", res);
@@ -437,7 +435,7 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
         }
 
         // Access_token
-        var access_token = process.env.gitCreateBranchToken;
+        var access_token = user[0].access_Token
         console.log("access_token", access_token)
 
 
@@ -449,15 +447,16 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
          */
         var res = await axios({
             method: 'get',
-            url: `${process.env.getCreateBranch}${params.gitUsername}/${params.repoName}/git/refs/heads?access_token=${access_token}`,
+            url: `${process.env.getCreateBranch}${params.gitUsername}/${params.repoName}/git/refs/heads`,
             headers: {
-                accept: 'application/json'
+                Authorization: `Bearer ${access_token}`
             },
 
         })
-        // .then((res) => {
+
         console.log("\nRepository Branch Response Data : ", res.data);
         console.log("\nRepository Branch Object Data : ", res.data[0].object.sha);
+        var access_token = user[0].access_Token
 
         /**
          * @function (Axios), which is used to handle http request
@@ -468,9 +467,9 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
          */
         var branchResponse = await axios({
             method: 'post',
-            url: `${process.env.postCreateBranch}${params.gitUsername}/${params.repoName}/git/refs?access_token=${access_token}`,
+            url: `${process.env.postCreateBranch}${params.gitUsername}/${params.repoName}/git/refs`,
             headers: {
-                accept: 'application/json'
+                Authorization: `Bearer ${access_token}`
             },
             data: JSON.stringify({
                 'ref': `refs/heads/${params.newBranch}`,
@@ -484,7 +483,7 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
 
     } catch (err) {
         console.log("!Error in catch : ", err)
-        return { "message": "This branch already exists in Repository" }
+        return { "message": "This branch is not created in Repository" }
     }
 }
 
@@ -521,7 +520,7 @@ gitAuthMutation.prototype.deleteGitBranch = async (root, params, context) => {
         }
 
         // Access_token
-        var access_token = process.env.gitCreateBranchToken;
+        var access_token = user[0].access_Token
         console.log("access_token", access_token)
 
 
@@ -533,10 +532,10 @@ gitAuthMutation.prototype.deleteGitBranch = async (root, params, context) => {
          */
         var res = await axios({
             method: 'DELETE',
-            url: `${process.env.deleteBranch}${params.gitUsername}/${params.repoName}/git/refs/heads/${params.DeleteBranch}?access_token=${access_token}`,
+            url: `${process.env.deleteBranch}${params.gitUsername}/${params.repoName}/git/refs/heads/${params.DeleteBranch}`,
             headers: {
-                accept: 'application/json'
-            },
+                Authorization: `Bearer ${access_token}`
+            }
         })
         console.log("\nRepository Branch Response Data : ", res);
 
