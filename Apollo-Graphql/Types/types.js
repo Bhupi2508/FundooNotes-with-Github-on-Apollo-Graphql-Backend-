@@ -109,7 +109,9 @@ type User {
     Reminder(noteID: ID!, reminder: String!):Notes
     deleteReminder(noteID: ID!):Notes
     Archieve(noteID: ID!):Notes
+    ArchieveRemove(noteID: ID!):Notes
     Trash(noteID: ID!):Notes
+    TrashRemove(noteID: ID!):Notes
     saveLabelToNote(noteID: ID!, label_ID: ID!): Notes
     removeLabelFromNote(noteID: ID!, label_ID: ID!): Notes
     GithubAuth(email: String!): GitHub

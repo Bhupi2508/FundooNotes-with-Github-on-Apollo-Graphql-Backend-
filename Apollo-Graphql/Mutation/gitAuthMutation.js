@@ -69,6 +69,8 @@ gitAuthMutation.prototype.GithubAuth = async (root, params) => {
 gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
 
     /**
+     * @function (Axios), which is used to handle http request
+     * @method (get), Get data from response when hit the url
      * @param {String}, post a url and then response will given token
      * @headers : application/json
      * @function getToken, has token
@@ -99,6 +101,13 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
      * @headers : application/json
      */
     function getToken(access_token) {
+
+        /**
+       * @function (Axios), which is used to handle http request
+       * @method (get), Get data from response when hit the url
+       * @param {headers}
+       * @purpose : get response from given url
+       */
         axios({
             method: 'get',
             url: `${process.env.getResponse}access_token=${access_token}`,

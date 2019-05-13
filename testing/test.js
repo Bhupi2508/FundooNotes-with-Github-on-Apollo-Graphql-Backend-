@@ -155,7 +155,7 @@ describe('Apollo-GraphQL API', () => {
     * @returns {error} error
     */
 
-    it('addLabel APIs', done => {
+    it('createLabel APIs', done => {
         request('http://localhost:4000')
             .post('/graphql ')
 
@@ -257,7 +257,7 @@ describe('Apollo-GraphQL API', () => {
     * @returns {error} error
     */
 
-    it('addNote APIs', done => {
+    it('createNote APIs', done => {
         request('http://localhost:4000')
             .post('/graphql ')
 
@@ -347,6 +347,147 @@ describe('Apollo-GraphQL API', () => {
 
             });
     });
+
+
+    /****************************************************************************************************************/
+    /**
+    * @purpose : Testing for users APIs
+    * @property {request} request has do request for server
+    * @property {post} post has post the function to the given path
+    * @property {send} send has send the parameter to the mutation
+    * @property {expect} expect has pass the ok means all are fine
+    * @returns {error} error
+    */
+
+    it('Reminder APIs', done => {
+        request('http://localhost:4000')
+            .post('/graphql ')
+
+            //write your data for checking by giving mutation
+            .send({ query: 'mutation {Reminder(noteID:"5cca9f80e4cb7d26ebb3d267" reminder:"25/05/2019 02:30:00"){message}}' })
+            .expect(200)
+            .end((err, res) => {
+
+
+                //if any error the return error
+                if (err) {
+                    return done(err);
+                }
+
+                //otherwise return success 
+                expect(JSON.parse(res.text).data.GitAuthTokenVerify.message).to.deep.equal("reminder set in note successfully")
+                done();
+
+            });
+    });
+
+
+
+    /****************************************************************************************************************/
+    /**
+    * @purpose : Testing for users APIs
+    * @property {request} request has do request for server
+    * @property {post} post has post the function to the given path
+    * @property {send} send has send the parameter to the mutation
+    * @property {expect} expect has pass the ok means all are fine
+    * @returns {error} error
+    */
+
+    it('Reminder delete APIs', done => {
+        request('http://localhost:4000')
+            .post('/graphql ')
+
+            //write your data for checking by giving mutation
+            .send({ query: 'mutation {deleteReminder(noteID:"5cca9f80e4cb7d26ebb3d267" ){message}}' })
+            .expect(200)
+            .end((err, res) => {
+
+
+                //if any error the return error
+                if (err) {
+                    return done(err);
+                }
+
+                //otherwise return success 
+                expect(JSON.parse(res.text).data.GitAuthTokenVerify.message).to.deep.equal("reminder remove successfully")
+                done();
+
+            });
+    });
+
+
+
+
+    /****************************************************************************************************************/
+    /**
+    * @purpose : Testing for users APIs
+    * @property {request} request has do request for server
+    * @property {post} post has post the function to the given path
+    * @property {send} send has send the parameter to the mutation
+    * @property {expect} expect has pass the ok means all are fine
+    * @returns {error} error
+    */
+
+    it('Archieve APIs', done => {
+        request('http://localhost:4000')
+            .post('/graphql ')
+
+            //write your data for checking by giving mutation
+            .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
+            .send({ query: 'mutation {Archieve(noteID:"5cca9f80e4cb7d26ebb3d267"){message}}' })
+            .expect(200)
+            .end((err, res) => {
+
+
+                //if any error the return error
+                if (err) {
+                    return done(err);
+                }
+
+                //otherwise return success 
+                expect(JSON.parse(res.text).data.GitAuthTokenVerify.message).to.deep.equal("note Archieve")
+                done();
+
+            });
+    });
+
+
+    /****************************************************************************************************************/
+    /**
+    * @purpose : Testing for users APIs
+    * @property {request} request has do request for server
+    * @property {post} post has post the function to the given path
+    * @property {send} send has send the parameter to the mutation
+    * @property {expect} expect has pass the ok means all are fine
+    * @returns {error} error
+    */
+
+    it('ArchieveRemove APIs', done => {
+        request('http://localhost:4000')
+            .post('/graphql ')
+
+            //write your data for checking by giving mutation
+            .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
+            .send({ query: 'mutation {ArchieveRemove(noteID:"5cca9f94e4cb7d26ebb3d269"){message}}' })
+            .expect(200)
+            .end((err, res) => {
+
+
+                //if any error the return error
+                if (err) {
+                    return done(err);
+                }
+
+                //otherwise return success 
+                expect(JSON.parse(res.text).data.GitAuthTokenVerify.message).to.deep.equal("note remove from Archieve")
+                done();
+
+            });
+
+    });
+
+
+
 
     /****************************************************************************************************************/
     /**
@@ -490,7 +631,7 @@ describe('Apollo-GraphQL API', () => {
     * @returns {error} error
     */
 
-    it('git Auth Token Verify for login APIs', done => {
+    it('GitAuthTokenVerify for git login verification', done => {
         request('http://localhost:4000')
             .post('/graphql ')
 
