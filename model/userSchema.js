@@ -38,16 +38,24 @@ var mongoSchema = mongoose.Schema;
 var schemaData = new mongoSchema({
     firstName: {
         type: String,
+        minlength: [3, 'min length is 3 for firstName'],
+        maxlength: [200, 'max length 200 for firstName']
     },
     lastName: {
         type: String,
+        minlength: [3, 'min length is 3 for lastName'],
+        maxlength: [200, 'max length 200 for lastName']
     },
     email: {
         type: String,
         unique: true,
+        minlength: [3, 'min length is 3 for email'],
+        maxlength: [200, 'max length 200 for email']
     },
     password: {
         type: String,
+        minlength: [3, 'min length is 3 for password'],
+        maxlength: [200, 'max length 200 for password']
     },
     verification: {
         type: Boolean,
@@ -59,6 +67,8 @@ var schemaData = new mongoSchema({
     },
     loginName: {
         type: String,
+        minlength: [3, 'min length is 3 for loginName'],
+        maxlength: [200, 'max length 200 for loginName']
     },
     gitID: {
         type: String,
