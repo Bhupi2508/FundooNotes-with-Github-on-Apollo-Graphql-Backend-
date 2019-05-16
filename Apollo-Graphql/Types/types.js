@@ -127,6 +127,7 @@ type User {
     createGitBranch(newBranch: String!, gitUsername: String!, repoName: String!): GitHub
     deleteGitBranch(DeleteBranch: String!, gitUsername: String!, repoName: String!): GitHub
     picUpload: UploadPic
+    addCollaboration(noteID:String!,colabID:String!):User
 
  }`;
 

@@ -24,7 +24,7 @@ var sendMail = require('../../sendMailer/sendMail')
 var tokenVerify = require('../../Authentication/authenticationUser')
 
 //create a redis client
- var client = redis.createClient()
+var client = redis.createClient()
 
 //saltrounds for hash password
 var saltRounds = 10;
@@ -95,7 +95,10 @@ userMutation.prototype.signup = async (root, params, context) => {
             var url = `${context.origin}?token=${token}`
 
             sendMail.sendEmailFunction(url, params.email)
-            return { "message": "Register successfull" }
+            return {
+                "message": "Register successfull",
+                "token": token
+            }
         }
     } catch (err) {
         console.log("!Error")
@@ -204,7 +207,7 @@ userMutation.prototype.login = async (root, params, context) => {
         var labelFind = await labelModel.find({ userID: user[0]._id })
 
         //set the labels in redis
-       await client.set('labels' + user[0]._id, JSON.stringify(labelFind))
+        await client.set('labels' + user[0]._id, JSON.stringify(labelFind))
 
 
         /**
