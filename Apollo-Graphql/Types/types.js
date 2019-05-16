@@ -73,6 +73,7 @@ type User {
       gitID: String!
       access_Token: String!
       message: String!
+      token : String
       clientMutationId : String
       repo:[repo]
    }

@@ -20,16 +20,21 @@ const { expect } = require('chai')
 const request = require('supertest')
 var server = require('../server')
 var fs = require('fs')
+var access_token = "";
+var signUp_token = "";
+var forgotPassword_token = "";
+var git_token = "";
 
 
-
+/**
+ * @function testJSON
+ */
 function testJSON() {
 
     var data = fs.readFileSync('/home/admin1/Desktop/fundoo(apollo)/testing/testFile.json');
     var data1 = JSON.parse(data);
     return data1;
 }
-
 
 
 
@@ -63,6 +68,7 @@ describe('Apollo-GraphQL API', () => {
 
                 //otherwise return success data
                 expect(JSON.parse(res.text).data.signUp.message).to.deep.equal("Register successfull")
+                signUp_token = JSON.parse(res.text).data.signUp.token
                 done();
             });
     });
@@ -92,7 +98,8 @@ describe('Apollo-GraphQL API', () => {
                 }
 
                 //otherwise return success
-                expect(JSON.parse(res.text).data.login.message).to.deep.equal("email is not present")
+                expect(JSON.parse(res.text).data.login.message).to.deep.equal("!Login....Successfully")
+                access_token = JSON.parse(res.text).data.login.token
                 done();
             });
     });
@@ -111,6 +118,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
+            .query({ 'token': signUp_token })
             .send({ query: testJSON().forgotPassword })
             .expect(200)
             .end((err, res) => {
@@ -123,6 +131,7 @@ describe('Apollo-GraphQL API', () => {
 
                 //otherwise return success
                 expect(JSON.parse(res.text).data.forgotPassword.message).to.deep.equal("email is not present in database")
+                forgotPassword_token = JSON.parse(res.text).data.forgotPassword.token
                 done();
             });
     });
@@ -141,6 +150,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
+            .query({ 'token': forgotPassword_token })
             .send({ query: testJSON().resetPassword })
             .expect(200)
             .end((err, res) => {
@@ -173,7 +183,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
+            .query({ 'token': access_token })
             .send({ query: testJSON().createLabel })
             .expect(200)
             .end((err, res) => {
@@ -207,7 +217,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
+            .query({ 'token': access_token })
             .send({ query: testJSON().editLabel })
             .expect(200)
             .end((err, res) => {
@@ -241,7 +251,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
+            .query({ 'token': access_token })
             .send({ query: testJSON().removeLabel })
             .expect(200)
             .end((err, res) => {
@@ -275,7 +285,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
+            .query({ 'token': access_token })
             .send({ query: testJSON().createNote })
             .expect(200)
             .end((err, res) => {
@@ -309,7 +319,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
+            .query({ 'token': access_token })
             .send({ query: testJSON().editNote })
             .expect(200)
             .end((err, res) => {
@@ -343,7 +353,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
+            .query({ 'token': access_token })
             .send({ query: testJSON().removeNote })
             .expect(200)
             .end((err, res) => {
@@ -446,8 +456,8 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
-            .send({ query:  testJSON().Archieve })
+            .query({ 'token': access_token })
+            .send({ query: testJSON().Archieve })
             .expect(200)
             .end((err, res) => {
 
@@ -480,7 +490,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
+            .query({ 'token': access_token })
             .send({ query: testJSON().ArchieveRemove })
             .expect(200)
             .end((err, res) => {
@@ -517,7 +527,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
+            .query({ 'token': access_token })
             .send({ query: testJSON().saveLabelToNote })
             .expect(200)
             .end((err, res) => {
@@ -550,7 +560,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
+            .query({ 'token': access_token })
             .send({ query: testJSON().removeLabelFromNote })
             .expect(200)
             .end((err, res) => {
@@ -628,6 +638,7 @@ describe('Apollo-GraphQL API', () => {
 
                 //otherwise return success 
                 expect(JSON.parse(res.text).data.codeVerify.message).to.deep.equal("Data save successfully")
+                git_token = JSON.parse(res.text).data.codeVerify.token
                 done();
 
             });
@@ -649,8 +660,8 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI1Y2Q0MDY1MDI1ZDA4ZjNjODg0MjUzOTUiLCJpZCI6NDc2Mzk2MzYsImxvZ2luIjoiQmh1cGkyNTA4IiwiaWF0IjoxNTU3Mzk5MTIwLCJleHAiOjE2NDM3OTkxMjB9.nidKhPCHXubIosxpueDGynYMMv5qtpd5oDCHKediXo8' })
-            .send({ query:  testJSON().GitAuthTokenVerify })
+            .query({ 'token': git_token })
+            .send({ query: testJSON().GitAuthTokenVerify })
             .expect(200)
             .end((err, res) => {
 
@@ -684,7 +695,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI1Y2Q0MDY1MDI1ZDA4ZjNjODg0MjUzOTUiLCJpZCI6NDc2Mzk2MzYsImxvZ2luIjoiQmh1cGkyNTA4IiwiaWF0IjoxNTU3Mzk5MTIwLCJleHAiOjE2NDM3OTkxMjB9.nidKhPCHXubIosxpueDGynYMMv5qtpd5oDCHKediXo8' })
+            .query({ 'token': git_token })
             .send({ query: testJSON().pullGitRepository })
             .expect(200)
             .end((err, res) => {
