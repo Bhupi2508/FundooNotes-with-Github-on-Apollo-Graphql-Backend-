@@ -19,6 +19,19 @@ const { describe, it } = require('mocha')
 const { expect } = require('chai')
 const request = require('supertest')
 var server = require('../server')
+var fs = require('fs')
+
+
+
+function testJSON() {
+
+    var data = fs.readFileSync('/home/admin1/Desktop/fundoo(apollo)/testing/testFile.json');
+    var data1 = JSON.parse(data);
+    return data1;
+}
+
+
+
 
 /**
  * @param {function()}
@@ -39,7 +52,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql')
 
             //write your data for checking by giving mutation
-            .send({ query: 'mutation { signUp (firstName:"akash" lastName:"sharma" email:"akaeddsh@gmail.com" password:"akasfdrgh1") {message}}' })
+            .send({ query: testJSON().signUp })
             .expect(200)
             .end((err, res) => {
 
@@ -68,7 +81,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .send({ query: 'mutation { login (email:"aaaaa@gmail.com" password:"akash1") {message}}' })
+            .send({ query: testJSON().login })
             .expect(200)
             .end((err, res) => {
 
@@ -98,7 +111,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .send({ query: 'mutation { forgotPassword (email:"aaaaaaaa@gmail.com") {message}}' })
+            .send({ query: testJSON().forgotPassword })
             .expect(200)
             .end((err, res) => {
 
@@ -128,7 +141,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .send({ query: 'mutation{ resetPassword (newPassword:"123456789" confirmPassword:"123456789"){message}}' })
+            .send({ query: testJSON().resetPassword })
             .expect(200)
             .end((err, res) => {
 
@@ -161,7 +174,7 @@ describe('Apollo-GraphQL API', () => {
 
             //write your data for checking by giving mutation
             .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
-            .send({ query: 'mutation {createLabel(labelName:"create By testing"){message}}' })
+            .send({ query: testJSON().createLabel })
             .expect(200)
             .end((err, res) => {
 
@@ -195,7 +208,7 @@ describe('Apollo-GraphQL API', () => {
 
             //write your data for checking by giving mutation
             .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
-            .send({ query: 'mutation {editLabel(labelID:"5cc6c5a32403fb4f1cac8d58" editlabelName:"AWS"){message}}' })
+            .send({ query: testJSON().editLabel })
             .expect(200)
             .end((err, res) => {
 
@@ -229,7 +242,7 @@ describe('Apollo-GraphQL API', () => {
 
             //write your data for checking by giving mutation
             .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
-            .send({ query: 'mutation {removeLabel(labelID:"5cc01661299f2121952ca652"){message}}' })
+            .send({ query: testJSON().removeLabel })
             .expect(200)
             .end((err, res) => {
 
@@ -263,7 +276,7 @@ describe('Apollo-GraphQL API', () => {
 
             //write your data for checking by giving mutation
             .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
-            .send({ query: 'mutation {createNote(title:"Javaaa", description:"programming languageaa"){message}}' })
+            .send({ query: testJSON().createNote })
             .expect(200)
             .end((err, res) => {
 
@@ -297,7 +310,7 @@ describe('Apollo-GraphQL API', () => {
 
             //write your data for checking by giving mutation
             .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
-            .send({ query: 'mutation {editNote(noteID:"5cc01661299f2121952ca652" editTitle:"change name during tseting"){message}}' })
+            .send({ query: testJSON().editNote })
             .expect(200)
             .end((err, res) => {
 
@@ -331,7 +344,7 @@ describe('Apollo-GraphQL API', () => {
 
             //write your data for checking by giving mutation
             .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
-            .send({ query: 'mutation {removeNote(noteID:"5cc016e0299f2121952ca653"){message}}' })
+            .send({ query: testJSON().removeNote })
             .expect(200)
             .end((err, res) => {
 
@@ -364,7 +377,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .send({ query: 'mutation {Reminder(noteID:"5cca9f80e4cb7d26ebb3d267" reminder:"25/05/2019 02:30:00"){message}}' })
+            .send({ query: testJSON().Reminder })
             .expect(200)
             .end((err, res) => {
 
@@ -398,7 +411,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .send({ query: 'mutation {deleteReminder(noteID:"5cca9f80e4cb7d26ebb3d267" ){message}}' })
+            .send({ query: testJSON().deleteReminder })
             .expect(200)
             .end((err, res) => {
 
@@ -434,7 +447,7 @@ describe('Apollo-GraphQL API', () => {
 
             //write your data for checking by giving mutation
             .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
-            .send({ query: 'mutation {Archieve(noteID:"5cca9f80e4cb7d26ebb3d267"){message}}' })
+            .send({ query:  testJSON().Archieve })
             .expect(200)
             .end((err, res) => {
 
@@ -468,7 +481,7 @@ describe('Apollo-GraphQL API', () => {
 
             //write your data for checking by giving mutation
             .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
-            .send({ query: 'mutation {ArchieveRemove(noteID:"5cca9f94e4cb7d26ebb3d269"){message}}' })
+            .send({ query: testJSON().ArchieveRemove })
             .expect(200)
             .end((err, res) => {
 
@@ -505,7 +518,7 @@ describe('Apollo-GraphQL API', () => {
 
             //write your data for checking by giving mutation
             .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
-            .send({ query: 'mutation {saveLabelToNote(noteID:"5cc83713d3daa33afdc12605" labelID:"5cc6c5a32403fb4f1cac8d58"){message}}' })
+            .send({ query: testJSON().saveLabelToNote })
             .expect(200)
             .end((err, res) => {
 
@@ -538,7 +551,7 @@ describe('Apollo-GraphQL API', () => {
 
             //write your data for checking by giving mutation
             .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJodXBlbmRyYXNpbmdoLmVjMThAZ21haWwuY29tIiwidXNlcklEIjoiNWNjNjgxNGQ3NmFmZDkxMjY5NGQ4NTE3IiwiaWF0IjoxNTU3NDg1MTIyLCJleHAiOjE2NDM4ODUxMjJ9.G1BWVZxijcQLIxV-eycspyxGxe-3OTyK9zvPm-2bfCM' })
-            .send({ query: 'mutation {removeLabelFromNote(noteID:"5cc004ca713f9c1141a20ac4" labelID:"5cc01661299f2121952ca652"){message}}' })
+            .send({ query: testJSON().removeLabelFromNote })
             .expect(200)
             .end((err, res) => {
 
@@ -570,7 +583,7 @@ describe('Apollo-GraphQL API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .send({ query: 'mutation {GithubAuth(email:"bhupendrasingh.ec18@gmail.com"){message}}' })
+            .send({ query: testJSON().GithubAuth })
             .expect(200)
             .end((err, res) => {
 
@@ -603,7 +616,7 @@ describe('Apollo-GraphQL API', () => {
 
             //write your data for checking by giving mutation
             .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI1Y2Q0MDY1MDI1ZDA4ZjNjODg0MjUzOTUiLCJpZCI6NDc2Mzk2MzYsImxvZ2luIjoiQmh1cGkyNTA4IiwiaWF0IjoxNTU3Mzk5MTIwLCJleHAiOjE2NDM3OTkxMjB9.nidKhPCHXubIosxpueDGynYMMv5qtpd5oDCHKediXo8' })
-            .send({ query: 'mutation {codeVerify{message}}' })
+            .send({ query: testJSON().codeVerify })
             .expect(200)
             .end((err, res) => {
 
@@ -637,7 +650,7 @@ describe('Apollo-GraphQL API', () => {
 
             //write your data for checking by giving mutation
             .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI1Y2Q0MDY1MDI1ZDA4ZjNjODg0MjUzOTUiLCJpZCI6NDc2Mzk2MzYsImxvZ2luIjoiQmh1cGkyNTA4IiwiaWF0IjoxNTU3Mzk5MTIwLCJleHAiOjE2NDM3OTkxMjB9.nidKhPCHXubIosxpueDGynYMMv5qtpd5oDCHKediXo8' })
-            .send({ query: 'mutation {GitAuthTokenVerify{message}}' })
+            .send({ query:  testJSON().GitAuthTokenVerify })
             .expect(200)
             .end((err, res) => {
 
@@ -672,7 +685,7 @@ describe('Apollo-GraphQL API', () => {
 
             //write your data for checking by giving mutation
             .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI1Y2Q0MDY1MDI1ZDA4ZjNjODg0MjUzOTUiLCJpZCI6NDc2Mzk2MzYsImxvZ2luIjoiQmh1cGkyNTA4IiwiaWF0IjoxNTU3Mzk5MTIwLCJleHAiOjE2NDM3OTkxMjB9.nidKhPCHXubIosxpueDGynYMMv5qtpd5oDCHKediXo8' })
-            .send({ query: 'mutation {pullGitRepository{message}}' })
+            .send({ query: testJSON().pullGitRepository })
             .expect(200)
             .end((err, res) => {
 
