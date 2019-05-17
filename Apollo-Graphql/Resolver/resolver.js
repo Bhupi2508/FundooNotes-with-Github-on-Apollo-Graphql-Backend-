@@ -57,6 +57,7 @@ const createGitBranch = require('../Mutation/gitAuthMutation').createGitBranch  
 const deleteGitBranch = require('../Mutation/gitAuthMutation').deleteGitBranch   //deleteBranch mutation
 const picUpload = require('../Mutation/uploadPicMutation').picUpload   //picUpload mutation
 const addCollaboration = require('../Mutation/collaboratorMutation').addCollaboration //picUpload mutation
+const removeCollaboration = require('../Mutation/collaboratorMutation').removeCollaboration  //removeCollaboration mutation
 
 //create a empty function
 var userResolver = function () { }
@@ -109,7 +110,8 @@ userResolver.prototype.resolvers = {
         createGitBranch,
         deleteGitBranch,
         picUpload,
-        addCollaboration
+        addCollaboration,
+        removeCollaboration
 
     },
     User: {

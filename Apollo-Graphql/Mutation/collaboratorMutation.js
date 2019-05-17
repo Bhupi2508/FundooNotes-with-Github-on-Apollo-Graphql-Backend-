@@ -99,6 +99,72 @@ collaboratorMutation.prototype.addCollaboration = async (root, args, context) =>
 }
 
 
+
+
+
+
+/*******************************************************************************************************************/
+/**
+ * @description : removeCollaboration APIs for collaborators to remove from user using apollo-graphql
+ * @purpose : removeCollaboration ID for which user you remove from database
+ * @param {root}, which has data information
+ * @param {params}, input by users
+ * @param {context}, req from queries, headers, server
+ */
+collaboratorMutation.prototype.removeCollaboration = async (root, args, context) => {
+
+    try {
+        if (!context.token) {
+            return { "message": "token not provided" }
+        }
+
+
+        /**
+         * @var payload, to take token after verify
+         */
+        var payload = await tokenVerify.verification(context.token)
+
+
+        /**
+         * @var user, find the user ID from userModel
+         */
+        var user = await userModel.find({ "_id": payload.userID });
+        if (!user) {
+            return { "message": "user not found" }
+        }
+
+
+        /**
+         * @var note,find the note ID from noteModel
+         */
+        var note = await noteModel.find({ "_id": args.noteID })
+        if (!note) {
+            return { "message": "note not found" }
+        }
+
+
+        /**
+         * @var colab, find colab ID from colModel
+         */
+        var findColab = await colModel.findOneAndDelete({ "collaboratorID": args.colabID })
+        if (findColab) {
+            return { "message": "collaborator removed successfully" }
+        }
+
+        return { "message": "This collaborator is not present" }
+
+
+    } catch (err) {
+        console.log("!Error")
+        return { "message": err }
+    }
+}
+
+
+
+
+
+
 /**
  * @exports collaboratorMutation
  */
