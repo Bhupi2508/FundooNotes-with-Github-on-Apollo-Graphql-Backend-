@@ -1,31 +1,25 @@
 /********************************************************************************************************************
- *  @Execution      : default node          : cmd> userMutations.js
+ *  @Execution      : default node          : cmd> collaboratorMutation.js
  *                      
- * 
- *  @Purpose        : perform operations by using users
+ *  @Purpose        : perform operations by using users for collaborate
  * 
  *  @description    : By using mutation we can manipulate the data (CURD)
  * 
  *  @overview       : fundoo application  
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
  *  @version        : 1.0
- *  @since          : 27-april-2019
+ *  @since          : 15-may-2019
  *
  *******************************************************************************************************************/
 /**
  * @requires files
  */
-var redis = require('async-redis')
-var bcrypt = require('bcrypt')
-const jsonwebtoken = require('jsonwebtoken')
 var userModel = require('../../model/userSchema')
 var noteModel = require('../../model/noteSchema')
 var sendMail = require('../../sendMailer/sendMail')
 var colModel = require('../../model/collabatorsSchema');
 var tokenVerify = require('../../Authentication/authenticationUser')
 
-//create a redis client
-var client = redis.createClient()
 
 //saltrounds for hash password
 var saltRounds = 10;
@@ -36,8 +30,8 @@ var collaboratorMutation = function () { }
 
 /*******************************************************************************************************************/
 /**
- * @description : register APIs for register a new user using apollo-graphql
- * @purpose : register user in database
+ * @description : addCollaboration APIs for collaborators to add user using apollo-graphql
+ * @purpose : addCollaborator ID for which user you add in database
  * @param {root}, which has data information
  * @param {params}, input by users
  * @param {context}, req from queries, headers, server
@@ -45,50 +39,59 @@ var collaboratorMutation = function () { }
 collaboratorMutation.prototype.addCollaboration = async (root, args, context) => {
 
     try {
-        if (context.token) {
-            var payload = await tokenVerify.verification(context.token)
-            var user = await userModel.find({ "_id": payload.userID });
-            if (!user) {
-                return {
-                    "message": "user not found"
-                }
-            }
-            var note = await noteModel.find({ "_id": args.noteID })
-            if (!note) {
-                return {
-                    "message": "note not found"
-                }
-            }
-            var colab = await colModel.find({ "collaboratorID": args.colabID})
-            console.log(colab);
-            console.log(colab.length);
-            
-            if (colab.length>0) {
-                return {
-                    "message": "user already colabrated"
-                }
-            }
-            var newColab = new colModel({
-                "userID": payload.userID,
-                "noteID": args.noteID,
-                "collaboratorID": args.colabID
-            })
-            var save = newColab.save()
-            if (save) {
-                return {
-                    "message": "colabbed successfully"
-                }
-            }
-            else {
-                return {
-                    "message": "colab unsuccessful"
-                }
-            }
+        if (!context.token) {
+            return { "message": "token not provided" }
+        }
 
+
+        /**
+         * @var payload, to take token after verify
+         */
+        var payload = await tokenVerify.verification(context.token)
+
+
+        /**
+         * @var user, find the user ID from userModel
+         */
+        var user = await userModel.find({ "_id": payload.userID });
+        if (!user) {
+            return { "message": "user not found" }
         }
-        return {
-            "message": "token not provided"
+
+
+        /**
+         * @var note,find the note ID from noteModel
+         */
+        var note = await noteModel.find({ "_id": args.noteID })
+        if (!note) {
+            return { "message": "note not found" }
         }
+
+
+        /**
+         * @var colab, find colab ID from colModel
+         */
+        var colab = await colModel.find({ "collaboratorID": args.colabID })
+        if (colab.length > 0) {
+            return { "message": "user already colabrated" }
+        }
+
+        //take those var from input 
+        var newColab = new colModel({
+            "userID": payload.userID,
+            "noteID": args.noteID,
+            "collaboratorID": args.colabID
+        })
+
+        //save in given database
+        var save = newColab.save()
+        if (save) {
+            return { "message": "colabbed successfully" }
+        }
+
+        return { "message": "colab unsuccessful" }
+
+
     } catch (err) {
         console.log("!Error")
         return { "message": err }

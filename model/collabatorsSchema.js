@@ -1,15 +1,15 @@
 /******************************************************************************
- *  @Execution      : default node          : cmd> labelSchema.js
+ *  @Execution      : default node          : cmd> collabatorsSchema.js
  *                      
  * 
- *  @Purpose        : MongoDB schema for labels
+ *  @Purpose        : MongoDB schema for collabators
  * 
- *  @description    : using this schema we store labels data in database
+ *  @description    : using this schema we store collabators data in database
  * 
  *  @overview       : fundoo application
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
  *  @version        : 1.0
- *  @since          : 29-april-2019
+ *  @since          : 14-may-2019
  *
  ******************************************************************************/
 /**
@@ -48,4 +48,8 @@ var collaboratorSchema = new mongoSchema({
 
 //connect database using mongoose
 var collaborator = mongoose.model('collaborators', collaboratorSchema);
+
+/**
+ * @exports collaborator
+ */
 module.exports = collaborator
