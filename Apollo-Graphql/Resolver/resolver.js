@@ -18,11 +18,13 @@ const redis = require("async-redis");
 const client = redis.createClient()
 const labelModel = require('../../model/labelSchema')  //labelModels  
 const noteModel = require('../../model/noteSchema')   //noteModel
+const colabModel = require('../../model/collabatorsSchema')   //colabModel
 const user = require('../Query/query').user;   //user queries
 const gitHubRepository = require('../Query/query').gitHubRepository;   //user queries
 const labelUser = require('../Query/query').labelUser;   //labelUser queries
 const notesUser = require('../Query/query').notesUser;   //notesUser queries
 const gitUser = require('../Query/query').gitUser;   //gitUser queries
+const colabUser = require('../Query/query').colabUser;   //colabUser queries
 const signUp = require('../Mutation/UserMutation').signup  //signUp mutation
 const emailVerify = require('../Mutation/UserMutation').emailVerify  //emailVerify mutation
 const login = require('../Mutation/UserMutation').login   //login mutation
@@ -55,6 +57,8 @@ const addWatchInGitRepo = require('../Mutation/gitAuthMutation').addWatchInGitRe
 const deleteWatchInGitRepo = require('../Mutation/gitAuthMutation').deleteWatchInGitRepo   //deleteWatchInGitRepo mutation
 const createGitBranch = require('../Mutation/gitAuthMutation').createGitBranch   //createBranch mutation
 const deleteGitBranch = require('../Mutation/gitAuthMutation').deleteGitBranch   //deleteBranch mutation
+const createGitRepository = require('../Mutation/gitAuthMutation').createGitRepository   //createGitRepository mutation
+const removeGitRepository = require('../Mutation/gitAuthMutation').removeGitRepository   //removeGitRepository mutation
 const picUpload = require('../Mutation/uploadPicMutation').picUpload   //picUpload mutation
 const addCollaboration = require('../Mutation/collaboratorMutation').addCollaboration //picUpload mutation
 const removeCollaboration = require('../Mutation/collaboratorMutation').removeCollaboration  //removeCollaboration mutation
@@ -74,7 +78,8 @@ userResolver.prototype.resolvers = {
         user,
         labelUser,
         notesUser,
-        gitUser
+        gitUser,
+        colabUser
     },
     Mutation: {
         signUp,
@@ -109,6 +114,8 @@ userResolver.prototype.resolvers = {
         deleteWatchInGitRepo,
         createGitBranch,
         deleteGitBranch,
+        createGitRepository,
+        removeGitRepository,
         picUpload,
         addCollaboration,
         removeCollaboration
@@ -125,13 +132,19 @@ userResolver.prototype.resolvers = {
                 var labels = await labelModel.find({ userID: root._id })
                 return labels
             }
-
         },
+
         async notes(root, params, context) {
             var notes = await noteModel.find({ userID: root._id })
             return notes
-        }
-    },
+        },
+
+        async colabs(root, params, context) {
+            var colabs = await colabModel.find()
+            return colabs
+
+        },
+    }
 }
 
 

@@ -19,6 +19,8 @@
 var userModel = require('../../model/userSchema')
 var labelModel = require('../../model/labelSchema')
 var notesModel = require('../../model/noteSchema')
+var colabModel = require('../../model/collabatorsSchema')
+var tokenVerify = require('../../Authentication/authenticationUser')
 
 //create a empty function
 var userQueries = function () { }
@@ -30,8 +32,14 @@ var userQueries = function () { }
  * @param {args}
  * @param {context}
  */
-userQueries.prototype.user = async (root, params) => {
-    var user = await userModel.find().limit(params.first).skip(params.offset)
+userQueries.prototype.user = async (root, params, context) => {
+    if (!context.token) {
+        return {
+            "message": "token not provided"
+        }
+    }
+    var payload = tokenVerify.verification(context.token)
+    var user = await userModel.find({ _id: payload.userID }).limit(params.first).skip(params.offset)
     console.log(user);
     return user
 }
@@ -60,6 +68,19 @@ userQueries.prototype.notesUser = async (root, params) => {
     var notes_User = await notesModel.find().limit(params.first).skip(params.offset)
     console.log(notes_User[0]);
     return notes_User
+}
+
+
+
+/***********************************************************************************/
+/**
+ * @purpose : for colaborators Query
+ * @param {args}
+ * @param {context}
+ */
+userQueries.prototype.colabUser = async (root, params) => {
+    var colab_User = await colabModel.find().exec()
+    return colab_User
 }
 
 

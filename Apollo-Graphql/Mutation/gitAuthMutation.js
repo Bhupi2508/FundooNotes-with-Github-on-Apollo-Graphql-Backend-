@@ -759,6 +759,142 @@ gitAuthMutation.prototype.removeStarRepository = async (root, params, context) =
 
 
 
+
+
+
+
+/*******************************************************************************************************************/
+/**
+ * @description : createGitBranch APIs for create Branch in github using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+gitAuthMutation.prototype.createGitRepository = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+        // Access_token
+        var access_token = user[0].access_Token
+        console.log("access_token", access_token)
+
+
+        /**
+         * @function (Axios), which is used to handle http request
+         * @method (get), Get data in response when hit the url
+         * @param {headers}
+         * @purpose : get response from given url
+         */
+        var res = await axios({
+            method: 'POST',
+            url: `${process.env.CREATE_REPO}`,
+            headers: {
+                Authorization: `Bearer ${access_token}`
+            },
+            data: JSON.stringify({
+                'name': `${params.repoName}`,
+            })
+
+        })
+
+        console.log("\nRepository Branch Response Data : ", res);
+        console.log("\nRepository Branch Object Data : ", res.data[0]);
+
+        return { "message": "Repository created Successfully" }
+
+    } catch (err) {
+        console.log("!Error in catch : ", err)
+        return { "message": "This Repository is already present" }
+    }
+}
+
+
+
+
+
+
+
+
+
+/*******************************************************************************************************************/
+/**
+ * @description : createGitBranch APIs for create Branch in github using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+gitAuthMutation.prototype.removeGitRepository = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+        // Access_token
+        var access_token = user[0].access_Token
+        console.log("access_token", access_token)
+
+
+        /**
+         * @function (Axios), which is used to handle http request
+         * @method (get), Get data in response when hit the url
+         * @param {headers}
+         * @purpose : get response from given url
+         */
+        var res = await axios({
+            method: 'DELETE',
+            url: `${process.env.DELETE_REPO}${params.ownerName}/${params.repoName}`,
+            headers: {
+                Authorization: `Bearer ${process.env.DELETE_TOKEN}`
+            }
+
+        })
+
+        console.log("\nRepository Branch Response Data : ", res);
+        console.log("\nRepository Branch Object Data : ", res.data[0]);
+
+        return { "message": "Repository deleted Successfully" }
+
+    } catch (err) {
+        console.log("!Error in catch : ", err)
+        return { "message": "This Repository is not present" }
+    }
+}
+
+
+
+
+
+
 /**
 * @exports gitAuthMutation
 */

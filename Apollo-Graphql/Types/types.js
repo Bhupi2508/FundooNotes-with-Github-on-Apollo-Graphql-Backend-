@@ -37,6 +37,7 @@ type User {
     token : String
     labels : [Label]
     notes : [Notes]
+    colabs : [Colab]
  }
 
  type Label {
@@ -51,20 +52,16 @@ type User {
      title: String!
      description: String!
      reminder: String!
-     color: String!
-     img: String!
      archieve: Boolean!
      trash: Boolean!
      pin: Boolean!
      message: String!
-     loginName: String!,
-     gitID:  String!,
-     access_Token: String!
    }
    
    type repo {
        name : String!
        description : String
+       access_Token: String
    }
 
    type GitHub {
@@ -83,10 +80,19 @@ type User {
       Key: String!
    }
 
+   type Colab {
+      _id: ID
+      userID: String
+      noteID: String
+      collaboratorID: String
+
+   }
+
  type Query {
     user(userID:String, first: Int, offset: Int): [User]
     labelUser(userID:String, first: Int, offset: Int): [Label]
     notesUser(userID:String, first: Int, offset: Int): [Notes]
+    colabUser(userID:String, first: Int, offset: Int): [Colab]
     gitUser: [GitHub]
     PicUser: [UploadPic]
     gitHubRepository: [User]
@@ -126,6 +132,8 @@ type User {
     deleteWatchInGitRepo(gitUsername: String!, repoName: String!): GitHub
     createGitBranch(newBranch: String!, gitUsername: String!, repoName: String!): GitHub
     deleteGitBranch(DeleteBranch: String!, gitUsername: String!, repoName: String!): GitHub
+    createGitRepository(repoName: String!):GitHub
+    removeGitRepository(ownerName: String!, repoName: String!):GitHub
     picUpload: UploadPic
     addCollaboration(noteID:String!,colabID:String!):User
     removeCollaboration(noteID:String!,colabID:String!):User

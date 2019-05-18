@@ -346,14 +346,14 @@ userMutation.prototype.resetPassword = async (root, params, context) => {
  * @purpose : For updation by using CURD operation
  * @param {*} root
  * @param {*} params
- */
-userMutation.prototype.update = async (root, params, context) => {
-
-    try {
-
-        /**
-        * @purpose : for token verification
-        * @returns {String} message
+ */ 
+userMutation.prototype.update =  async (root, params, context) => {
+ 
+    try { 
+ 
+        /** 
+        * @purpose : for token v erification
+        * @returns {String} mess age
         */
         var afterVerify = tokenVerify.verification(context.token)
         if (!afterVerify > 0) {

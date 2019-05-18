@@ -1,5 +1,5 @@
 {
-    "signUp": "mutation { signUp (firstName:\"akash\", lastName:\"sharma\", email:\"akaeddsh@gmail.com\", password:\"akasfdrgh1\") {message token}}",
+    "signUp": "mutation { signUp (firstName:\"akash\", lastName:\"sharma\", email:\"akaeddh@gmail.com\", password:\"akasfdrgh1\") {message token}}",
     "login": "mutation { login (email:\"bhupendrasingh.ec18@gmail.com\", password:\"123456789\") {message token}}",
     "forgotPassword": "mutation { forgotPassword (email:\"bhupendrasingh.ec18@gmail.com\") {message token}}",
     "resetPassword": "mutation{ resetPassword (newPassword:\"123456789\" confirmPassword:\"123456789\"){message}}",
