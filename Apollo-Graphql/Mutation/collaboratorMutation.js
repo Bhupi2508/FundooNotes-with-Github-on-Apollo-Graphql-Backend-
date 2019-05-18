@@ -163,8 +163,6 @@ collaboratorMutation.prototype.removeCollaboration = async (root, args, context)
 
 
 
-
-
 /**
  * @exports collaboratorMutation
  */

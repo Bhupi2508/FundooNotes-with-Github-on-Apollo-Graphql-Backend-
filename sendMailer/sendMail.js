@@ -30,13 +30,13 @@ exports.sendEmailFunction = (url, email) => {
 
         //email and password are hidden by using of env file
         auth: {
-            user: process.env.email,
-            pass: process.env.password
+            user: process.env.EMAIL,
+            pass: process.env.PASSWORD
         },
     });
 
     const mailOptions = {
-        from: process.env.email,
+        from: process.env.EMAIL,
         to: email,
         subject: 'fundoo password reset link ',
         text: 'Please go through the e-mail verifaction link provided in this mail:\n\n' + url

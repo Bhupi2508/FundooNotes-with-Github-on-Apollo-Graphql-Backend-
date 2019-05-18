@@ -29,7 +29,7 @@ exports.verification = (token) => {
          * @return {String}, value of verify token
          * @param {String}, secretKey
          */
-        var value = jwt.verify(token, process.env.secretKey)
+        var value = jwt.verify(token, process.env.SECRET_KEY)
         return value
     }
     catch (err) {

@@ -23,8 +23,8 @@ var multerS3 = require('multer-s3')
 var s3 = new aws.S3({
     bucketName: 'myfundoo',
     region: 'ap-south-1',
-    accessKeyId: process.env.awsID,
-    secretAccessKey: process.env.awsSecret
+    accessKeyId: process.env.AWS_ID,
+    secretAccessKey: process.env.AWS_SECRET
 })
 
 /**

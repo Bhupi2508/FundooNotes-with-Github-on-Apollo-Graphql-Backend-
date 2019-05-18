@@ -41,7 +41,7 @@ gitAuthMutation.prototype.GithubAuth = async (root, params) => {
          * @param {String}, create a code, which is redirect in graphiql
          * @returns {String} message
          */
-        var url = `${process.env.gitCode}?client_id=${process.env.ClientID}&redirect_uri=${process.env.Git_Link}&scope=repo`
+        var url = `${process.env.GIT_CODE}?client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.GIT_LINK}&scope=repo`
 
         //sent mail to the mail id
         var mail = sendMail.sendEmailFunction(url, params.email)
@@ -77,7 +77,7 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
      */
     axios({
         method: 'post',
-        url: `${process.env.gitAccess}client_id=${process.env.ClientID}&client_secret=${process.env.ClientSecret}&code=${context.code}`,
+        url: `${process.env.GIT_ACCESS}client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}&code=${context.code}`,
         headers: {
             accept: 'application/json',
         }
@@ -110,7 +110,7 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
        */
         axios({
             method: 'get',
-            url: `${process.env.getResponse}access_token=${access_token}`,
+            url: `${process.env.GET_RESPONSE}access_token=${access_token}`,
             headers: {
                 accept: 'application/json',
             }
@@ -136,7 +136,7 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
 
 
                 //token created for gitAuth login verification and send to git mail
-                var token = await jwt.sign({ "userID": saveuser.id, "id": response.data.id, "login": response.data.login }, process.env.secretKey, { expiresIn: 86400000 })
+                var token = await jwt.sign({ "userID": saveuser.id, "id": response.data.id, "login": response.data.login }, process.env.SECRET_KEY, { expiresIn: 86400000 })
 
                 //send mail to the given mail id
                 var url = `http://localhost:4000?token=${token}`
@@ -248,7 +248,7 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
         */
         axios({
             method: 'get',
-            url: `${process.env.gitRepository}access_token=${access_token}`,
+            url: `${process.env.GIT_REPOSITORY}access_token=${access_token}`,
             headers: {
                 accept: 'application/json'
             }
@@ -331,7 +331,7 @@ gitAuthMutation.prototype.addWatchInGitRepo = async (root, params, context) => {
          */
         axios({
             method: 'PUT',
-            url: `${process.env.addWatchInGit}${params.gitUsername}/${params.repoName}`,
+            url: `${process.env.ADD_WATCH_IN_GIT}${params.gitUsername}/${params.repoName}`,
             headers: {
                 Authorization: `Bearer ${access_token}`
             }
@@ -394,7 +394,7 @@ gitAuthMutation.prototype.deleteWatchInGitRepo = async (root, params, context) =
          */
         axios({
             method: 'DELETE',
-            url: `${process.env.deleteWatchInGitRepo}${params.gitUsername}/${params.repoName}/subscription`,
+            url: `${process.env.DELETE_WATCH_IN_GIT_REPO}${params.gitUsername}/${params.repoName}/subscription`,
             headers: {
                 Authorization: `Bearer ${access_token}`
             },
@@ -456,7 +456,7 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
          */
         var res = await axios({
             method: 'get',
-            url: `${process.env.getCreateBranch}${params.gitUsername}/${params.repoName}/git/refs/heads`,
+            url: `${process.env.GET_CREATE_BRANCH}${params.gitUsername}/${params.repoName}/git/refs/heads`,
             headers: {
                 Authorization: `Bearer ${access_token}`
             },
@@ -476,7 +476,7 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
          */
         var branchResponse = await axios({
             method: 'post',
-            url: `${process.env.postCreateBranch}${params.gitUsername}/${params.repoName}/git/refs`,
+            url: `${process.env.POST_CREATE_BRANCH}${params.gitUsername}/${params.repoName}/git/refs`,
             headers: {
                 Authorization: `Bearer ${access_token}`
             },
@@ -541,7 +541,7 @@ gitAuthMutation.prototype.deleteGitBranch = async (root, params, context) => {
          */
         var res = await axios({
             method: 'DELETE',
-            url: `${process.env.deleteBranch}${params.gitUsername}/${params.repoName}/git/refs/heads/${params.DeleteBranch}`,
+            url: `${process.env.DELETE_BRANCH}${params.gitUsername}/${params.repoName}/git/refs/heads/${params.DeleteBranch}`,
             headers: {
                 Authorization: `Bearer ${access_token}`
             }
@@ -736,12 +736,14 @@ gitAuthMutation.prototype.removeStarRepository = async (root, params, context) =
 
         //fetch repository data from github
         const fetch = createApolloFetch({
-            uri: `https://api.github.com/graphql?access_token=${access_token}`
+            uri: `${process.env.APOLLO_REPO_FETCH}${access_token}`
         });
+
+
 
         //pass the query mutation for data fetching
         const res = await fetch({
-            query: `mutation {addStar(input: {starrableId: "MDEwOlJlcG9zaXRvcnkxODU1NDM1ODk=", clientMutationId:${gitNodeID}}) { clientMutationId}}`,
+            query: `mutation {addStar(input: {starrableId: ${process.env.GIT_ID}, clientMutationId:${gitNodeID}}) { clientMutationId}}`,
         })
 
         console.log(res)

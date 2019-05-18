@@ -78,7 +78,7 @@ userMutation.prototype.signup = async (root, params, context) => {
             /**
              * @param {token}, a token and send for verification
              */
-            var token = jsonwebtoken.sign({ email: params.email }, process.env.secretKey, { expiresIn: 86400000 })
+            var token = jsonwebtoken.sign({ email: params.email }, process.env.SECRET_KEY, { expiresIn: 86400000 })
 
 
             /**
@@ -184,7 +184,7 @@ userMutation.prototype.login = async (root, params, context) => {
         /**
          * @param {token}, generate a token with expire time and provide a secret key
          */
-        var token = jsonwebtoken.sign({ email: params.email, userID: user[0].id }, process.env.secretKey, { expiresIn: 86400000 })
+        var token = jsonwebtoken.sign({ email: params.email, userID: user[0].id }, process.env.SECRET_KEY, { expiresIn: 86400000 })
 
         //create a url
         var url = `${context.origin}?token=${token}`
@@ -263,7 +263,7 @@ userMutation.prototype.forgotPassword = async (root, params, context) => {
         /**
          * @purpose : generate a token for send a mail
          */
-        var token = jsonwebtoken.sign({ email: params.email }, process.env.secretKey, { expiresIn: 86400000 });
+        var token = jsonwebtoken.sign({ email: params.email }, process.env.SECRET_KEY, { expiresIn: 86400000 });
 
         //send token to sendmail function, which is send to the link(token)
         var url = `${context.origin}?token=${token}`
