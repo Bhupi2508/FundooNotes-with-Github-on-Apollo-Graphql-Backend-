@@ -588,34 +588,37 @@ noteMutation.prototype.searchNote = async (root, params) => {
     try {
 
         //find labelID from noteModel Schema
-        var id = await noteModel.find({ "title": params.title })
+        var id = await noteModel.findOne({ "title": params.title })
+        
 
-        //if id is already present
-        if (!id.length > 0) {
-            return { "message": "This title is not present in anyNotes" }
-        }
+        console.log("_id", id);
 
-        //find id from noteModel and update(push) into notes
-        var note = await noteModel.fin({ _id: params.noteID },
-            {
-                $pull: {
-                    labelID: params.label_ID
-                }
-            })
+        // //if id is already present
+        // if (!id.length > 0) {
+        //     return { "message": "This title is not present in anyNotes" }
+        // }
 
-        /**
-         * @return {String}, message
-         */
-        if (!note) {
-            return { "message": "label not deleted " }
-        } else {
-            for (let i = 0; i < (note.labelID).length; i++) {
-                if (note.labelID[i] === params.label_ID) {
-                    note.labelID.splice(i, 1);
-                }
-            }
-            return { "message": "label delete from note successfully " }
-        }
+        // //find id from noteModel and update(push) into notes
+        // var note = await noteModel.find({ _id: params.noteID },
+        //     {
+        //         $pull: {
+        //             labelID: params.label_ID
+        //         }
+        //     })
+
+        // /**
+        //  * @return {String}, message
+        //  */
+        // if (!note) {
+        //     return { "message": "label not deleted " }
+        // } else {
+        //     for (let i = 0; i < (note.labelID).length; i++) {
+        //         if (note.labelID[i] === params.label_ID) {
+        //             note.labelID.splice(i, 1);
+        //         }
+        //     }
+        //     return { "message": "label delete from note successfully " }
+        // }
 
 
     } catch (error) {

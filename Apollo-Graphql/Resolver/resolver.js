@@ -20,11 +20,12 @@ const labelModel = require('../../model/labelSchema')  //labelModels
 const noteModel = require('../../model/noteSchema')   //noteModel
 const colabModel = require('../../model/collabatorsSchema')   //colabModel
 const user = require('../Query/query').user;   //user queries
-const gitHubRepository = require('../Query/query').gitHubRepository;   //user queries
-const labelUser = require('../Query/query').labelUser;   //labelUser queries
-const notesUser = require('../Query/query').notesUser;   //notesUser queries
-const gitUser = require('../Query/query').gitUser;   //gitUser queries
-const colabUser = require('../Query/query').colabUser;   //colabUser queries
+const labelUser = require('../Query/query').labelUser   //labelUser queries
+const notesUser = require('../Query/query').notesUser   //notesUser queries
+const gitUser = require('../Query/query').gitUser    //gitUser queries
+const colabUser = require('../Query/query').colabUser   //colabUser queries
+const searchNoteByTitle = require('../Query/query').searchNoteByTitle   //searchNoteByTitle queries
+const searchNoteByDescription = require('../Query/query').searchNoteByDescription   //searchNoteByDescription queries
 const signUp = require('../Mutation/UserMutation').signup  //signUp mutation
 const emailVerify = require('../Mutation/UserMutation').emailVerify  //emailVerify mutation
 const login = require('../Mutation/UserMutation').login   //login mutation
@@ -79,7 +80,9 @@ userResolver.prototype.resolvers = {
         labelUser,
         notesUser,
         gitUser,
-        colabUser
+        colabUser,
+        searchNoteByTitle,
+        searchNoteByDescription
     },
     Mutation: {
         signUp,
@@ -135,7 +138,9 @@ userResolver.prototype.resolvers = {
         },
 
         async notes(root, params, context) {
-            var notes = await noteModel.find({ userID: root._id })
+            var regex1 = new RegExp(params.title)
+            var regex2 = new RegExp(params.description)
+            var notes = await noteModel.find({ userID: root._id, title: regex1, description: regex2 })
             return notes
         },
 

@@ -36,7 +36,7 @@ type User {
     message : String!
     token : String
     labels : [Label]
-    notes : [Notes]
+    notes(title: String,description: String) : [Notes]
     colabs : [Colab]
  }
 
@@ -91,11 +91,13 @@ type User {
  type Query {
     user(userID:String, first: Int, offset: Int): [User]
     labelUser(userID:String, first: Int, offset: Int): [Label]
-    notesUser(userID:String, first: Int, offset: Int): [Notes]
+    notesUser(userID:String,title: String,description: String, first: Int, offset: Int): [Notes]
     colabUser(userID:String, first: Int, offset: Int): [Colab]
     gitUser: [GitHub]
     PicUser: [UploadPic]
     gitHubRepository: [User]
+    searchNoteByTitle(title: String!):[Notes]
+    searchNoteByDescription(description: String!):[Notes]
  }
 
  

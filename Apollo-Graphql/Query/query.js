@@ -65,7 +65,9 @@ userQueries.prototype.labelUser = async (root, params) => {
  * @param {context}
  */
 userQueries.prototype.notesUser = async (root, params) => {
-    var notes_User = await notesModel.find().limit(params.first).skip(params.offset)
+    var regex1 = new RegExp(params.title)
+    var regex2 = new RegExp(params.description)
+    var notes_User = await notesModel.find({ title: regex1, description: regex2 }).limit(params.first).skip(params.offset)
     console.log(notes_User[0]);
     return notes_User
 }
@@ -84,6 +86,7 @@ userQueries.prototype.colabUser = async (root, params) => {
 }
 
 
+
 /***********************************************************************************/
 /**
  * @purpose : for gituser Query
@@ -95,6 +98,40 @@ userQueries.prototype.gitUser = async (root, params) => {
     console.log(git_User[0]);
     return git_User
 }
+
+
+
+
+/***********************************************************************************/
+/**
+ * @purpose : for searchNoteByTitle Query 
+ * @param {args}
+ * @param {context}
+ */
+userQueries.prototype.searchNoteByTitle = async (root, params) => {
+    var regex1 = new RegExp(params.title)
+    var notes_User = await notesModel.find({ title: regex1 }).limit(params.first).skip(params.offset)
+    console.log("notes_user", notes_User[0]);
+    return notes_User
+}
+
+
+
+
+/***********************************************************************************/
+/**
+ * @purpose : for searchNoteByDescription Query 
+ * @param {args}
+ * @param {context}
+ */
+userQueries.prototype.searchNoteByDescription = async (root, params) => {
+    var regex2 = new RegExp(params.description)
+    var notes_User = await notesModel.find({ description: regex2 }).limit(params.first).skip(params.offset)
+    console.log("notes_user", notes_User[0]);
+    return notes_User
+}
+
+
 
 
 /**
