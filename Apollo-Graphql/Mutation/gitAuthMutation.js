@@ -743,7 +743,7 @@ gitAuthMutation.prototype.removeStarRepository = async (root, params, context) =
 
         //pass the query mutation for data fetching
         const res = await fetch({
-            query: `mutation {addStar(input: {starrableId: ${process.env.GIT_ID}, clientMutationId:${gitNodeID}}) { clientMutationId}}`,
+            query: `mutation {removeStar(input: {starrableId: ${process.env.GIT_ID}, clientMutationId:${gitNodeID}}) { clientMutationId}}`,
         })
 
         console.log(res)
