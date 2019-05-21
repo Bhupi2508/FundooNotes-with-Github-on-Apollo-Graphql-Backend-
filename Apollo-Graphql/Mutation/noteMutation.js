@@ -376,7 +376,7 @@ noteMutation.prototype.Archieve = async (root, params, context) => {
              * @param {ID}, userID
              * @returns {String}, message
              */
-            var note = await noteModel.updateOne({ _id: params.noteID },
+            await noteModel.updateOne({ _id: params.noteID },
                 {
                     $set:
                     {
@@ -437,7 +437,7 @@ noteMutation.prototype.ArchieveRemove = async (root, params, context) => {
             * @param {ID}, userID
             * @returns {String}, message
             */
-            var note = await noteModel.updateOne({ _id: params.noteID },
+            await noteModel.updateOne({ _id: params.noteID },
                 {
                     $set:
                     {
@@ -493,7 +493,7 @@ noteMutation.prototype.Trash = async (root, params, context) => {
              * @param {ID}, userID
              * @returns {String}, message
              */
-            var note = await noteModel.updateOne({ _id: params.noteID },
+            await noteModel.updateOne({ _id: params.noteID },
                 {
                     $set:
                     {
@@ -556,7 +556,7 @@ noteMutation.prototype.TrashRemove = async (root, params, context) => {
             * @param {ID}, userID
             * @returns {String}, message
             */
-            var note = await noteModel.updateOne({ _id: params.noteID },
+            await noteModel.updateOne({ _id: params.noteID },
                 {
                     $set:
                     {
@@ -574,58 +574,6 @@ noteMutation.prototype.TrashRemove = async (root, params, context) => {
     }
 }
 
-
-
-
-/*******************************************************************************************************************/
-/**
- * @description : searchNote API into search notes by using title for using apollo-graphql
- * @purpose : For fetch data by using CURD operation
- * @param {*} root
- * @param {*} params
- */
-noteMutation.prototype.searchNote = async (root, params) => {
-    try {
-
-        //find labelID from noteModel Schema
-        var id = await noteModel.findOne({ "title": params.title })
-        
-
-        console.log("_id", id);
-
-        // //if id is already present
-        // if (!id.length > 0) {
-        //     return { "message": "This title is not present in anyNotes" }
-        // }
-
-        // //find id from noteModel and update(push) into notes
-        // var note = await noteModel.find({ _id: params.noteID },
-        //     {
-        //         $pull: {
-        //             labelID: params.label_ID
-        //         }
-        //     })
-
-        // /**
-        //  * @return {String}, message
-        //  */
-        // if (!note) {
-        //     return { "message": "label not deleted " }
-        // } else {
-        //     for (let i = 0; i < (note.labelID).length; i++) {
-        //         if (note.labelID[i] === params.label_ID) {
-        //             note.labelID.splice(i, 1);
-        //         }
-        //     }
-        //     return { "message": "label delete from note successfully " }
-        // }
-
-
-    } catch (error) {
-        console.log("error in catch")
-        return { "message": err }
-    }
-}
 
 
 

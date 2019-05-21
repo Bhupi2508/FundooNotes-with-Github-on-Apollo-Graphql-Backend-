@@ -60,7 +60,7 @@ userMutation.prototype.signup = async (root, params, context) => {
         }
 
         //for email id cheking
-        verify = await userModel.find({ "email": params.email })
+        var verify = await userModel.find({ "email": params.email })
         if (verify.length > 0) {
             return { "message": "email already exists" }
         }
@@ -173,7 +173,7 @@ userMutation.prototype.login = async (root, params, context) => {
         }
 
         //find email that is present in database or not
-        user = await userModel.find({ "email": params.email })
+        var user = await userModel.find({ "email": params.email })
         if (!user.length > 0) {
             return { "message": "email is not present" }
         }
@@ -187,11 +187,8 @@ userMutation.prototype.login = async (root, params, context) => {
         var token = jsonwebtoken.sign({ email: params.email, userID: user[0].id }, process.env.SECRET_KEY, { expiresIn: 86400000 })
 
         //create a url
-        var url = `${context.origin}?token=${token}`
-
-        //send to mail
-        //sendMail.sendEmailFunction(url, params.email)
-
+        `${context.origin}?token=${token}`
+       
         //take id for current user from database
         var id = user[0].id
 
@@ -255,7 +252,7 @@ userMutation.prototype.forgotPassword = async (root, params, context) => {
          * @purpose : find email that is present in database or not
          * @return {String} message
          */
-        user = await userModel.find({ "email": params.email })
+        var user = await userModel.find({ "email": params.email })
         if (!user.length > 0) {
             return { "message": "email is not present in database" }
         }

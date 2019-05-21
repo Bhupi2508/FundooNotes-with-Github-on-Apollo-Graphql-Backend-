@@ -9,8 +9,8 @@ Environment variables:
   - GJS_DEBUG_TOPICS=JS ERROR;JS LOG
   - GNOME_DESKTOP_SESSION_ID=this-is-deprecated
   - GNOME_SHELL_SESSION_MODE=ubuntu
-  - GNOME_TERMINAL_SCREEN=/org/gnome/Terminal/screen/90bccc60_50f4_471c_bc85_aba1bb242f0c
-  - GNOME_TERMINAL_SERVICE=:1.134
+  - GNOME_TERMINAL_SCREEN=/org/gnome/Terminal/screen/26fad6a0_0127_4e31_89d4_e62aedf78106
+  - GNOME_TERMINAL_SERVICE=:1.186
   - GPG_AGENT_INFO=/run/user/1000/gnupg/S.gpg-agent:0:1
   - GTK_IM_MODULE=ibus
   - GTK_MODULES=gail:atk-bridge

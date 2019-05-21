@@ -132,8 +132,8 @@ userResolver.prototype.resolvers = {
                 return value
             }
             else {
-                var labels = await labelModel.find({ userID: root._id })
-                return labels
+                var labels_find = await labelModel.find({ userID: root._id })
+                return labels_find
             }
         },
 

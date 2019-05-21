@@ -1,7 +1,4 @@
-±
+R
 
-javascriptS2583lChange this condition so that it does not always evaluate to "true"; some subsequent code is never executed. 2
-˜˜ ": 
-¬
-šœ
- 	Never reached
+javascriptS1656/Remove or correct this useless self-assignment. 2
+±± 

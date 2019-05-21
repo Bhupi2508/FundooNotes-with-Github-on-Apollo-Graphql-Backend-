@@ -274,7 +274,7 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
                     });
 
                     //save data in database
-                    const note = model.save()
+                    model.save()
                 }
             }
         })
@@ -465,7 +465,7 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
 
         console.log("\nRepository Branch Response Data : ", res.data);
         console.log("\nRepository Branch Object Data : ", res.data[0].object.sha);
-        var access_token = user[0].access_Token
+        var access_token1 = user[0].access_Token
 
         /**
          * @function (Axios), which is used to handle http request
@@ -478,7 +478,7 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
             method: 'post',
             url: `${process.env.POST_CREATE_BRANCH}${params.gitUsername}/${params.repoName}/git/refs`,
             headers: {
-                Authorization: `Bearer ${access_token}`
+                Authorization: `Bearer ${access_token1}`
             },
             data: JSON.stringify({
                 'ref': `refs/heads/${params.newBranch}`,
@@ -621,7 +621,7 @@ gitAuthMutation.prototype.fetchRepository = async (root, params, context) => {
                 });
 
                 //save data in database
-                const note = notesmodel.save()
+                notesmodel.save()
             }
         }
 
@@ -669,7 +669,7 @@ gitAuthMutation.prototype.starRepository = async (root, params, context) => {
         }
 
         // Access_token and Git Node ID
-        var gitNodeID = user[0].gitNodeID;
+        //var gitNodeID = user[0].gitNodeID;
         var access_token = user[0].access_Token;
 
 
