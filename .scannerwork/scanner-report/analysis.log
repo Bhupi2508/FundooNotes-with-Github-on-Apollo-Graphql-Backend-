@@ -9,8 +9,8 @@ Environment variables:
   - GJS_DEBUG_TOPICS=JS ERROR;JS LOG
   - GNOME_DESKTOP_SESSION_ID=this-is-deprecated
   - GNOME_SHELL_SESSION_MODE=ubuntu
-  - GNOME_TERMINAL_SCREEN=/org/gnome/Terminal/screen/26fad6a0_0127_4e31_89d4_e62aedf78106
-  - GNOME_TERMINAL_SERVICE=:1.186
+  - GNOME_TERMINAL_SCREEN=/org/gnome/Terminal/screen/287a17bb_1959_4843_98b1_526070b491fd
+  - GNOME_TERMINAL_SERVICE=:1.155
   - GPG_AGENT_INFO=/run/user/1000/gnupg/S.gpg-agent:0:1
   - GTK_IM_MODULE=ibus
   - GTK_MODULES=gail:atk-bridge
@@ -30,11 +30,11 @@ Environment variables:
   - QT4_IM_MODULE=xim
   - QT_ACCESSIBILITY=1
   - QT_IM_MODULE=xim
-  - SESSION_MANAGER=local/admin1-desktop:@/tmp/.ICE-unix/1331,unix/admin1-desktop:/tmp/.ICE-unix/1331
+  - SESSION_MANAGER=local/admin1-desktop:@/tmp/.ICE-unix/4202,unix/admin1-desktop:/tmp/.ICE-unix/4202
   - SHELL=/bin/bash
   - SHLVL=1
   - SONARQUBE_SCANNER_PARAMS={}
-  - SSH_AGENT_PID=1426
+  - SSH_AGENT_PID=4298
   - SSH_AUTH_SOCK=/run/user/1000/keyring/ssh
   - TERM=xterm-256color
   - TEXTDOMAIN=im-config
@@ -126,12 +126,13 @@ SonarQube plugins:
   - SonarQube :: Plugins :: SCM :: SVN 1.6.0.860 (scmsvn)
   - SonarJS 3.2.0.5506 (javascript)
 Global properties:
-  - sonar.core.id=AWraFZPhLZesnf9Vzxcv
-  - sonar.core.startTime=2019-05-21T11:09:48+0000
-Settings for module: fundoo_apollo_graphQl
+  - sonar.core.id=AWreIWDMlcvLErbzIWNX
+  - sonar.core.startTime=2019-05-22T06:00:57+0000
+Settings for module: fundoo_Apollo_Graphql
+  - sonar.exclusions=node_modules/**/*
   - sonar.host.url=http://localhost:9000
   - sonar.projectBaseDir=/home/admin1/Desktop/fundoo(apollo)
-  - sonar.projectKey=fundoo_apollo_graphQl
+  - sonar.projectKey=fundoo_Apollo_Graphql
   - sonar.projectName=fundoo(apollo)
   - sonar.projectVersion=1.0
   - sonar.scanner.app=ScannerCli
