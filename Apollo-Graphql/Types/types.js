@@ -126,7 +126,7 @@ type User {
     GithubAuth(email: String!): GitHub
     codeVerify(firstName: String, lastName: String, email: String): GitHub
     pullGitRepository:GitHub
-    fetchRepository:GitHub
+    fetchRepository(login_Name: String!):GitHub
     starRepository:GitHub
     removeStarRepository:GitHub
     GitAuthTokenVerify: GitHub

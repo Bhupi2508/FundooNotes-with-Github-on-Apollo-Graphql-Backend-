@@ -596,11 +596,11 @@ gitAuthMutation.prototype.fetchRepository = async (root, params, context) => {
 
         //get response from given url
         const fetch = createApolloFetch({
-            uri: `https://api.github.com/graphql?access_token=${access_token}`
+            uri: `${process.env.GIT_FETCH_REPO}${access_token}`
         });
 
         const res = await fetch({
-            query: '{ repositoryOwner(login: Bhupi2508) { id login avatarUrl repositories(first:10){ nodes{ isPrivate name description} } } }',
+            query: `{ repositoryOwner(login: ${params.login_Name}) { id login avatarUrl repositories(first:10){ nodes{ isPrivate name description} } } }`,
         })
 
         //for loop for save the repository in database
@@ -669,19 +669,19 @@ gitAuthMutation.prototype.starRepository = async (root, params, context) => {
         }
 
         // Access_token and Git Node ID
-        //var gitNodeID = user[0].gitNodeID;
+        var gitNodeID = user[0].gitNodeID;
         var access_token = user[0].access_Token;
 
 
         //fetch repository data from github
         const fetch = createApolloFetch({
-            uri: `https://api.github.com/graphql?access_token=${access_token}`
+            uri: `${process.env.GIT_FETCH_REPO}${access_token}`
         });
 
 
         //pass the query mutation for data fetching
         const res = await fetch({
-            query: 'mutation {addStar(input: {starrableId: "MDEwOlJlcG9zaXRvcnkxODU1NDM1ODk=", clientMutationId:"MDQ6VXNlcjQ3NjM5NjM2"}) { clientMutationId}}',
+            query: `mutation {addStar(input: {starrableId: ${process.env.GIT_ID}, clientMutationId:${gitNodeID}}) { clientMutationId}}`,
         })
 
         console.log(res)
