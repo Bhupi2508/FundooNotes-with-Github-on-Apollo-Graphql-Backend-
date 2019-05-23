@@ -78,7 +78,6 @@ var schemaData = new mongoSchema({
     },
     access_Token: {
         type: String,
-        required: [true, 'access_token from gitHub']
     },
     ProfilePicUrl: {
         type: String

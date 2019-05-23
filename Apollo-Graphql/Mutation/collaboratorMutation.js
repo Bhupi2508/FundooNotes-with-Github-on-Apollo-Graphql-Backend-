@@ -85,7 +85,18 @@ collaboratorMutation.prototype.addCollaboration = async (root, args, context) =>
 
         //save in given database
         var save = newColab.save()
+
+
+        //email which we collaborate
+        var findEmail = await userModel.find({ _id: args.colabID })
+        var email = findEmail[0].email
+
+        //message for mail
+        var url = "This" + email + "email is collaborate with me for Fundoo Notes"
+
+        //condition
         if (save) {
+            sendMail.sendEmailFunction(url, email)
             return { "message": "colabbed successfully" }
         }
 

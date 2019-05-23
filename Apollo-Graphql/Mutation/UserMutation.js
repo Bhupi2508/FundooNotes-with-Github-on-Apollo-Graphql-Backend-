@@ -17,7 +17,7 @@
  */
 var redis = require('async-redis')
 var bcrypt = require('bcrypt')
-const jsonwebtoken = require('jsonwebtoken')
+var jsonwebtoken = require('jsonwebtoken')
 var userModel = require('../../model/userSchema')
 var labelModel = require('../../model/labelSchema')
 var sendMail = require('../../sendMailer/sendMail')
@@ -67,7 +67,7 @@ userMutation.prototype.signup = async (root, params, context) => {
 
         //for bcrypt password
         params.password = await bcrypt.hashSync(params.password, saltRounds)
-        const usersMdl = new userModel(params)
+        var usersMdl = new userModel(params)
 
         //save in database
         const uModel = usersMdl.save();
@@ -187,7 +187,7 @@ userMutation.prototype.login = async (root, params, context) => {
         var token = jsonwebtoken.sign({ email: params.email, userID: user[0].id }, process.env.SECRET_KEY, { expiresIn: 86400000 })
 
         //create a url
-        `${context.origin}?token=${token}`
+        var url = `${context.origin}?token=${token}`
        
         //take id for current user from database
         var id = user[0].id
