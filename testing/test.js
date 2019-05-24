@@ -38,10 +38,12 @@ function testJSON() {
 
 
 
+
+/*********************************************************    Users   *********************************************************************/
 /**
  * @param {function()}
  */
-describe('Apollo-GraphQL API', () => {
+describe('Apollo-GraphQL Users API', () => {
 
     /***************************************************************************************************************/
     /**
@@ -167,6 +169,16 @@ describe('Apollo-GraphQL API', () => {
 
             });
     });
+})
+
+
+
+
+/*********************************************************    Labels   ********************************************************************/
+/**
+ * @param {function()}
+*/
+describe('Apollo-GraphQL Labels API', () => {
 
     /****************************************************************************************************************/
     /**
@@ -268,6 +280,16 @@ describe('Apollo-GraphQL API', () => {
 
             });
     });
+})
+
+
+
+
+/**********************************************************    Notes   ********************************************************************/
+/**
+* @param {function()}
+*/
+describe('Apollo-GraphQL Notes API', () => {
 
 
     /****************************************************************************************************************/
@@ -577,6 +599,96 @@ describe('Apollo-GraphQL API', () => {
 
             });
     });
+
+
+
+
+
+
+    /****************************************************************************************************************/
+    /**
+    * @purpose : Testing for users APIs
+    * @property {request} request has do request for server
+    * @property {post} post has post the function to the given path
+    * @property {send} send has send the parameter to the mutation
+    * @property {expect} expect has pass the ok means all are fine
+    * @returns {error} error
+    */
+
+    it('addCollaborator APIs', done => {
+        request('http://localhost:4000')
+            .post('/graphql ')
+
+            //write your data for checking by giving mutation
+            .query({ 'token': access_token })
+            .send({ query: testJSON().addCollaboration })
+            .expect(200)
+            .end((err, res) => {
+
+
+                //if any error the return error
+                if (err) {
+                    return done(err);
+                }
+
+                //otherwise return success 
+                expect(JSON.parse(res.text).data.removeLabelFromNote.message).to.deep.equal("colabbed successfully")
+                done();
+
+            });
+    });
+
+
+
+
+
+
+    /****************************************************************************************************************/
+    /**
+    * @purpose : Testing for users APIs
+    * @property {request} request has do request for server
+    * @property {post} post has post the function to the given path
+    * @property {send} send has send the parameter to the mutation
+    * @property {expect} expect has pass the ok means all are fine
+    * @returns {error} error
+    */
+
+    it('removeCollaborators APIs', done => {
+        request('http://localhost:4000')
+            .post('/graphql ')
+
+            //write your data for checking by giving mutation
+            .query({ 'token': access_token })
+            .send({ query: testJSON().removeCollaboration })
+            .expect(200)
+            .end((err, res) => {
+
+
+                //if any error the return error
+                if (err) {
+                    return done(err);
+                }
+
+                //otherwise return success 
+                expect(JSON.parse(res.text).data.removeLabelFromNote.message).to.deep.equal("collaborator removed successfully")
+                done();
+
+            });
+    });
+})
+
+
+
+
+
+
+
+/********************************************************    GithubAith   ****************************************************************/
+/**
+* @param {function()}
+*/
+describe('Apollo-GraphQL GithubAith API', () => {
+
 
     /****************************************************************************************************************/
     /**

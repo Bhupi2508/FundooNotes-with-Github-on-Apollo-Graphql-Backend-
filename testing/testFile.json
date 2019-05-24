@@ -15,6 +15,8 @@
     "ArchieveRemove": "mutation {ArchieveRemove(noteID:\"5cca9f94e4cb7d26ebb3d269\"){message}}",
     "saveLabelToNote": "mutation {saveLabelToNote(noteID:\"5cd94297c925f04c3baea621\" labelID:\"5cdd47e56841f5407f2c471b\"){message}}",
     "removeLabelFromNote": "mutation {removeLabelFromNote(noteID:\"5cdd481d6841f5407f2c471f\" labelID:\"5cdd47e56841f5407f2c471b\"){message}}",
+    "addCollaboration": "mutation {addCollaboration(noteID:\"5cca9f94e4cb7d26ebb3d269\" colabID:\"5ce681157b816477869ea0ee\"){message}}",
+    "removeCollaboration": "mutation {removeCollaboration(noteID:\"5cca9f94e4cb7d26ebb3d269\" colabID:\"5ce681157b816477869ea0ee\"){message}}",
     "GithubAuth": "mutation {GithubAuth(email:\"bhupendrasingh.ec18@gmail.com\"){message}}",
     "codeVerify": "mutation {codeVerify{message token}}",
     "GitAuthTokenVerify": "mutation {GitAuthTokenVerify{message}}",

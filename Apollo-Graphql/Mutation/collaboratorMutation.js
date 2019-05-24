@@ -92,7 +92,7 @@ collaboratorMutation.prototype.addCollaboration = async (root, args, context) =>
         var email = findEmail[0].email
 
         //message for mail
-        var url = "This" + email + "email is collaborate with me for Fundoo Notes"
+        var url = "This " + email + " email is collaborate with me for Fundoo Notes"
 
         //condition
         if (save) {
