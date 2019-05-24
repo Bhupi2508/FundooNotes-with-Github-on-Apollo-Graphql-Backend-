@@ -32,8 +32,9 @@ exports.verification = (token) => {
         var value = jwt.verify(token, process.env.SECRET_KEY)
         return value
     }
+
     catch (err) {
-        console.log("found error in verify token")
+        console.log("Error during Authentication time (Token Verification Time)")
         return { "message": err }
     }
 }
