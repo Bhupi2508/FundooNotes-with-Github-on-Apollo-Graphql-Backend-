@@ -1,7 +1,7 @@
 /******************************************************************************
  *  @Execution      : default node          : cmd> resolver.js
  * 
- *  @Purpose        : resolvers(Programs logic)
+ *  @Purpose        : resolvers(Programs logic), imports all the queries and mutations the exports
  * 
  *  @description    : Inseide resolvers we write business logics and also fetch data
  * 
