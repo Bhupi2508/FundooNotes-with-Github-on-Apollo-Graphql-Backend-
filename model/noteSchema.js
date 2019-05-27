@@ -45,7 +45,6 @@ var noteSchema = new mongoSchema({
     },
     description: {
         type: String,
-        //required: true
     },
     reminder: {
         type: Date

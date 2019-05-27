@@ -16,5 +16,5 @@
  * @exports
  */
 module.exports = {
-    db: 'mongodb://127.0.0.1/Apollo-graphql',
+    db: process.env.MONGO_PORT,
 }

@@ -15,7 +15,7 @@
 /**
  * @requires files
  */
-const { ApolloServer, gql } = require('apollo-server');
+const { ApolloServer } = require('apollo-server');
 require('dotenv').config();
 const express = require('express')
 const { typeDefs } = require('./Apollo-Graphql/Types/types');
@@ -39,7 +39,7 @@ var server = new ApolloServer({
 });
 
 
-// //middleware for s3 APIs
+//middleware for s3 APIs
 // app.use('/graphql', upload.single('picture'))
 // server.applyMiddleware({ app })
 
