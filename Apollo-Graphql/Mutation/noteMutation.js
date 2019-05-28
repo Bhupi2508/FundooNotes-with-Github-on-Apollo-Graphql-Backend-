@@ -266,7 +266,7 @@ noteMutation.prototype.removeLabelFromNote = async (root, params) => {
 noteMutation.prototype.Reminder = async (root, params) => {
     try {
 
-        //find labelID from noteModel Schema
+        //find noteID from noteModel Schema
         var id = await noteModel.find({ "_id": params.noteID })
 
         //if id is already present
@@ -311,7 +311,7 @@ noteMutation.prototype.Reminder = async (root, params) => {
 noteMutation.prototype.deleteReminder = async (root, params) => {
     try {
 
-        //find labelID from noteModel Schema
+        //find noteID from noteModel Schema
         var id = await noteModel.find({ "_id": params.noteID })
 
         //if id is already present
@@ -321,7 +321,6 @@ noteMutation.prototype.deleteReminder = async (root, params) => {
 
         //find id from noteModel and update(push) into notes
         var note = await noteModel.findOneAndUpdate({ _id: params.noteID }, { $set: { reminder: "" } })
-
         console.log(note);
 
 

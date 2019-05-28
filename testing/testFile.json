@@ -20,5 +20,7 @@
     "GithubAuth": "mutation {GithubAuth(email:\"bhupendrasingh.ec18@gmail.com\"){message}}",
     "codeVerify": "mutation {codeVerify{message token}}",
     "GitAuthTokenVerify": "mutation {GitAuthTokenVerify{message}}",
+    "starRepository": "mutation {starRepository{message}}",
+    "removeStarRepository": "mutation {removeStarRepository{message}}",
     "pullGitRepository": "mutation {pullGitRepository{message}}"
 }

@@ -23,7 +23,7 @@ var fs = require('fs')
 var access_token = "";
 var signUp_token = "";
 var forgotPassword_token = "";
-var git_token = "";
+var git_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI1Y2RmYWVjOTM4NGUxMzNhNmU3YjU2MjUiLCJpZCI6NDc2Mzk2MzYsImxvZ2luIjoiQmh1cGkyNTA4IiwiaWF0IjoxNTU4MTYzMTQ1LCJleHAiOjE2NDQ1NjMxNDV9.0np7FiCpXFgjzx2ILk3chU1UXKX22hWRsgkdTsW9ApI";
 
 
 /**
@@ -772,7 +772,7 @@ describe('Apollo-GraphQL GithubAith API', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .query({ 'token': git_token })
+            //.query({ 'token': git_token })
             .send({ query: testJSON().GitAuthTokenVerify })
             .expect(200)
             .end((err, res) => {
@@ -789,6 +789,83 @@ describe('Apollo-GraphQL GithubAith API', () => {
 
             });
     });
+
+
+
+
+    /****************************************************************************************************************/
+    /**
+    * @purpose : Testing for users APIs
+    * @property {request} request has do request for server
+    * @property {post} post has post the function to the given path
+    * @property {send} send has send the parameter to the mutation
+    * @property {expect} expect has pass the ok means all are fine
+    * @returns {error} error
+    */
+
+    it('Star Repository APIs', done => {
+        request('http://localhost:4000')
+            .post('/graphql ')
+
+            //write your data for checking by giving mutation
+            .query({ 'token': git_token })
+            .send({ query: testJSON().starRepository })
+            .expect(200)
+            .end((err, res) => {
+
+
+                //if any error the return error
+                if (err) {
+                    return done(err);
+                }
+
+                //otherwise return success 
+                expect(JSON.parse(res.text).data.codeVerify.message).to.deep.equal("Star the repository Successfully")
+                done();
+
+            });
+    });
+
+
+
+
+
+    /****************************************************************************************************************/
+    /**
+    * @purpose : Testing for users APIs
+    * @property {request} request has do request for server
+    * @property {post} post has post the function to the given path
+    * @property {send} send has send the parameter to the mutation
+    * @property {expect} expect has pass the ok means all are fine
+    * @returns {error} error
+    */
+
+    it('Remove Star Repository APIs', done => {
+        request('http://localhost:4000')
+            .post('/graphql ')
+
+            //write your data for checking by giving mutation
+            .query({ 'token': git_token })
+            .send({ query: testJSON().removeStarRepository })
+            .expect(200)
+            .end((err, res) => {
+
+
+                //if any error the return error
+                if (err) {
+                    return done(err);
+                }
+
+                //otherwise return success 
+                expect(JSON.parse(res.text).data.codeVerify.message).to.deep.equal("remove Star from repository Successfully")
+                done();
+
+            });
+    });
+
+
+
+
 
 
 
@@ -826,3 +903,6 @@ describe('Apollo-GraphQL GithubAith API', () => {
     });
 
 });
+
+
+// token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI1Y2RmYWVjOTM4NGUxMzNhNmU3YjU2MjUiLCJpZCI6NDc2Mzk2MzYsImxvZ2luIjoiQmh1cGkyNTA4IiwiaWF0IjoxNTU4MTYzMTQ1LCJleHAiOjE2NDQ1NjMxNDV9.0np7FiCpXFgjzx2ILk3chU1UXKX22hWRsgkdTsW9ApI
