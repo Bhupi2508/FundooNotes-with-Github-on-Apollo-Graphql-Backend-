@@ -22,5 +22,9 @@
     "GitAuthTokenVerify": "mutation {GitAuthTokenVerify{message}}",
     "starRepository": "mutation {starRepository{message}}",
     "removeStarRepository": "mutation {removeStarRepository{message}}",
-    "pullGitRepository": "mutation {pullGitRepository{message}}"
+    "pullGitRepository": "mutation {pullGitRepository{message}}",
+    "addWatchInGitRepo": "mutation{addWatchInGitRepo(gitUsername:\"Bhupi2508\"  repoName: \"Test\"){message}}",
+    "deleteWatchInGitRepo": "mutation{deleteWatchInGitRepo(gitUsername:\"Bhupi2508\"  repoName: \"Test\"){message}}",
+    "createGitBranch": "mutation{createGitBranch(newBranch: \"Testing\"  gitUsername: \"Bhupi2508\"  repoName: \"Test\"){message}}",
+    "deleteGitBranch": "mutation{deleteGitBranch(DeleteBranch: \"Test\"  gitUsername: \"Bhupi2508\"  repoName: \"Test\"){message}}"
 }

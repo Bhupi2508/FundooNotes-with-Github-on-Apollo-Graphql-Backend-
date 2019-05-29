@@ -146,7 +146,10 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
                 if (!saveuser.id.length > 0) {
                     return { "message": "data not save successfully" }
                 }
-                return { "message": "Data save successfully" }
+                return {
+                    "message": "Data save successfully",
+                    "token": token
+                }
             })
             .catch(error => {
                 console.log(error)
@@ -445,7 +448,7 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
 
         // Access_token
         var access_token = user[0].access_Token
-        console.log("access_token", access_token)
+        //console.log("access_token", access_token)
 
 
         /**
@@ -463,8 +466,8 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
 
         })
 
-        console.log("\nRepository Branch Response Data : ", res.data);
-        console.log("\nRepository Branch Object Data : ", res.data[0].object.sha);
+        //console.log("\nRepository Branch Response Data : ", res.data);
+        //console.log("\nRepository Branch Object Data : ", res.data[0].object.sha);
         var access_token1 = user[0].access_Token
 
         /**
@@ -486,12 +489,12 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
             }),
 
         })
-        console.log("\nRepository Branch after post Data : ", branchResponse.data);
+       // console.log("\nRepository Branch after post Data : ", branchResponse.data);
 
         return { "message": "git branch create Successfully" }
 
     } catch (err) {
-        console.log("!Error in catch : ", err)
+        //console.log("!Error in catch : ", err)
         return { "message": "This branch is not created in Repository" }
     }
 }
@@ -546,12 +549,12 @@ gitAuthMutation.prototype.deleteGitBranch = async (root, params, context) => {
                 Authorization: `Bearer ${access_token}`
             }
         })
-        console.log("\nRepository Branch Response Data : ", res);
+       // console.log("\nRepository Branch Response Data : ", res);
 
         return { "message": "git branch delete Successfully" }
 
     } catch (err) {
-        console.log("!Error", err)
+        //console.log("!Error", err)
         return { "message": "This branch not present in Repository" }
     }
 }
@@ -671,6 +674,8 @@ gitAuthMutation.prototype.starRepository = async (root, params, context) => {
         // Access_token and Git Node ID
         var gitNodeID = user[0].gitNodeID;
         var access_token = user[0].access_Token;
+        console.log(typeof(process.env.GIT_ID));
+        
 
 
         //fetch repository data from github
@@ -681,10 +686,10 @@ gitAuthMutation.prototype.starRepository = async (root, params, context) => {
 
         //pass the query mutation for data fetching
         const res = await fetch({
-            query: `mutation {addStar(input: {starrableId: ${process.env.GIT_ID}, clientMutationId:${gitNodeID}}) { clientMutationId}}`,
+            query: `mutation {addStar(input: {starrableId: "${process.env.GIT_ID}" clientMutationId:"${gitNodeID}"}) { clientMutationId}}`,
         })
 
-        console.log(res)
+        console.log("res", res)
 
         return {
             "message": "Star the repository Successfully",
@@ -743,7 +748,7 @@ gitAuthMutation.prototype.removeStarRepository = async (root, params, context) =
 
         //pass the query mutation for data fetching
         const res = await fetch({
-            query: `mutation {removeStar(input: {starrableId: ${process.env.GIT_ID}, clientMutationId:${gitNodeID}}) { clientMutationId}}`,
+            query: `mutation {removeStar(input: {starrableId: "${process.env.GIT_ID}" clientMutationId:"${gitNodeID}"}) { clientMutationId}}`,
         })
 
         console.log(res)
