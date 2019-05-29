@@ -188,7 +188,7 @@ userMutation.prototype.login = async (root, params, context) => {
 
         //create a url
         var url = `${context.origin}?token=${token}`
-       
+
         //take id for current user from database
         var id = user[0].id
 
@@ -263,7 +263,7 @@ userMutation.prototype.forgotPassword = async (root, params, context) => {
         var token = jsonwebtoken.sign({ email: params.email }, process.env.SECRET_KEY, { expiresIn: 86400000 });
 
         //send token to sendmail function, which is send to the link(token)
-        var url = `${context.origin}?token=${token}`
+        var url = `http://localhost:4000/?token=${token}`
         //var url = `${context.origin}/graphql?token=${token}`
 
         /**
@@ -274,7 +274,10 @@ userMutation.prototype.forgotPassword = async (root, params, context) => {
         if (!mail > 0) {
             return { "mesage": "!Error, mail not send " }
         }
-        return { "message": "Mail sent to your given email id" }
+        return {
+            "message": "Mail sent to your given email id",
+            "token": token
+        }
 
     } catch (err) {
         console.log("!Error")
@@ -343,11 +346,11 @@ userMutation.prototype.resetPassword = async (root, params, context) => {
  * @purpose : For updation by using CURD operation
  * @param {*} root
  * @param {*} params
- */ 
-userMutation.prototype.update =  async (root, params, context) => {
- 
-    try { 
- 
+ */
+userMutation.prototype.update = async (root, params, context) => {
+
+    try {
+
         /** 
         * @purpose : for token v erification
         * @returns {String} mess age

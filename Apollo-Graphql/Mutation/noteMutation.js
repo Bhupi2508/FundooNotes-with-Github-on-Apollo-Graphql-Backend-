@@ -293,7 +293,7 @@ noteMutation.prototype.Reminder = async (root, params) => {
         if (!note) {
             return { "message": "reminder not set " }
         }
-        return { "message": "reminder set in note successfully " }
+        return { "message": "reminder set in note successfully" }
 
 
     } catch (error) {
@@ -330,7 +330,7 @@ noteMutation.prototype.deleteReminder = async (root, params) => {
         if (!note) {
             return { "message": "reminder not remove " }
         }
-        return { "message": "reminder remove successfully " }
+        return { "message": "reminder remove successfully" }
 
 
     } catch (error) {
