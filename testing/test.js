@@ -77,6 +77,43 @@ describe('Apollo-GraphQL Users API', () => {
 
 
 
+
+
+
+    /***************************************************************************************************************/
+    /**
+    * @purpose : Testing for users APIs
+    * @property {request} request has do request for server
+    * @property {post} post has post the function to the given path
+    * @property {send} send has send the parameter to the mutation
+    * @property {expect} expect has pass the ok means all are fine
+    * @returns {error} error
+    */
+    it('Email Verify API', done => {
+        request('http://localhost:4000')
+            .post('/graphql')
+
+            //write your data for checking by giving mutation
+            .query({ 'token': signUp_token })
+            .send({ query: testJSON().emailVerify })
+            .expect(200)
+            .end((err, res) => {
+
+                //if any error the return error
+                if (err) {
+                    return done(err);
+                }
+
+                //otherwise return success data
+                expect(JSON.parse(res.text).data.emailVerify.message).to.deep.equal("verification successfull")
+                done();
+            });
+    });
+
+
+
+
+
     /****************************************************************************************************************/
     /**
     * @purpose : Testing for users APIs
@@ -1073,6 +1110,5 @@ describe('Apollo-GraphQL GithubAith API', () => {
 
             });
     });
-
 
 });

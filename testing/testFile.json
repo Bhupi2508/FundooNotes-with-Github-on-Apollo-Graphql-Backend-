@@ -1,5 +1,6 @@
 {
     "signUp": "mutation { signUp (firstName:\"Testing\", lastName:\"Purpose\", email:\"testing@gmail.com\", password:\"123456789\") {message token}}",
+    "emailVerify": "mutation{emailVerify{message}}",
     "login": "mutation { login (email:\"bhupendrasingh.ec18@gmail.com\", password:\"1234567\") {message token}}",
     "forgotPassword": "mutation { forgotPassword (email:\"bhupendrasingh.ec18@gmail.com\") {message token}}",
     "resetPassword": "mutation{ resetPassword (newPassword:\"123456789\" confirmPassword:\"123456789\"){message}}",
