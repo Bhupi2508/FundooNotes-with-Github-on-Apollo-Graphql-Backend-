@@ -9,32 +9,30 @@
 
 import find from '../../polyfills/find';
 import objectEntries from '../../polyfills/objectEntries';
-import type { ValidationContext } from '../ValidationContext';
+import { type ValidationContext } from '../ValidationContext';
 import { GraphQLError } from '../../error/GraphQLError';
 import inspect from '../../jsutils/inspect';
-import type { ObjMap } from '../../jsutils/ObjMap';
-import type {
-  SelectionSetNode,
-  FieldNode,
-  ArgumentNode,
-  FragmentDefinitionNode,
+import { type ObjMap } from '../../jsutils/ObjMap';
+import {
+  type SelectionSetNode,
+  type FieldNode,
+  type ArgumentNode,
+  type FragmentDefinitionNode,
 } from '../../language/ast';
 import { Kind } from '../../language/kinds';
 import { print } from '../../language/printer';
-import type { ASTVisitor } from '../../language/visitor';
+import { type ASTVisitor } from '../../language/visitor';
 import {
+  type GraphQLNamedType,
+  type GraphQLOutputType,
+  type GraphQLCompositeType,
+  type GraphQLField,
   getNamedType,
   isNonNullType,
   isLeafType,
   isObjectType,
   isListType,
   isInterfaceType,
-} from '../../type/definition';
-import type {
-  GraphQLNamedType,
-  GraphQLOutputType,
-  GraphQLCompositeType,
-  GraphQLField,
 } from '../../type/definition';
 import { typeFromAST } from '../../utilities/typeFromAST';
 
@@ -749,7 +747,7 @@ function _collectFieldsAndFragmentNames(
   for (let i = 0; i < selectionSet.selections.length; i++) {
     const selection = selectionSet.selections[i];
     switch (selection.kind) {
-      case Kind.FIELD:
+      case Kind.FIELD: {
         const fieldName = selection.name.value;
         let fieldDef;
         if (isObjectType(parentType) || isInterfaceType(parentType)) {
@@ -763,10 +761,11 @@ function _collectFieldsAndFragmentNames(
         }
         nodeAndDefs[responseName].push([parentType, selection, fieldDef]);
         break;
+      }
       case Kind.FRAGMENT_SPREAD:
         fragmentNames[selection.name.value] = true;
         break;
-      case Kind.INLINE_FRAGMENT:
+      case Kind.INLINE_FRAGMENT: {
         const typeCondition = selection.typeCondition;
         const inlineFragmentType = typeCondition
           ? typeFromAST(context.getSchema(), typeCondition)
@@ -779,6 +778,7 @@ function _collectFieldsAndFragmentNames(
           fragmentNames,
         );
         break;
+      }
     }
   }
 }

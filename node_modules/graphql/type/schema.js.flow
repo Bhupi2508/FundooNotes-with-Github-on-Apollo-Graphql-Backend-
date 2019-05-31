@@ -10,6 +10,10 @@
 import find from '../polyfills/find';
 import objectValues from '../polyfills/objectValues';
 import {
+  type GraphQLType,
+  type GraphQLNamedType,
+  type GraphQLAbstractType,
+  type GraphQLObjectType,
   isAbstractType,
   isObjectType,
   isInterfaceType,
@@ -17,28 +21,22 @@ import {
   isInputObjectType,
   isWrappingType,
 } from './definition';
-import type {
-  GraphQLType,
-  GraphQLNamedType,
-  GraphQLAbstractType,
-  GraphQLObjectType,
-} from './definition';
-import type {
-  SchemaDefinitionNode,
-  SchemaExtensionNode,
+import {
+  type SchemaDefinitionNode,
+  type SchemaExtensionNode,
 } from '../language/ast';
 import {
   GraphQLDirective,
   isDirective,
   specifiedDirectives,
 } from './directives';
-import type { GraphQLError } from '../error/GraphQLError';
+import { type GraphQLError } from '../error/GraphQLError';
 import inspect from '../jsutils/inspect';
 import { __Schema } from './introspection';
 import defineToStringTag from '../jsutils/defineToStringTag';
 import instanceOf from '../jsutils/instanceOf';
 import invariant from '../jsutils/invariant';
-import type { ObjMap } from '../jsutils/ObjMap';
+import { type ObjMap } from '../jsutils/ObjMap';
 
 /**
  * Test if the given value is a GraphQL schema.
@@ -259,10 +257,10 @@ export class GraphQLSchema {
 
     if (!possibleTypeMap[abstractType.name]) {
       const possibleTypes = this.getPossibleTypes(abstractType);
-      possibleTypeMap[abstractType.name] = possibleTypes.reduce(
-        (map, type) => ((map[type.name] = true), map),
-        Object.create(null),
-      );
+      possibleTypeMap[abstractType.name] = possibleTypes.reduce((map, type) => {
+        map[type.name] = true;
+        return map;
+      }, Object.create(null));
     }
 
     return Boolean(possibleTypeMap[abstractType.name][possibleType.name]);

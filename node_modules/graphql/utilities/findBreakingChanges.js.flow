@@ -8,7 +8,12 @@
  */
 
 import find from '../polyfills/find';
+import inspect from '../jsutils/inspect';
 import {
+  type GraphQLNamedType,
+  type GraphQLFieldMap,
+  type GraphQLType,
+  type GraphQLArgument,
   isScalarType,
   isObjectType,
   isInterfaceType,
@@ -21,20 +26,12 @@ import {
   isRequiredArgument,
   isRequiredInputField,
 } from '../type/definition';
-
-import type {
-  GraphQLNamedType,
-  GraphQLFieldMap,
-  GraphQLType,
-  GraphQLArgument,
-} from '../type/definition';
-
-import type { GraphQLDirective } from '../type/directives';
-import type { GraphQLSchema } from '../type/schema';
+import { type GraphQLDirective } from '../type/directives';
+import { type GraphQLSchema } from '../type/schema';
 import keyMap from '../jsutils/keyMap';
 
-import type { ObjMap } from '../jsutils/ObjMap';
-import type { DirectiveLocationEnum } from '../language/directiveLocation';
+import { type ObjMap } from '../jsutils/ObjMap';
+import { type DirectiveLocationEnum } from '../language/directiveLocation';
 
 export const BreakingChangeType = {
   FIELD_CHANGED_KIND: 'FIELD_CHANGED_KIND',
@@ -120,7 +117,7 @@ export function findDangerousChanges(
  * Given two schemas, returns an Array containing descriptions of any breaking
  * changes in the newSchema related to removing an entire type.
  */
-export function findRemovedTypes(
+function findRemovedTypes(
   oldSchema: GraphQLSchema,
   newSchema: GraphQLSchema,
 ): Array<BreakingChange> {
@@ -143,7 +140,7 @@ export function findRemovedTypes(
  * Given two schemas, returns an Array containing descriptions of any breaking
  * changes in the newSchema related to changing the type of a type.
  */
-export function findTypesThatChangedKind(
+function findTypesThatChangedKind(
   oldSchema: GraphQLSchema,
   newSchema: GraphQLSchema,
 ): Array<BreakingChange> {
@@ -175,7 +172,7 @@ export function findTypesThatChangedKind(
  * (such as removal or change of type of an argument, or a change in an
  * argument's default value).
  */
-export function findArgChanges(
+function findArgChanges(
   oldSchema: GraphQLSchema,
   newSchema: GraphQLSchema,
 ): {
@@ -296,10 +293,13 @@ function typeKindName(type: GraphQLNamedType): string {
   if (isInputObjectType(type)) {
     return 'an Input type';
   }
-  throw new TypeError('Unknown type ' + type.constructor.name);
+
+  // Not reachable. All possible named types have been considered.
+  /* istanbul ignore next */
+  throw new TypeError(`Unexpected type: ${inspect((type: empty))}.`);
 }
 
-export function findFieldsThatChangedTypeOnObjectOrInterfaceTypes(
+function findFieldsThatChangedTypeOnObjectOrInterfaceTypes(
   oldSchema: GraphQLSchema,
   newSchema: GraphQLSchema,
 ): Array<BreakingChange> {
@@ -354,7 +354,7 @@ export function findFieldsThatChangedTypeOnObjectOrInterfaceTypes(
   return breakingChanges;
 }
 
-export function findFieldsThatChangedTypeOnInputObjectTypes(
+function findFieldsThatChangedTypeOnInputObjectTypes(
   oldSchema: GraphQLSchema,
   newSchema: GraphQLSchema,
 ): {
@@ -437,15 +437,7 @@ function isChangeSafeForObjectOrInterfaceField(
   oldType: GraphQLType,
   newType: GraphQLType,
 ): boolean {
-  if (isNamedType(oldType)) {
-    return (
-      // if they're both named types, see if their names are equivalent
-      (isNamedType(newType) && oldType.name === newType.name) ||
-      // moving from nullable to non-null of the same underlying type is safe
-      (isNonNullType(newType) &&
-        isChangeSafeForObjectOrInterfaceField(oldType, newType.ofType))
-    );
-  } else if (isListType(oldType)) {
+  if (isListType(oldType)) {
     return (
       // if they're both lists, make sure the underlying types are compatible
       (isListType(newType) &&
@@ -457,30 +449,38 @@ function isChangeSafeForObjectOrInterfaceField(
       (isNonNullType(newType) &&
         isChangeSafeForObjectOrInterfaceField(oldType, newType.ofType))
     );
-  } else if (isNonNullType(oldType)) {
+  }
+
+  if (isNonNullType(oldType)) {
     // if they're both non-null, make sure the underlying types are compatible
     return (
       isNonNullType(newType) &&
       isChangeSafeForObjectOrInterfaceField(oldType.ofType, newType.ofType)
     );
   }
-  return false;
+
+  return (
+    // if they're both named types, see if their names are equivalent
+    (isNamedType(newType) && oldType.name === newType.name) ||
+    // moving from nullable to non-null of the same underlying type is safe
+    (isNonNullType(newType) &&
+      isChangeSafeForObjectOrInterfaceField(oldType, newType.ofType))
+  );
 }
 
 function isChangeSafeForInputObjectFieldOrFieldArg(
   oldType: GraphQLType,
   newType: GraphQLType,
 ): boolean {
-  if (isNamedType(oldType)) {
-    // if they're both named types, see if their names are equivalent
-    return isNamedType(newType) && oldType.name === newType.name;
-  } else if (isListType(oldType)) {
+  if (isListType(oldType)) {
     // if they're both lists, make sure the underlying types are compatible
     return (
       isListType(newType) &&
       isChangeSafeForInputObjectFieldOrFieldArg(oldType.ofType, newType.ofType)
     );
-  } else if (isNonNullType(oldType)) {
+  }
+
+  if (isNonNullType(oldType)) {
     return (
       // if they're both non-null, make sure the underlying types are
       // compatible
@@ -494,14 +494,16 @@ function isChangeSafeForInputObjectFieldOrFieldArg(
         isChangeSafeForInputObjectFieldOrFieldArg(oldType.ofType, newType))
     );
   }
-  return false;
+
+  // if they're both named types, see if their names are equivalent
+  return isNamedType(newType) && oldType.name === newType.name;
 }
 
 /**
  * Given two schemas, returns an Array containing descriptions of any breaking
  * changes in the newSchema related to removing types from a union type.
  */
-export function findTypesRemovedFromUnions(
+function findTypesRemovedFromUnions(
   oldSchema: GraphQLSchema,
   newSchema: GraphQLSchema,
 ): Array<BreakingChange> {
@@ -535,7 +537,7 @@ export function findTypesRemovedFromUnions(
  * Given two schemas, returns an Array containing descriptions of any dangerous
  * changes in the newSchema related to adding types to a union type.
  */
-export function findTypesAddedToUnions(
+function findTypesAddedToUnions(
   oldSchema: GraphQLSchema,
   newSchema: GraphQLSchema,
 ): Array<DangerousChange> {
@@ -568,7 +570,7 @@ export function findTypesAddedToUnions(
  * Given two schemas, returns an Array containing descriptions of any breaking
  * changes in the newSchema related to removing values from an enum type.
  */
-export function findValuesRemovedFromEnums(
+function findValuesRemovedFromEnums(
   oldSchema: GraphQLSchema,
   newSchema: GraphQLSchema,
 ): Array<BreakingChange> {
@@ -602,7 +604,7 @@ export function findValuesRemovedFromEnums(
  * Given two schemas, returns an Array containing descriptions of any dangerous
  * changes in the newSchema related to adding values to an enum type.
  */
-export function findValuesAddedToEnums(
+function findValuesAddedToEnums(
   oldSchema: GraphQLSchema,
   newSchema: GraphQLSchema,
 ): Array<DangerousChange> {
@@ -633,7 +635,7 @@ export function findValuesAddedToEnums(
   return valuesAddedToEnums;
 }
 
-export function findInterfacesRemovedFromObjectTypes(
+function findInterfacesRemovedFromObjectTypes(
   oldSchema: GraphQLSchema,
   newSchema: GraphQLSchema,
 ): Array<BreakingChange> {
@@ -664,7 +666,7 @@ export function findInterfacesRemovedFromObjectTypes(
   return breakingChanges;
 }
 
-export function findInterfacesAddedToObjectTypes(
+function findInterfacesAddedToObjectTypes(
   oldSchema: GraphQLSchema,
   newSchema: GraphQLSchema,
 ): Array<DangerousChange> {
@@ -695,7 +697,7 @@ export function findInterfacesAddedToObjectTypes(
   return interfacesAddedToObjectTypes;
 }
 
-export function findRemovedDirectives(
+function findRemovedDirectives(
   oldSchema: GraphQLSchema,
   newSchema: GraphQLSchema,
 ): Array<BreakingChange> {
@@ -730,7 +732,7 @@ function findRemovedArgsForDirective(
   return removedArgs;
 }
 
-export function findRemovedDirectiveArgs(
+function findRemovedDirectiveArgs(
   oldSchema: GraphQLSchema,
   newSchema: GraphQLSchema,
 ): Array<BreakingChange> {
@@ -770,7 +772,7 @@ function findAddedArgsForDirective(
   return addedArgs;
 }
 
-export function findAddedNonNullDirectiveArgs(
+function findAddedNonNullDirectiveArgs(
   oldSchema: GraphQLSchema,
   newSchema: GraphQLSchema,
 ): Array<BreakingChange> {
@@ -798,7 +800,7 @@ export function findAddedNonNullDirectiveArgs(
   return addedNonNullableArgs;
 }
 
-export function findRemovedLocationsForDirective(
+function findRemovedLocationsForDirective(
   oldDirective: GraphQLDirective,
   newDirective: GraphQLDirective,
 ): Array<DirectiveLocationEnum> {
@@ -814,7 +816,7 @@ export function findRemovedLocationsForDirective(
   return removedLocations;
 }
 
-export function findRemovedDirectiveLocations(
+function findRemovedDirectiveLocations(
   oldSchema: GraphQLSchema,
   newSchema: GraphQLSchema,
 ): Array<BreakingChange> {

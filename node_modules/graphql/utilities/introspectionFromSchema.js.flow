@@ -8,13 +8,14 @@
  */
 
 import invariant from '../jsutils/invariant';
-import { getIntrospectionQuery } from './introspectionQuery';
-import type { GraphQLSchema } from '../type/schema';
+import isPromise from '../jsutils/isPromise';
+import { type GraphQLSchema } from '../type/schema';
 import { execute } from '../execution/execute';
 import { parse } from '../language/parser';
-import type {
-  IntrospectionQuery,
-  IntrospectionOptions,
+import {
+  type IntrospectionQuery,
+  type IntrospectionOptions,
+  getIntrospectionQuery,
 } from './introspectionQuery';
 
 /**
@@ -32,6 +33,6 @@ export function introspectionFromSchema(
 ): IntrospectionQuery {
   const queryAST = parse(getIntrospectionQuery(options));
   const result = execute(schema, queryAST);
-  invariant(!result.then && !result.errors && result.data);
+  invariant(!isPromise(result) && !result.errors && result.data);
   return (result.data: any);
 }

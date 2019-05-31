@@ -16,32 +16,32 @@ import invariant from '../jsutils/invariant';
 import keyMap from '../jsutils/keyMap';
 import keyValMap from '../jsutils/keyValMap';
 import mapValue from '../jsutils/mapValue';
-import type { ObjMap } from '../jsutils/ObjMap';
+import { type ObjMap } from '../jsutils/ObjMap';
 import { Kind } from '../language/kinds';
 import { valueFromASTUntyped } from '../utilities/valueFromASTUntyped';
-import type {
-  ScalarTypeDefinitionNode,
-  ObjectTypeDefinitionNode,
-  FieldDefinitionNode,
-  InputValueDefinitionNode,
-  InterfaceTypeDefinitionNode,
-  UnionTypeDefinitionNode,
-  EnumTypeDefinitionNode,
-  EnumValueDefinitionNode,
-  InputObjectTypeDefinitionNode,
-  ScalarTypeExtensionNode,
-  ObjectTypeExtensionNode,
-  InterfaceTypeExtensionNode,
-  UnionTypeExtensionNode,
-  EnumTypeExtensionNode,
-  InputObjectTypeExtensionNode,
-  OperationDefinitionNode,
-  FieldNode,
-  FragmentDefinitionNode,
-  ValueNode,
+import {
+  type ScalarTypeDefinitionNode,
+  type ObjectTypeDefinitionNode,
+  type FieldDefinitionNode,
+  type InputValueDefinitionNode,
+  type InterfaceTypeDefinitionNode,
+  type UnionTypeDefinitionNode,
+  type EnumTypeDefinitionNode,
+  type EnumValueDefinitionNode,
+  type InputObjectTypeDefinitionNode,
+  type ScalarTypeExtensionNode,
+  type ObjectTypeExtensionNode,
+  type InterfaceTypeExtensionNode,
+  type UnionTypeExtensionNode,
+  type EnumTypeExtensionNode,
+  type InputObjectTypeExtensionNode,
+  type OperationDefinitionNode,
+  type FieldNode,
+  type FragmentDefinitionNode,
+  type ValueNode,
 } from '../language/ast';
-import type { GraphQLSchema } from './schema';
-import type { PromiseOrValue } from '../jsutils/PromiseOrValue';
+import { type GraphQLSchema } from './schema';
+import { type PromiseOrValue } from '../jsutils/PromiseOrValue';
 
 // Predicates & Assertions
 
@@ -759,7 +759,7 @@ function defineFieldMap<TSource, TContext>(
       `${config.name}.${fieldName} field config must be an object`,
     );
     invariant(
-      !fieldConfig.hasOwnProperty('isDeprecated'),
+      !('isDeprecated' in fieldConfig),
       `${config.name}.${fieldName} should provide "deprecationReason" ` +
         'instead of "isDeprecated".',
     );
@@ -1253,7 +1253,7 @@ function defineEnumValues(
         `representing an internal value but got: ${inspect(value)}.`,
     );
     invariant(
-      !value.hasOwnProperty('isDeprecated'),
+      !('isDeprecated' in value),
       `${type.name}.${valueName} should provide "deprecationReason" instead ` +
         'of "isDeprecated".',
     );
@@ -1263,7 +1263,7 @@ function defineEnumValues(
       isDeprecated: Boolean(value.deprecationReason),
       deprecationReason: value.deprecationReason,
       astNode: value.astNode,
-      value: value.hasOwnProperty('value') ? value.value : valueName,
+      value: 'value' in value ? value.value : valueName,
     };
   });
 }
@@ -1379,7 +1379,7 @@ function defineInputFieldMap(
   );
   return mapValue(fieldMap, (fieldConfig, fieldName) => {
     invariant(
-      !fieldConfig.hasOwnProperty('resolve'),
+      !('resolve' in fieldConfig),
       `${config.name}.${fieldName} field has a resolve property, but ` +
         'Input Types cannot define resolvers.',
     );

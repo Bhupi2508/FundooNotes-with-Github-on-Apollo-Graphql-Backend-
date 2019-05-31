@@ -8,8 +8,8 @@
  */
 
 import defineToJSON from '../jsutils/defineToJSON';
-import type { Token } from './ast';
-import type { Source } from './source';
+import { type Token } from './ast';
+import { type Source } from './source';
 import { syntaxError } from '../error';
 import { dedentBlockStringValue } from './blockString';
 
@@ -128,6 +128,27 @@ export const TokenKind = Object.freeze({
  * The enum type representing the token kinds values.
  */
 export type TokenKindEnum = $Values<typeof TokenKind>;
+
+// @internal
+export function isPunctuatorToken(token: Token) {
+  const kind = token.kind;
+  return (
+    kind === TokenKind.BANG ||
+    kind === TokenKind.DOLLAR ||
+    kind === TokenKind.AMP ||
+    kind === TokenKind.PAREN_L ||
+    kind === TokenKind.PAREN_R ||
+    kind === TokenKind.SPREAD ||
+    kind === TokenKind.COLON ||
+    kind === TokenKind.EQUALS ||
+    kind === TokenKind.AT ||
+    kind === TokenKind.BRACKET_L ||
+    kind === TokenKind.BRACKET_R ||
+    kind === TokenKind.BRACE_L ||
+    kind === TokenKind.PIPE ||
+    kind === TokenKind.BRACE_R
+  );
+}
 
 /**
  * A helper function to describe a token as a string for debugging
@@ -576,7 +597,8 @@ function readString(source, start, line, col, prev): Token {
         case 116:
           value += '\t';
           break;
-        case 117: // u
+        case 117: {
+          // uXXXX
           const charCode = uniCharCode(
             body.charCodeAt(position + 1),
             body.charCodeAt(position + 2),
@@ -594,6 +616,7 @@ function readString(source, start, line, col, prev): Token {
           value += String.fromCharCode(charCode);
           position += 4;
           break;
+        }
         default:
           throw syntaxError(
             source,

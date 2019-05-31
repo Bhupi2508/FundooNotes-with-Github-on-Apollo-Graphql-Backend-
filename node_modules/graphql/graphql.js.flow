@@ -7,19 +7,19 @@
  * @flow strict
  */
 
+import isPromise from './jsutils/isPromise';
 import { validateSchema } from './type/validate';
 import { parse } from './language/parser';
 import { validate } from './validation/validate';
-import { execute } from './execution/execute';
-import type { ObjMap } from './jsutils/ObjMap';
-import type { Source } from './language/source';
-import type {
-  GraphQLFieldResolver,
-  GraphQLTypeResolver,
+import { type ExecutionResult, execute } from './execution/execute';
+import { type ObjMap } from './jsutils/ObjMap';
+import { type Source } from './language/source';
+import {
+  type GraphQLFieldResolver,
+  type GraphQLTypeResolver,
 } from './type/definition';
-import type { GraphQLSchema } from './type/schema';
-import type { ExecutionResult } from './execution/execute';
-import type { PromiseOrValue } from './jsutils/PromiseOrValue';
+import { type GraphQLSchema } from './type/schema';
+import { type PromiseOrValue } from './jsutils/PromiseOrValue';
 
 /**
  * This is the primary entry point function for fulfilling GraphQL operations
@@ -55,6 +55,10 @@ import type { PromiseOrValue } from './jsutils/PromiseOrValue';
  *    A resolver function to use when one is not provided by the schema.
  *    If not provided, the default field resolver is used (which looks for a
  *    value or method on the source value with the field's name).
+ * typeResolver:
+ *    A type resolver function to use when none is provided by the schema.
+ *    If not provided, the default type resolver is used (which looks for a
+ *    `__typename` field or alternatively calls the `isTypeOf` method).
  */
 export type GraphQLArgs = {|
   schema: GraphQLSchema,
@@ -172,7 +176,7 @@ export function graphqlSync(
         );
 
   // Assert that the execution was synchronous.
-  if (result.then) {
+  if (isPromise(result)) {
     throw new Error('GraphQL execution failed to complete synchronously.');
   }
 

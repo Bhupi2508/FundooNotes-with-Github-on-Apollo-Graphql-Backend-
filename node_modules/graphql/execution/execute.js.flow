@@ -18,8 +18,8 @@ import isPromise from '../jsutils/isPromise';
 import memoize3 from '../jsutils/memoize3';
 import promiseForObject from '../jsutils/promiseForObject';
 import promiseReduce from '../jsutils/promiseReduce';
-import type { ObjMap } from '../jsutils/ObjMap';
-import type { PromiseOrValue } from '../jsutils/PromiseOrValue';
+import { type ObjMap } from '../jsutils/ObjMap';
+import { type PromiseOrValue } from '../jsutils/PromiseOrValue';
 
 import { getOperationRootType } from '../utilities/getOperationRootType';
 import { typeFromAST } from '../utilities/typeFromAST';
@@ -30,25 +30,23 @@ import {
   getDirectiveValues,
 } from './values';
 import {
+  type GraphQLObjectType,
+  type GraphQLOutputType,
+  type GraphQLLeafType,
+  type GraphQLAbstractType,
+  type GraphQLField,
+  type GraphQLFieldResolver,
+  type GraphQLResolveInfo,
+  type GraphQLTypeResolver,
+  type ResponsePath,
+  type GraphQLList,
   isObjectType,
   isAbstractType,
   isLeafType,
   isListType,
   isNonNullType,
 } from '../type/definition';
-import type {
-  GraphQLObjectType,
-  GraphQLOutputType,
-  GraphQLLeafType,
-  GraphQLAbstractType,
-  GraphQLField,
-  GraphQLFieldResolver,
-  GraphQLResolveInfo,
-  GraphQLTypeResolver,
-  ResponsePath,
-  GraphQLList,
-} from '../type/definition';
-import type { GraphQLSchema } from '../type/schema';
+import { type GraphQLSchema } from '../type/schema';
 import {
   SchemaMetaFieldDef,
   TypeMetaFieldDef,
@@ -59,14 +57,14 @@ import {
   GraphQLSkipDirective,
 } from '../type/directives';
 import { assertValidSchema } from '../type/validate';
-import type {
-  DocumentNode,
-  OperationDefinitionNode,
-  SelectionSetNode,
-  FieldNode,
-  FragmentSpreadNode,
-  InlineFragmentNode,
-  FragmentDefinitionNode,
+import {
+  type DocumentNode,
+  type OperationDefinitionNode,
+  type SelectionSetNode,
+  type FieldNode,
+  type FragmentSpreadNode,
+  type InlineFragmentNode,
+  type FragmentDefinitionNode,
 } from '../language/ast';
 
 /**
@@ -530,7 +528,7 @@ export function collectFields(
   for (let i = 0; i < selectionSet.selections.length; i++) {
     const selection = selectionSet.selections[i];
     switch (selection.kind) {
-      case Kind.FIELD:
+      case Kind.FIELD: {
         if (!shouldIncludeNode(exeContext, selection)) {
           continue;
         }
@@ -540,7 +538,8 @@ export function collectFields(
         }
         fields[name].push(selection);
         break;
-      case Kind.INLINE_FRAGMENT:
+      }
+      case Kind.INLINE_FRAGMENT: {
         if (
           !shouldIncludeNode(exeContext, selection) ||
           !doesFragmentConditionMatch(exeContext, selection, runtimeType)
@@ -555,7 +554,8 @@ export function collectFields(
           visitedFragmentNames,
         );
         break;
-      case Kind.FRAGMENT_SPREAD:
+      }
+      case Kind.FRAGMENT_SPREAD: {
         const fragName = selection.name.value;
         if (
           visitedFragmentNames[fragName] ||
@@ -579,6 +579,7 @@ export function collectFields(
           visitedFragmentNames,
         );
         break;
+      }
     }
   }
   return fields;
