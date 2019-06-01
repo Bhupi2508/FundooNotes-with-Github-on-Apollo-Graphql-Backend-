@@ -28,7 +28,7 @@ exports.sendEmailFunction = (url, email) => {
     const transporter = nodemailer.createTransport({
         service: 'gmail',
 
-        //email and password are hidden by using of env file
+        //email and password are hidden by using of env file, these are users information 
         auth: {
             user: process.env.EMAIL,
             pass: process.env.PASSWORD
