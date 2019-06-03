@@ -477,7 +477,7 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
          * @Data : send the given data depend on what you doing
          * @purpose : get response from given url
          */
-        var branchResponse = await axios({
+        await axios({
             method: 'post',
             url: `${process.env.POST_CREATE_BRANCH}${params.gitUsername}/${params.repoName}/git/refs`,
             headers: {
@@ -542,7 +542,7 @@ gitAuthMutation.prototype.deleteGitBranch = async (root, params, context) => {
          * @param {headers}
          * @purpose : get response from given url
          */
-        var res = await axios({
+       await axios({
             method: 'DELETE',
             url: `${process.env.DELETE_BRANCH}${params.gitUsername}/${params.repoName}/git/refs/heads/${params.DeleteBranch}`,
             headers: {

@@ -1,41 +1,41 @@
-Й▓РЖ╜-fundoo_Apollo_Graphql(:2
+Й░╛Е╠-fundoo_Apollo_Graphql(:2
 cs,
-AWreIaZMlcvLErbzIWnw	Sonar waycs Юи├Я╜-:6
+AWraFd7SLZesnf9Vzx3I	Sonar waycs ╦╧вп╜-:6
 java.
-AWreIaetlcvLErbzIWvQ	Sonar wayjava Юи├Я╜-:6
+AWraFeAnLZesnf9Vzx-o	Sonar wayjava ╦╧вп╜-:6
 flex.
-AWreIajKlcvLErbzIW0y	Sonar wayflex Юи├Я╜-:4
+AWraFeEYLZesnf9VzyEK	Sonar wayflex ═авп╜-:4
 xml-
-AWreIamLlcvLErbzIW1x	Sonar wayxml хя├Я╜-:2
+AWraFeHKLZesnf9VzyFJ	Sonar wayxml ═авп╜-:2
 js,
-AWreIarRlcvLErbzIW6c	Sonar wayjs хя├Я╜-:4
+AWraFeL7LZesnf9VzyJ0	Sonar wayjs ═авп╜-:4
 php-
-AWreIauwlcvLErbzIW8b	Sonar wayphp хя├Я╜-:2
+AWraFePCLZesnf9VzyLz	Sonar wayphp ═авп╜-:2
 py,
-AWreIa4ilcvLErbzIW_M	Sonar waypy ╟ы├Я╜-:2
+AWraFeWCLZesnf9VzyOk	Sonar waypy ┬ивп╜-:2
 ts,
-AWreIa62lcvLErbzIXAQ	Sonar wayts ╟ы├Я╜-B
+AWraFeZHLZesnf9VzyPo	Sonar wayts ┬ивп╜-B
 csharp
-csharp┬╒├Я╜-B
+csharpИ≈вп╜-B
 python
-python┬╒├Я╜-B
+pythonИ≈вп╜-B
 java
-java┬╒├Я╜-B
+javaИ≈вп╜-B
 flex
-flex┬╒├Я╜-B
+flexИ≈вп╜-B
 scmgit
-scmgit┬╒├Я╜-B
+scmgitИ≈вп╜-B
 xml
-xml┬╒├Я╜-B
+xmlИ≈вп╜-B
 php
-php┬╒├Я╜-B!
+phpИ≈вп╜-B!
 
 typescript
 
-typescript┬╒├Я╜-B
+typescriptИ≈вп╜-B
 scmsvn
-scmsvn┬╒├Я╜-B!
+scmsvnИ≈вп╜-B!
 
 javascript
 
-javascript┬╒├Я╜-
+javascriptИ≈вп╜-

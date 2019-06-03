@@ -1,1 +1,1 @@
-Apollo-Graphql/Resolver :
+#Apollo-Graphql/Resolver/resolver.js 2jsXŸh

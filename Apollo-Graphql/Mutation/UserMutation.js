@@ -187,7 +187,7 @@ userMutation.prototype.login = async (root, params, context) => {
         var token = jsonwebtoken.sign({ email: params.email, userID: user[0].id }, process.env.SECRET_KEY, { expiresIn: 86400000 })
 
         //create a url
-        var url = `${context.origin}?token=${token}`
+        //var url = `${context.origin}?token=${token}`
 
         //take id for current user from database
         var id = user[0].id

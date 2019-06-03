@@ -1,207 +1,338 @@
 /********************************************************************************************************************
- *  @Execution      : default node          : cmd> noteMutation.js
+ *  @Execution      : default node          : cmd> userMutations.js
  *                      
  * 
  *  @Purpose        : perform operations by using users
  * 
- *  @description    : By using mutation create a new files and fetch the data
+ *  @description    : By using mutation we can manipulate the data (CURD)
  * 
  *  @overview       : fundoo application  
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
  *  @version        : 1.0
- *  @since          : 29-april-2019
+ *  @since          : 27-april-2019
  *
  *******************************************************************************************************************/
 /**
  * @requires files
  */
-var noteModel = require('../../model/noteSchema')
+var redis = require('async-redis')
+var bcrypt = require('bcrypt')
+var jsonwebtoken = require('jsonwebtoken')
+var userModel = require('../../model/userSchema')
 var labelModel = require('../../model/labelSchema')
+var sendMail = require('../../sendMailer/sendMail')
 var tokenVerify = require('../../Authentication/authenticationUser')
 
+//create a redis client
+var client = redis.createClient()
+
+//saltrounds for hash password
+var saltRounds = 10;
+
 //create a empty function
-var noteMutation = function () { }
+var userMutation = function () { }
+
 
 /*******************************************************************************************************************/
 /**
- * @description : create a APIs for add notes for using apollo-graphql
- * @purpose : For fetch data by using CURD operation
- * @param {*} root 
- * @param {*} params
- * @param {*} context
+ * @description : register APIs for register a new user using apollo-graphql
+ * @purpose : register user in database
+ * @param {root}, which has data information
+ * @param {params}, input by users
+ * @param {context}, req from queries, headers, server
  */
-noteMutation.prototype.createNote = async (root, params, context) => {
+userMutation.prototype.signup = async (root, params, context) => {
+
     try {
 
-        /**
-         * @param {String} title validation 
-         * @param {String} description validation
-         */
-        if (params.title.length < 3) {
-            return { "message": "Enter title length min 3 letter " }
-        }
-        if (params.description.length < 4) {
-            return { "message": "Enter description length min 4 letter " }
+        //for email validation
+        var emailformat = (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/);
+
+        if (!emailformat.test(params.email)) {
+            return { "message": "not valid email", }
         }
 
-
         /**
-         * @payload send token for verification
-         * @condition if present or not
-         * @returns {String} message
+         * @param {number}, password validation 
          */
-        var payload = tokenVerify.verification(context.token)
-        if (!payload) {
-            return { "message": "token is not verify" }
+        if (params.password.length < 8) {
+            return { "message": "Enter pasword more than 8 letters " }
         }
 
-
-        //find title from database
-        var notefind = await noteModel.find({ title: params.title })
-
-        /**
-         * @param {number} notefind.length, check the label name already present or not
-         * @returns {String} message
-         */
-        if (notefind.length > 0) {
-            return { "message": "title already present" }
+        //for email id cheking
+        var verify = await userModel.find({ "email": params.email })
+        if (verify.length > 0) {
+            return { "message": "email already exists" }
         }
 
+        //for bcrypt password
+        params.password = await bcrypt.hashSync(params.password, saltRounds)
+        var usersMdl = new userModel(params)
 
-        //find id from users models
-        const model = new noteModel({
-            title: params.title,
-            description: params.description,
-            reminder: params.reminder,
-            color: params.color,
-            img: params.img,
-            userID: payload.userID
-
-        })
-        const note = model.save()
-
-
-        /**
-         * @return {String}, message
-         */
-        if (!note) {
-            return { "message": "note is not created" }
+        //save in database
+        const uModel = usersMdl.save();
+        if (!uModel) {
+            return { "message": "Register unsuccessfull" }
         } else {
-            return { "message": "note created" }
-        }
 
-    } catch (error) {
-        console.log("error in catch")
+            /**
+             * @param {token}, a token and send for verification
+             */
+            var token = jsonwebtoken.sign({ email: params.email }, process.env.SECRET_KEY, { expiresIn: 86400000 })
+
+
+            /**
+             * @param {token}, send token for verification to the mail
+             * @returns {String} message
+             */
+
+            // var url = `${process.env.link}${token}`
+            /**
+             * @purpose : we can also use origin(port) from headers for 
+             *             query, instead of hard code
+             * @param {String} token
+             */
+            var url = `${context.origin}?token=${token}`
+
+            sendMail.sendEmailFunction(url, params.email)
+            return {
+                "message": "Register successfull",
+                "token": token
+            }
+        }
+    } catch (err) {
+        console.log("!Error")
         return { "message": err }
     }
 }
 
 
+
+
 /*******************************************************************************************************************/
 /**
- * @description : update data APIs for updated notes for using apollo-graphql
- * @purpose : For fetch data by using CURD operation
- * @param {token}
- * @purpose : update title or description from database
- * @param {params} params
+ * @description : emailverification APIs for verify a eamil that is valid or not using apollo-graphql
+ * @purpose : For register emailverification by using CURD operation
+ * @param {root}, which has data information
+ * @param {params}, input by users
+ * @param {context}, req from queries, headers, server
  */
-noteMutation.prototype.editNote = async (root, params) => {
+userMutation.prototype.emailVerify = async (root, params, context) => {
     try {
 
-        //find id from users models
-        var note = await noteModel.findOneAndUpdate({ _id: params.noteID },
-            {
-                $set: {
-                    title: params.editTitle,
-                    description: params.editDescription
-                }
-            })
+        /**
+         * @param {token}, send token for verify
+         * @returns {String} message, token verification
+         */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        /**
+         * @param {String} email
+         * @returns {String} message
+         * @param {$set}, for verification
+         */
+        var update = await userModel.updateOne({ "email": afterVerify.email },
+            { $set: { verification: true } },
+            { new: true })
+        if (!update) {
+            return { "message": "verification unsuccessfull" }
+        }
+        return { "message": "verification successfull" }
+
+    } catch (err) {
+        console.log("!Error")
+        return { "message": err }
+    }
+}
+
+
+
+
+
+/*******************************************************************************************************************/
+/**
+ * @description : Login APIs for login user using apollo-graphql
+ * @purpose : For login user by which is already exists in database using CURD operation
+ * @param {root}, which has data information
+ * @param {params}, input by users
+ * @param {context}, req from queries, headers, server
+ */
+userMutation.prototype.login = async (root, params, context) => {
+
+    try {
+        var emailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
         /**
          * @return {String} message
          */
-        if (!note) {
-            return { "message": "note is not updated" }
-        } else {
-            return { "message": "note updated" }
+        if (!emailformat.test(params.email)) {
+            return { "message": "not valid email" }
+        }
+
+        //find email that is present in database or not
+        var user = await userModel.find({ "email": params.email })
+        if (!user.length > 0) {
+            return { "message": "email is not present" }
+        }
+        if (user[0].verification === false) {
+            return { "message": "Email not verified" }
+        }
+
+        /**
+         * @param {token}, generate a token with expire time and provide a secret key
+         */
+        var token = jsonwebtoken.sign({ email: params.email, userID: user[0].id }, process.env.SECRET_KEY, { expiresIn: 86400000 })
+
+        //create a url
+        //var url = `${context.origin}?token=${token}`
+
+        //take id for current user from database
+        var id = user[0].id
+
+        //compare password that is present in database or not
+        const valid = await bcrypt.compare(params.password, user[0].password)
+
+        if (!valid) {
+            return { "message": "unauthonticate password" }
         }
 
 
-    } catch (error) {
-        console.log("error")
+        //find user Id from database
+        var labelFind = await labelModel.find({ userID: user[0]._id })
+
+        //set the labels in redis
+        await client.set('labels' + user[0]._id, JSON.stringify(labelFind))
+
+
+        /**
+         * @return {token}
+         * @return {number} id
+         * @return {String} message
+         */
+        return {
+            "token": token,
+            "id": id,
+            "message": "!Login....Successfully"
+        }
+
+    } catch (err) {
+        console.log("!Error")
         return { "message": err }
     }
 }
 
 
+
+
+
 /*******************************************************************************************************************/
 /**
- * @description : remove APIs for remove note for using apollo-graphql
- * @purpose : For fetch data by using CURD operation
+ * @description : forgotPassword APIs for updatePassword user using apollo-graphql
+ * @purpose : For deletion by using CURD operation
  * @param {*} root
  * @param {*} params
  */
-noteMutation.prototype.removeNote = async (root, params) => {
+userMutation.prototype.forgotPassword = async (root, params, context) => {
+
     try {
+        var emailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
         /**
-         * @purpose : find id from database then remove from dataase
-         * @param {String} id
+         * @purpose : check that email is valid or not
+         * @return {String} message
+         */
+        if (!emailformat.test(params.email)) {
+            return { "message": "not valid email" }
+        }
+
+        /**
+         * @purpose : find email that is present in database or not
+         * @return {String} message
+         */
+        var user = await userModel.find({ "email": params.email })
+        if (!user.length > 0) {
+            return { "message": "email is not present in database" }
+        }
+
+        /**
+         * @purpose : generate a token for send a mail
+         */
+        var token = jsonwebtoken.sign({ email: params.email }, process.env.SECRET_KEY, { expiresIn: 86400000 });
+
+        //send token to sendmail function, which is send to the link(token)
+        var url = `http://localhost:4000/?token=${token}`
+        //var url = `${context.origin}/graphql?token=${token}`
+
+        /**
+         * @param {token}, for sending mail to the mail
          * @returns {String} message
          */
-        var note = await noteModel.findOneAndRemove({ _id: params.noteID })
-        if (!note) {
-            return { "message": "note is not present" }
-        } else {
-            return { "message": "note removed" }
+        var mail = sendMail.sendEmailFunction(url, params.email)
+        if (!mail > 0) {
+            return { "mesage": "!Error, mail not send " }
+        }
+        return {
+            "message": "Mail sent to your given email id",
+            "token": token
         }
 
-
-    } catch (error) {
-        console.log("error")
+    } catch (err) {
+        console.log("!Error")
         return { "message": err }
     }
 }
 
 
 
+
 /*******************************************************************************************************************/
 /**
- * @description : save label into notes APIs for updated notes for using apollo-graphql
- * @purpose : For fetch data by using CURD operation
+ * @description : resetPassword APIs for resetPassword user using apollo-graphql
+ * @purpose : For resetPassword by using CURD operation
  * @param {*} root
- * @param {*} params 
+ * @param {*} params
+ * @param {*} context 
  */
-noteMutation.prototype.saveLabelToNote = async (root, params) => {
+userMutation.prototype.resetPassword = async (root, params, context) => {
     try {
 
-        //find labelID from noteModel Schema
-        var id = await noteModel.find({ _id: params.noteID, "labelID": params.label_ID })
-
-        //if id is already present
-        if (id.length > 0) {
-            return { "message": "This label is already added in note" }
+        /**
+         * @purpose : for token verification
+         * @returns {String} message
+         */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
         }
 
-        //find id from noteModel and update(push) into notes
-        var note = await noteModel.findOneAndUpdate({ _id: params.noteID },
-            {
-                $push: {
-                    labelID: params.label_ID
-                }
-            })
+        //password matching
+        if (params.newPassword != params.confirmPassword) {
+            return { "message": "password and confirm password are not match" }
+        }
+
+        //bcrypt new password
+        params.newPassword = await bcrypt.hashSync(params.newPassword, saltRounds)
 
         /**
-         * @return {String}, message
+         * @purpose : for updated password
+         * @param {String}, message
+         * @param {$set}, new passowrd in database
+         * @returns {String} message
          */
-        if (!note) {
-            return { "message": "label not added " }
-        } else {
-            return { "message": "label added on note successfully " }
-        }
+        var update = await userModel.updateOne({ "email": afterVerify.email },
+            { $set: { password: params.newPassword } },
+            { new: true })
 
-    } catch (error) {
-        console.log("error in catch")
+        if (!update) {
+            return { "message": "Password not reset" }
+        }
+        return { "message": "resetPassword Successfully" }
+
+    } catch (err) {
+        console.log("!Error")
         return { "message": err }
     }
 }
@@ -211,187 +342,41 @@ noteMutation.prototype.saveLabelToNote = async (root, params) => {
 
 /*******************************************************************************************************************/
 /**
- * @description : save label into notes APIs for updated notes for using apollo-graphql
- * @purpose : For fetch data by using CURD operation
+ * @description : update APIs for updateUser data using apollo-graphql
+ * @purpose : For updation by using CURD operation
  * @param {*} root
  * @param {*} params
  */
-noteMutation.prototype.removeLabelFromNote = async (root, params) => {
+userMutation.prototype.update = async (root, params, context) => {
+
     try {
 
-        //find labelID from noteModel Schema
-        var id = await noteModel.find({ "labelID": params.label_ID })
-
-        //if id is already present
-        if (!id.length > 0) {
-            return { "message": "This label is not present in notes" }
+        /** 
+        * @purpose : for token v erification
+        * @returns {String} mess age
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
         }
 
-        //find id from noteModel and update(push) into notes
-        var note = await noteModel.findOneAndUpdate({ _id: params.noteID },
+        var update = await userModel.updateOne({ _id: afterVerify.userID },
             {
-                $pull: {
-                    labelID: params.label_ID
+                $set:
+                {
+                    firstName: params.firstName,
                 }
-            })
-
-        /**
-         * @return {String}, message
-         */
-        if (!note) {
-            return { "message": "label not deleted " }
-        } else {
-            for (let i = 0; i < (note.labelID).length; i++) {
-                if (note.labelID[i] === params.label_ID) {
-                    note.labelID.splice(i, 1);
-                }
-            }
-            return { "message": "label delete from note successfully " }
+            },
+            { new: true }
+        )
+        if (!update) {
+            return { "message": "check user id or name, try again" }
         }
+        return { "message": "user update successfully" };
 
 
-    } catch (error) {
-        console.log("error in catch")
-        return { "message": err }
-    }
-}
-
-
-
-/*******************************************************************************************************************/
-/**
- * @description : set Reminder APIs in notes for using apollo-graphql
- * @purpose : For fetch data by using CURD operation
- */
-noteMutation.prototype.Reminder = async (root, params) => {
-    try {
-
-        //find labelID from noteModel Schema
-        var id = await noteModel.find({ "_id": params.noteID })
-
-        //if id is already present
-        if (!id.length > 0) {
-            return { "message": "This noteID is not present in notes" }
-        }
-
-        var date = new Date(params.reminder)
-        console.log(date)
-        //find id from noteModel and update(push) into notes
-        var note = await noteModel.findOneAndUpdate({ _id: params.noteID },
-            {
-                $set: {
-                    reminder: date
-                }
-            })
-
-        //time set for reminder time
-
-
-        /**
-     * @return {String}, message
-     */
-        if (!note) {
-            return { "message": "reminder not set " }
-        }
-        return { "message": "reminder set in note successfully " }
-
-
-    } catch (error) {
-        console.log("error in catch")
-        return { "message": error }
-    }
-}
-
-
-/*******************************************************************************************************************/
-/**
- * @description : deleteReminder APIs from notes for using apollo-graphql
- * @purpose : For fetch data by using CURD operation
- */
-noteMutation.prototype.deleteReminder = async (root, params) => {
-    try {
-
-        //find labelID from noteModel Schema
-        var id = await noteModel.find({ "_id": params.noteID })
-
-        //if id is already present
-        if (!id.length > 0) {
-            return { "message": "This noteID is not present in notes" }
-        }
-
-        //find id from noteModel and update(push) into notes
-        var note = await noteModel.findOneAndUpdate({ _id: params.noteID }, { $set: { reminder: "" } })
-
-        console.log(note);
-
-
-        /**
-         * @return {String}, message
-         */
-        if (!note) {
-            return { "message": "reminder not remove " }
-        }
-        return { "message": "reminder remove successfully " }
-
-
-    } catch (error) {
-        console.log("error in catch")
-        return { "message": err }
-    }
-}
-
-
-/*******************************************************************************************************************/
-/**
- * @description : Archieve data APIs check whether is archieve or not for using apollo-graphql
- * @purpose : For fetch data by using CURD operation
- * @param {payload}, has token for verification and ID
- * @purpose : Archiev note from database
- * @param {params} params
- */
-noteMutation.prototype.Archieve = async (root, params, context) => {
-    try {
-
-
-        /**
-         * @payload send token for verification
-         * @condition if present or not
-         * @returns {String} message
-         */
-        var payload = tokenVerify.verification(context.token)
-        if (!payload) {
-            return { "message": "token is not verify" }
-        }
-
-        //find that id id presen or not
-        var checkNote = await noteModel.find({ _id: params.noteID })
-        console.log(checkNote);
-
-
-        //check whether is false or true in database
-        if (checkNote[0].archieve == false) {
-
-            /**
-             * @purpose : find id and then update archieve
-             * @param {ID}, userID
-             * @returns {String}, message
-             */
-            await noteModel.updateOne({ _id: params.noteID },
-                {
-                    $set:
-                    {
-                        "archieve": true
-                    }
-                })
-
-            return { "message": "note Archieve" }
-        }
-
-        return { "message": "note already Archieve" }
-
-
-    } catch (error) {
-        console.log("error")
+    } catch (err) {
+        console.log("!Error in catch")
         return { "message": err }
     }
 }
@@ -399,187 +384,31 @@ noteMutation.prototype.Archieve = async (root, params, context) => {
 
 
 
-
 /*******************************************************************************************************************/
 /**
- * @description : Archieve data APIs check whether is archieve or not for using apollo-graphql
- * @purpose : For fetch data by using CURD operation
- * @param {payload}, has token for verification and ID
- * @purpose : Archiev note from database
- * @param {params} params
+ * @description : REMOVE APIs for remove data from database using apollo-graphql
+ * @purpose : remove user from database by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @returns {number} remove user id
  */
-noteMutation.prototype.ArchieveRemove = async (root, params, context) => {
+userMutation.prototype.remove = async (root, params) => {
+
     try {
-
-
-        /**
-         * @payload send token for verification
-         * @condition if present or not
-         * @returns {String} message
-         */
-        var payload = tokenVerify.verification(context.token)
-        if (!payload) {
-            return { "message": "token is not verify" }
+        //find id and remove from the user Data
+        const removeduser = await userModel.findByIdAndRemove(params.id).exec();
+        if (!removeduser) {
+            return { "message": "check user id, try again" }
         }
+        return { "message": "user delete successfully" };
 
-        //find that id id presen or not
-        var checkNote = await noteModel.find({ _id: params.noteID })
-
-        //check whether is false or true in database
-        if (checkNote[0].archieve == false) {
-
-            return { "message": "This note is not Archieve" }
-
-        } else {
-
-            /**
-            * @purpose : find id and then update archieve
-            * @param {ID}, userID
-            * @returns {String}, message
-            */
-            await noteModel.updateOne({ _id: params.noteID },
-                {
-                    $set:
-                    {
-                        "archieve": false
-                    }
-                })
-
-            return { "message": "note remove from Archieve" }
-        }
-
-
-    } catch (error) {
-        console.log("error")
+    } catch (err) {
+        console.log("!Error")
         return { "message": err }
     }
 }
 
-
-
-
-
-/*******************************************************************************************************************/
 /**
- * @description : Trash data APIs check whether is Trash/Delete or not for using apollo-graphql
- * @purpose : For fetch data by using CURD operation
- * @param {payload}, has token for verification and ID
- * @purpose : Trash note from database
- * @param {params} params
+ * @exports userMutation
  */
-noteMutation.prototype.Trash = async (root, params, context) => {
-    try {
-
-
-        /**
-         * @payload send token for verification
-         * @condition if present or not
-         * @returns {String} message
-         */
-        var payload = tokenVerify.verification(context.token)
-        if (!payload) {
-            return { "message": "token is not verify" }
-        }
-
-        //find that id id presen or not
-        var checkNote = await noteModel.find({ _id: params.noteID })
-
-        //check whether is false or true in database
-        if (checkNote[0].trash == false) {
-
-
-            /**
-             * @purpose : find id and then update archieve
-             * @param {ID}, userID
-             * @returns {String}, message
-             */
-            await noteModel.updateOne({ _id: params.noteID },
-                {
-                    $set:
-                    {
-                        "trash": true
-                    }
-                })
-
-            return { "message": "note trash" }
-
-        }
-
-        return { "message": "This note is already in trash" }
-
-
-    } catch (error) {
-        console.log("error")
-        return { "message": err }
-    }
-}
-
-
-
-
-
-
-/*******************************************************************************************************************/
-/**
- * @description : Trash data APIs check whether is Trash/Delete or not for using apollo-graphql
- * @purpose : For fetch data by using CURD operation
- * @param {payload}, has token for verification and ID
- * @purpose : Trash note from database
- * @param {params} params
- */
-noteMutation.prototype.TrashRemove = async (root, params, context) => {
-    try {
-
-
-        /**
-         * @payload send token for verification
-         * @condition if present or not
-         * @returns {String} message
-         */
-        var payload = tokenVerify.verification(context.token)
-        if (!payload) {
-            return { "message": "token is not verify" }
-        }
-
-        //find that id id presen or not
-        var checkNote = await noteModel.find({ _id: params.noteID })
-
-        //check whether is false or true in database
-        if (checkNote[0].trash == false) {
-
-            return { "message": "This not is not in trash" }
-
-        } else {
-
-            /**
-            * @purpose : find id and then update archieve
-            * @param {ID}, userID
-            * @returns {String}, message
-            */
-            await noteModel.updateOne({ _id: params.noteID },
-                {
-                    $set:
-                    {
-                        "trash": false
-                    }
-                })
-
-            return { "message": "note remove from trash" }
-        }
-
-
-    } catch (error) {
-        console.log("error")
-        return { "message": err }
-    }
-}
-
-
-
-
-
-
-/**
- * @exports noteMutation
- */
-module.exports = new noteMutation()
+module.exports = new userMutation()

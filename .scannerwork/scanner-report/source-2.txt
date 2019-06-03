@@ -1,52 +1,55 @@
-/********************************************************************************************************************
- *  @Execution      : default node          : cmd> s3-Services.js
+/******************************************************************************
+ *  @Execution      : default node          : cmd> collabatorsSchema.js
  *                      
  * 
- *  @Purpose        : upload a pic on aws-s3 services 
+ *  @Purpose        : MongoDB schema for collabators
  * 
- *  @description    : using apollo-graphql upload a pic in s3 services for gitHub
+ *  @description    : using this schema we store collabators data in database
  * 
- *  @overview       : fundoo application  
+ *  @overview       : fundoo application
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
  *  @version        : 1.0
- *  @since          : 30-april-2019
+ *  @since          : 14-may-2019
  *
- *******************************************************************************************************************/
+ ******************************************************************************/
 /**
  * @requires files
  */
-var aws = require('aws-sdk')
-var multer = require('multer')
-var multerS3 = require('multer-s3')
+var mongoose = require('mongoose');
 
-//for s3 upload a pic in S# bucket
-var s3 = new aws.S3({
-    bucketName: 'myfundoo',
-    region: 'ap-south-1',
-    accessKeyId: process.env.AWS_ID,
-    secretAccessKey: process.env.AWS_SECRET
-})
+//connect the schema with database
+var mongoSchema = mongoose.Schema;
+
 
 /**
- * @description : create a uplaod file for given aws information
- *                and use multer for upload image
- * @purpose : for github profile
+ * @purpose : store data in database based on this schema
+ * @param {number} userID
+ * @param {String} labelName
+ * @param {timestamps} timestamps
  */
-var upload = multer({
-    storage: multerS3({
-        s3: s3,
-        bucket: 'myfundoo',
-        metadata: function (req, file, cb) {
-            cb(null, { fieldName: file.fieldname });
-        },
-        key: function (req, file, cb) {
-            cb(null, Date.now().toString())
-        }
+var collaboratorSchema = new mongoSchema({
+    userID: {
+        type: mongoSchema.Types.ObjectId,
+        ref: 'schemaData'
+    },
+    noteID: {
+        type: mongoSchema.Types.ObjectId,
+        ref: 'noteSchema'
+    },
+    collaboratorID: {
+        type: mongoSchema.Types.ObjectId,
+        ref: 'schemaData'
+    },
+},
+    {
+        timestamps: true
     })
-})
 
+
+//connect database using mongoose
+var collaborator = mongoose.model('collaborators', collaboratorSchema);
 
 /**
- * @exports upload
+ * @exports collaborator
  */
-module.exports = upload
+module.exports = collaborator
