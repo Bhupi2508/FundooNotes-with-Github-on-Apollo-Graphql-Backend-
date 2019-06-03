@@ -22,7 +22,9 @@ const { typeDefs } = require('./Apollo-Graphql/Types/types');
 const resolvers = require('./Apollo-Graphql/Resolver/resolver').resolvers
 const mongoose = require('./Mongoconfig/mongoose')
 const upload = require('./services/s3-services')
+var redis = require('./Mongoconfig/redis')
 const db = mongoose()
+var redis1 = redis()
 var app = express()
 
 

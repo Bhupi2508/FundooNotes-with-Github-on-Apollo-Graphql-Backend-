@@ -29,13 +29,20 @@ module.exports = function () {
 
     //connect to the database by given url
     var db = mongoose.connect(config.db, { useNewUrlParser: true });
-    mongoose.connection.on('error', function (err) {
-        console.log('Error: Could not connect to MongoDB. Did you forget to run `mongod`?'.err);
-    }).on('open', function () {
+
+    mongoose.connection.on('open', function () {
         console.log('#####################################################################################');
         console.log('##############                connected with MongoDb                   ##############');
         console.log('#####################################################################################\n');
-        //process.exit()
     })
+    mongoose.connection.on('error', function (err) {
+        console.log('Error: Could not connect to MongoDB. Did you forget to run `mongod`?'.err);
+        process.exit()
+    })
+    mongoose.connection.on('disconnect', function () {
+        console.log('MongoDB Disconnected');
+        process.exit(1)
+    })
+
     return db;
 };
