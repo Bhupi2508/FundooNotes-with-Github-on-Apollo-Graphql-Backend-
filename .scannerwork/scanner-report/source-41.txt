@@ -1,10 +1,10 @@
 /******************************************************************************
- *  @Execution      : default node          : cmd> server.js
+ *  @Execution      : default node          : cmd> nodemon authenticationUser.js
  *                      
  * 
- *  @Purpose        : Create APIs and connect server using apollo-graphql
+ *  @Purpose        : verification 
  * 
- *  @description    : set middleware and connect all the server mechanism(path)
+ *  @description    : token verification by using jsonWebToken
  * 
  *  @overview       : fundoo application
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
@@ -15,46 +15,26 @@
 /**
  * @requires files
  */
-const { ApolloServer } = require('apollo-server');
-require('dotenv').config();
-const express = require('express')
-const { typeDefs } = require('./Apollo-Graphql/Types/types');
-const resolvers = require('./Apollo-Graphql/Resolver/resolver').resolvers
-const mongoose = require('./Mongoconfig/mongoose')
-const upload = require('./services/s3-services')
-var redis = require('./Mongoconfig/redis')
-const db = mongoose()
-var redis1 = redis()
-var app = express()
-
-
-//create a middleware using apollo-graphql
-var server = new ApolloServer({
-    typeDefs,
-    resolvers,
-    context: ({ req }) => ({
-        origin: req.headers.origin,
-        token: req.query.token,
-        code: req.query.code,
-    })
-});
-
-
-//middleware for s3 APIs
-// app.use('/graphql', upload.single('picture'))
-// server.applyMiddleware({ app })
-
-
-//listen the given port
-var userPort = (process.env.PORT)
-server.listen(userPort, () => {
-    console.log('#####################################################################################');
-    console.log('##############          STARTING SERVER at port : ', userPort, '               ##############');
-    console.log('#####################################################################################');
-});
+var jwt = require('jsonwebtoken');
 
 
 /**
- * @exports server
+ * @exports verification
  */
-module.exports = server
+exports.verification = (token) => {
+    try {
+
+        /**
+         * @param {String}, secretKey is string used for hidden data
+         * @return {String}, value of verify token
+         * @param {String}, secretKey
+         */
+        var value = jwt.verify(token, process.env.SECRET_KEY)
+        return value
+    }
+
+    catch (err) {
+        console.log("Error during Authentication time (Token Verification Time)")
+        return { "message": err }
+    }
+}

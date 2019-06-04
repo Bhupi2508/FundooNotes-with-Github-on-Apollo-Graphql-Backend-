@@ -1,65 +1,55 @@
-/********************************************************************************************************************
- *  @Execution      : default node          : cmd> uploadPicMutation.js
+/******************************************************************************
+ *  @Execution      : default node          : cmd> collabatorsSchema.js
  *                      
  * 
- *  @Purpose        : upload pic on s3-aws storage using apollo-graphql 
+ *  @Purpose        : MongoDB schema for collabators
  * 
- *  @description    : By mutation upload a pic on AWS-s3
+ *  @description    : using this schema we store collabators data in database
  * 
- *  @overview       : fundoo application  
+ *  @overview       : fundoo application
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
  *  @version        : 1.0
- *  @since          : 29-april-2019
+ *  @since          : 14-may-2019
  *
- *******************************************************************************************************************/
+ ******************************************************************************/
 /**
  * @requires files
  */
-var userModel = require('../../model/userSchema');
-var verifyToken = require('../../Authentication/authenticationUser')
+var mongoose = require('mongoose');
 
-
-
-//create a empty function
-var uploadPicMutation = function () { }
-
+//connect the schema with database
+var mongoSchema = mongoose.Schema;
 
 
 /**
- * @param {*} root
- * @param {*} args
- * @param {*} context
+ * @purpose : store data in database based on this schema
+ * @param {number} userID
+ * @param {String} labelName
+ * @param {timestamps} timestamps
  */
-uploadPicMutation.prototype.picUpload = async (root, args, context) => {
-    if (context.token) {
+var collaboratorSchema = new mongoSchema({
+    userID: {
+        type: mongoSchema.Types.ObjectId,
+        ref: 'schemaData'
+    },
+    noteID: {
+        type: mongoSchema.Types.ObjectId,
+        ref: 'noteSchema'
+    },
+    collaboratorID: {
+        type: mongoSchema.Types.ObjectId,
+        ref: 'schemaData'
+    },
+},
+    {
+        timestamps: true
+    })
 
 
-
-        //verify token 
-        var afterVerify = verifyToken.verification(context.token)
-        if (!afterVerify > 0) {
-            return { "message": "token is not verify" }
-        }
-        console.log(context.req.file.location)
-
-
-
-        //find in database and then update
-        var updateurl = await userModel.findOneAndUpdate({ _id: afterVerify.userID }, { $set: { ProfilePicUrl: context.req.file.location } })
-        if (updateurl) {
-            return {
-                "uploadURL": context.req.file.location,
-                "message": "Upload pic successfully"
-            }
-        }
-    }
-    else {
-        return { "uploadURL": "profile Pic is not set" }
-    }
-}
-
+//connect database using mongoose
+var collaborator = mongoose.model('collaborators', collaboratorSchema);
 
 /**
-* @exports uploadPicMutation
-*/
-module.exports = new uploadPicMutation()
+ * @exports collaborator
+ */
+module.exports = collaborator
