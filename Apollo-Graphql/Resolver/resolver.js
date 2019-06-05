@@ -61,10 +61,11 @@ const deleteGitBranch = require('../Mutation/gitAuthMutation').deleteGitBranch  
 const createGitRepository = require('../Mutation/gitAuthMutation').createGitRepository   //createGitRepository mutation
 const removeGitRepository = require('../Mutation/gitAuthMutation').removeGitRepository   //removeGitRepository mutation
 const picUpload = require('../Mutation/uploadPicMutation').picUpload   //picUpload mutation
-const addCollaboration = require('../Mutation/collaboratorMutation').addCollaboration //picUpload mutation
+const addCollaboration = require('../Mutation/collaboratorMutation').addCollaboration //addCollaboration mutation
 const removeCollaboration = require('../Mutation/collaboratorMutation').removeCollaboration  //removeCollaboration mutation
 const addCollaboratorGithub = require('../Mutation/gitCollaborators').addCollaboratorGithub  //addCollaboratorGithub mutation
-const removeCollaboratorGithub = require('../Mutation/gitCollaborators').removeCollaboratorGithub  //removeCollaboratorGithub mutation
+const removeCollaboratorGithub = require('../Mutation/gitCollaborators').removeCollaboratorGithub  //removeCollaboratorGithub
+const changeStatusInGithub = require('../Mutation/gitAuthMutation').changeStatusInGithub //changeStatusInGithub mutation
 
 //create a empty function
 var userResolver = function () { }
@@ -125,7 +126,8 @@ userResolver.prototype.resolvers = {
         addCollaboration,
         removeCollaboration,
         addCollaboratorGithub,
-        removeCollaboratorGithub
+        removeCollaboratorGithub,
+        changeStatusInGithub
 
     },
     User: {

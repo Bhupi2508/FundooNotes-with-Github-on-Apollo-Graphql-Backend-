@@ -489,7 +489,7 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
             }),
 
         })
-       // console.log("\nRepository Branch after post Data : ", branchResponse.data);
+        // console.log("\nRepository Branch after post Data : ", branchResponse.data);
 
         return { "message": "git branch create Successfully" }
 
@@ -542,14 +542,14 @@ gitAuthMutation.prototype.deleteGitBranch = async (root, params, context) => {
          * @param {headers}
          * @purpose : get response from given url
          */
-       await axios({
+        await axios({
             method: 'DELETE',
             url: `${process.env.DELETE_BRANCH}${params.gitUsername}/${params.repoName}/git/refs/heads/${params.DeleteBranch}`,
             headers: {
                 Authorization: `Bearer ${access_token}`
             }
         })
-       // console.log("\nRepository Branch Response Data : ", res);
+        // console.log("\nRepository Branch Response Data : ", res);
 
         return { "message": "git branch delete Successfully" }
 
@@ -674,8 +674,8 @@ gitAuthMutation.prototype.starRepository = async (root, params, context) => {
         // Access_token and Git Node ID
         var gitNodeID = user[0].gitNodeID;
         var access_token = user[0].access_Token;
-        console.log(typeof(process.env.GIT_ID));
-        
+        console.log(typeof (process.env.GIT_ID));
+
 
 
         //fetch repository data from github
@@ -892,6 +892,65 @@ gitAuthMutation.prototype.removeGitRepository = async (root, params, context) =>
     } catch (err) {
         console.log("!Error in catch : ", err)
         return { "message": "This Repository is not present" }
+    }
+}
+
+
+
+
+
+
+
+/*******************************************************************************************************************/
+/**
+ * @description : Change Status APIs for change the status in github using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+gitAuthMutation.prototype.changeStatusInGithub = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+        // Access_token from github
+        var access_token = process.env.USER_TOKEN_FOR_STATUS
+
+        //fetch github data from github
+        const fetch = createApolloFetch({
+            uri: `${process.env.GIT_FETCH_REPO}${access_token}`
+        });
+
+
+        //pass the query mutation for data fetching
+        const res = await fetch({
+            query: `mutation {changeUserStatus(input:{message:${params.status}}){status{message}}}`,
+        })
+
+        console.log("res", res)
+
+        return {
+            "message": "Status updated successfully",
+        }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": err }
     }
 }
 

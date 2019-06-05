@@ -141,6 +141,7 @@ type User {
     removeCollaboration(noteID:String!,colabID:String!):User
     addCollaboratorGithub(ownerName:String!, repoName:String!, colabUserName:String!):User
     removeCollaboratorGithub(ownerName:String!, repoName:String!, colabUserName:String!):User
+    changeStatusInGithub(status:String!):User
 
  }`;
 
