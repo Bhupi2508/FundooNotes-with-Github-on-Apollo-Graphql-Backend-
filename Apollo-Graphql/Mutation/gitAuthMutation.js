@@ -835,8 +835,6 @@ gitAuthMutation.prototype.createGitRepository = async (root, params, context) =>
 
 
 
-
-
 /*******************************************************************************************************************/
 /**
  * @description : createGitBranch APIs for create Branch in github using apollo-graphql
@@ -1004,12 +1002,18 @@ gitAuthMutation.prototype.gitRepoCommits = async (root, params, context) => {
 
         })
 
+        var array = [];
         for (var i = 0; i < res.data.length; i++) {
             console.log("\nRepository Commits Details  : ", res.data[i].commit.committer)
             console.log("Repository Commits message  : ", res.data[i].commit.message)
+            array.push(res.data[i].commit.message);
         }
 
-        return { "message": "Repository commits fetch Successfully" }
+        console.log("\narray", array)
+        return {
+            "message": "Repository commits fetch Successfully",
+            "commit": array
+        }
 
     } catch (err) {
         console.log("!Error in catch : ", err)

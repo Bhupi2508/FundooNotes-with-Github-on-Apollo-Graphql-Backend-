@@ -72,7 +72,9 @@ type User {
       message: String!
       token : String
       clientMutationId : String
+      status: String
       repo:[repo]
+      commit: [String]
    }
 
    type UploadPic {
@@ -141,8 +143,8 @@ type User {
     removeCollaboration(noteID:String!,colabID:String!):User
     addCollaboratorGithub(ownerName:String!, repoName:String!, colabUserName:String!):User
     removeCollaboratorGithub(ownerName:String!, repoName:String!, colabUserName:String!):User
-    changeStatusInGithub(status:String!, emoji:String):User
-    gitRepoCommits(ownerName:String!, repoName:String!):User
+    changeStatusInGithub(status:String!, emoji:String):GitHub
+    gitRepoCommits(ownerName:String!, repoName:String!):GitHub
 
  }`;
 
