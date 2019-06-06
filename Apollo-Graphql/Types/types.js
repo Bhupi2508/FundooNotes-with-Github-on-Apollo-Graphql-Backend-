@@ -122,26 +122,27 @@ type User {
     Trash(noteID: ID!):Notes
     TrashRemove(noteID: ID!):Notes
     saveLabelToNote(noteID: ID!, label_ID: ID!): Notes
-    removeLabelFromNote(noteID: ID!, label_ID: ID!): Notes
-    GithubAuth(email: String!): GitHub
-    codeVerify(firstName: String, lastName: String, email: String): GitHub
+    removeLabelFromNote(noteID: ID!, label_ID: ID!):Notes
+    GithubAuth(email: String!):GitHub
+    codeVerify(firstName: String, lastName: String, email: String):GitHub
     pullGitRepository:GitHub
     fetchRepository(login_Name: String!):GitHub
     starRepository:GitHub
     removeStarRepository:GitHub
-    GitAuthTokenVerify: GitHub
-    addWatchInGitRepo(gitUsername: String!, repoName: String!): GitHub
-    deleteWatchInGitRepo(gitUsername: String!, repoName: String!): GitHub
-    createGitBranch(newBranch: String!, gitUsername: String!, repoName: String!): GitHub
-    deleteGitBranch(DeleteBranch: String!, gitUsername: String!, repoName: String!): GitHub
+    GitAuthTokenVerify:GitHub
+    addWatchInGitRepo(gitUsername: String!, repoName: String!):GitHub
+    deleteWatchInGitRepo(gitUsername: String!, repoName: String!):GitHub
+    createGitBranch(newBranch: String!, gitUsername: String!, repoName: String!):GitHub
+    deleteGitBranch(DeleteBranch: String!, gitUsername: String!, repoName: String!):GitHub
     createGitRepository(repoName: String!):GitHub
     removeGitRepository(ownerName: String!, repoName: String!):GitHub
-    picUpload: UploadPic
+    picUpload:UploadPic
     addCollaboration(noteID:String!,colabID:String!):User
     removeCollaboration(noteID:String!,colabID:String!):User
     addCollaboratorGithub(ownerName:String!, repoName:String!, colabUserName:String!):User
     removeCollaboratorGithub(ownerName:String!, repoName:String!, colabUserName:String!):User
     changeStatusInGithub(status:String!, emoji:String):User
+    gitRepoCommits(ownerName:String!, repoName:String!):User
 
  }`;
 

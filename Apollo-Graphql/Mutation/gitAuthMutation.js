@@ -958,6 +958,71 @@ gitAuthMutation.prototype.changeStatusInGithub = async (root, params, context) =
 
 
 
+/*******************************************************************************************************************/
+/**
+ * @description : gitRepoCommits APIs for fetch commits from github using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+gitAuthMutation.prototype.gitRepoCommits = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+        // Access_token
+        var access_token = user[0].access_Token
+
+
+        /**
+         * @function (Axios), which is used to handle http request
+         * @method (get), Get data in response when hit the url
+         * @param {headers}
+         * @purpose : get response from given url
+         */
+        var res = await axios({
+            method: 'GET',
+            url: `${process.env.DELETE_REPO}${params.ownerName}/${params.repoName}/commits`,
+            headers: {
+                Authorization: `Bearer ${access_token}`
+            }
+
+        })
+
+        for (var i = 0; i < res.data.length; i++) {
+            console.log("\nRepository Commits Details  : ", res.data[i].commit.committer)
+            console.log("Repository Commits message  : ", res.data[i].commit.message)
+        }
+
+        return { "message": "Repository commits fetch Successfully" }
+
+    } catch (err) {
+        console.log("!Error in catch : ", err)
+        return { "message": "Repository commits fetch UnSuccessfully" }
+    }
+}
+
+
+
+
+
+
+
 
 /**
 * @exports gitAuthMutation
