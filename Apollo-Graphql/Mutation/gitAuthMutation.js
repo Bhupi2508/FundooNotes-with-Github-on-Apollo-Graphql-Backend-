@@ -1002,25 +1002,99 @@ gitAuthMutation.prototype.gitRepoCommits = async (root, params, context) => {
 
         })
 
-        var array = [];
+        console.log("res",res.data[0]);
+        
+
+        //create a for loop for seprate data
         for (var i = 0; i < res.data.length; i++) {
             console.log("\nRepository Commits Details  : ", res.data[i].commit.committer)
-            console.log("Repository Commits message  : ", res.data[i].commit.message)
-            array.push(res.data[i].commit.message);
+            console.log("Repository Commits message  : ", res.data[i].commit.message);
         }
 
-        console.log("\narray", array)
         return {
-            "message": "Repository commits fetch Successfully",
-            "commit": array
+            "message": "commits fetch successfully",
+            "data": res.data
         }
-
     } catch (err) {
         console.log("!Error in catch : ", err)
         return { "message": "Repository commits fetch UnSuccessfully" }
     }
 }
 
+
+
+
+
+
+
+/*******************************************************************************************************************/
+/**
+ * @description : gitRepoWebhook APIs for create a webhook in github using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+gitAuthMutation.prototype.gitRepoWebhook = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+        // Access_token
+        var access_token = process.env.GIT_REPO_TOKEN
+        console.log(access_token);
+
+
+        /**
+         * @function (Axios), which is used to handle http request
+         * @method (POST), post  data in response when hit the url
+         * @param {headers}
+         * @purpose : get response from given url
+         */
+        var res = await axios({
+            method: 'POST',
+            url: `${process.env.DELETE_REPO}${params.ownerName}/${params.repoName}/hooks`,
+            headers: {
+                Authorization: `Bearer ${access_token}`
+            },
+            data: JSON.stringify({
+                "active": true,
+                "events": [
+                    "push",
+                    "pull_request"
+                ],
+                "config": {
+                    "url": `${params.url}`,
+                    "content_type": "json",
+                    "insecure_ssl": "0"
+                }
+            }),
+        })
+
+        console.log("\nGithub response : ", res)
+        return {
+            "message": "Repository webhook response successfully",
+        }
+
+    } catch (err) {
+        console.log("!Error in catch : ", err)
+        return { "message": "Repository webhook response Unsuccessfully" }
+    }
+}
 
 
 

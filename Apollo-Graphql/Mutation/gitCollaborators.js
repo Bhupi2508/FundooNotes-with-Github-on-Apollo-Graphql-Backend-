@@ -52,7 +52,6 @@ userAddInCollaborator.prototype.addCollaboratorGithub = async (root, params, con
 
         // Access_token
         var access_token = user[0].access_Token
-        console.log("access_token", access_token)
 
 
         /**
@@ -68,7 +67,7 @@ userAddInCollaborator.prototype.addCollaboratorGithub = async (root, params, con
                 Authorization: `Bearer ${access_token}`
             }
         })
-        console.log("\nRepository collaborators Details : ", res);
+        //console.log("\nRepository collaborators Details : ", res);
 
         return { "message": "user collaborators added successfully" }
 
@@ -111,7 +110,6 @@ userAddInCollaborator.prototype.removeCollaboratorGithub = async (root, params, 
 
         // Access_token
         var access_token = user[0].access_Token
-        console.log("access_token", access_token)
 
 
         /**
@@ -127,7 +125,7 @@ userAddInCollaborator.prototype.removeCollaboratorGithub = async (root, params, 
                 Authorization: `Bearer ${access_token}`
             }
         })
-        console.log("\nRepository collaborators Details : ", res);
+        //console.log("\nRepository collaborators Details : ", res);
 
         return { "message": "collborators remove successfully" }
 
@@ -135,6 +133,76 @@ userAddInCollaborator.prototype.removeCollaboratorGithub = async (root, params, 
         return { "message": "collborators alredy removed " }
     }
 }
+
+
+
+
+
+/*******************************************************************************************************************/
+/**
+ * @description : gitCollaboratorsList APIs for show all the collaborators list using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+userAddInCollaborator.prototype.gitCollaboratorsList = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+        // Access_token
+        var access_token = user[0].access_Token
+
+
+        /**
+         * @function (Axios), which is used to handle http request
+         * @method (GET), GET data from response when hit the url
+         * @param {headers}
+         * @purpose : get response from given url
+         */
+        var res = await axios({
+            method: 'GET',
+            url: `${process.env.GIT_COMMITS}${params.ownerName}/${params.repoName}/collaborators`,
+            headers: {
+                Authorization: `Bearer ${access_token}`
+            }
+        })
+
+        console.log("res", res.data);
+
+        //create a array
+        var array = [];
+        for (var i = 0; i < res.data.length; i++) {
+            console.log("\nRepository collaborators Details : ", res.data[i].login);
+            array.push(res.data[i].login)
+        }
+
+        return {
+            "message": "Collaborators list fetch successfully",
+            "data": res.data
+        }
+
+    } catch (err) {
+        return { "message": "error in fetch collaborators list" }
+    }
+}
+
+
 
 
 

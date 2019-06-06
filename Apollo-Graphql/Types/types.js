@@ -74,7 +74,20 @@ type User {
       clientMutationId : String
       status: String
       repo:[repo]
-      commit: [String]
+      data: [login]
+   }
+
+   type RepoCommits {
+      message: String
+      data: [commit]
+   }
+
+   type commit {
+      commit: User
+   }
+
+   type login {
+      login: String
    }
 
    type UploadPic {
@@ -144,7 +157,9 @@ type User {
     addCollaboratorGithub(ownerName:String!, repoName:String!, colabUserName:String!):User
     removeCollaboratorGithub(ownerName:String!, repoName:String!, colabUserName:String!):User
     changeStatusInGithub(status:String!, emoji:String):GitHub
-    gitRepoCommits(ownerName:String!, repoName:String!):GitHub
+    gitRepoCommits(ownerName:String!, repoName:String!):RepoCommits
+    gitCollaboratorsList(ownerName:String!, repoName:String!):GitHub
+    gitRepoWebhook(ownerName:String!, repoName:String!, url:String!):GitHub
 
  }`;
 

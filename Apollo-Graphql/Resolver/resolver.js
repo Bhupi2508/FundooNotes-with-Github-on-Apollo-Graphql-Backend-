@@ -65,8 +65,10 @@ const addCollaboration = require('../Mutation/collaboratorMutation').addCollabor
 const removeCollaboration = require('../Mutation/collaboratorMutation').removeCollaboration  //removeCollaboration mutation
 const addCollaboratorGithub = require('../Mutation/gitCollaborators').addCollaboratorGithub  //addCollaboratorGithub mutation
 const removeCollaboratorGithub = require('../Mutation/gitCollaborators').removeCollaboratorGithub  //removeCollaboratorGithub
-const changeStatusInGithub = require('../Mutation/gitAuthMutation').changeStatusInGithub //changeStatusInGithub mutation
-const gitRepoCommits = require('../Mutation/gitAuthMutation').gitRepoCommits //gitRepoCommits mutation
+const changeStatusInGithub = require('../Mutation/gitAuthMutation').changeStatusInGithub  //changeStatusInGithub mutation
+const gitRepoCommits = require('../Mutation/gitAuthMutation').gitRepoCommits  //gitRepoCommits mutation
+const gitCollaboratorsList = require('../Mutation/gitCollaborators').gitCollaboratorsList  //gitRepoCommits mutation
+const gitRepoWebhook = require('../Mutation/gitAuthMutation').gitRepoWebhook  //gitRepoWebhook mutation
 
 //create a empty function
 var userResolver = function () { }
@@ -129,7 +131,9 @@ userResolver.prototype.resolvers = {
         addCollaboratorGithub,
         removeCollaboratorGithub,
         changeStatusInGithub,
-        gitRepoCommits
+        gitRepoCommits,
+        gitCollaboratorsList,
+        gitRepoWebhook
 
     },
     User: {
