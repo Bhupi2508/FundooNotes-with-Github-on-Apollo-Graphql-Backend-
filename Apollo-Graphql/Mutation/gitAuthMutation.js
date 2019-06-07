@@ -48,7 +48,9 @@ gitAuthMutation.prototype.GithubAuth = async (root, params) => {
         if (!mail) {
             return { "message": "mail not sent" }
         }
-        return { "message": "Mail sent to your mail ID" }
+        return {
+            "message": "Mail sent to your mail ID"
+        }
 
     } catch (err) {
         console.log("!Error")
@@ -1002,8 +1004,8 @@ gitAuthMutation.prototype.gitRepoCommits = async (root, params, context) => {
 
         })
 
-        console.log("res",res.data[0]);
-        
+        console.log("res", res.data[0]);
+
 
         //create a for loop for seprate data
         for (var i = 0; i < res.data.length; i++) {

@@ -26,6 +26,7 @@ var redis = require('./Mongoconfig/redis')
 const db = mongoose()
 var redis1 = redis()
 var app = express()
+var elastic = require('./ElasticSearch/elastic')
 
 
 //create a middleware using apollo-graphql
