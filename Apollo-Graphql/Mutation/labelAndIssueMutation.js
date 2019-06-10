@@ -158,64 +158,64 @@ userAddLabelMutation.prototype.updateLabelInGit = async (root, params, context) 
 
 
 
-// /*******************************************************************************************************************/
-// /**
-//  * @description : GetLabelList APIs get list from github using apollo-graphql
-//  * @purpose : For gitAuth verification by using CURD operation
-//  * @param {*} root
-//  * @param {*} params
-//  * @param {*} token
-//  */
-// userAddLabelMutation.prototype.GetLabelList = async (root, params, context) => {
-//     try {
+/*******************************************************************************************************************/
+/**
+ * @description : GetLabelList APIs get list from github using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+userAddLabelMutation.prototype.GetLabelList = async (root, params, context) => {
+    try {
 
 
-//         /**
-//         * @param {token}, send token for verify
-//         * @returns {String} message, token verification 
-//         */
-//         var afterVerify = tokenVerify.verification(context.token)
-//         if (!afterVerify > 0) {
-//             return { "message": "token is not verify" }
-//         }
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
 
-//         //find token from dataBase
-//         var user = await model.find({ _id: afterVerify.userID })
-//         if (!user) {
-//             return { "message": "user not verified" }
-//         }
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
 
-//         // Access_token
-//         var access_token = user[0].access_Token
-//         console.log("access_token", access_token)
+        // Access_token
+        var access_token = user[0].access_Token
+        console.log("access_token", access_token)
 
 
-//         /**
-//          * @function (Axios), which is used to handle http request
-//          * @method (GET), GET data from response when hit the url
-//          * @param {headers}
-//          * @purpose : get response from given url
-//          */
-//         var res = await axios({
-//             method: 'GET',
-//             url: `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/labels`,
-//             headers: {
-//                 Authorization: `Bearer ${access_token}`
-//             },
-//         })
+        /**
+         * @function (Axios), which is used to handle http request
+         * @method (GET), GET data from response when hit the url
+         * @param {headers}
+         * @purpose : get response from given url
+         */
+        var res = await axios({
+            method: 'GET',
+            url: `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/labels`,
+            headers: {
+                Authorization: `Bearer ${access_token}`
+            },
+        })
 
-//         console.log("res", res)
+        console.log("res", res)
 
-//         return {
-//             "message": "Label Data Fetch successfully",
-//             "data": res.data
-//         }
+        return {
+            "message": "Label Data Fetch successfully",
+            "data": res.data
+        }
 
-//     } catch (err) {
-//         console.log("!Error", err)
-//         return { "message": "Label data not fetch successfully" }
-//     }
-// }
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": "Label data not fetch successfully" }
+    }
+}
 
 
 
