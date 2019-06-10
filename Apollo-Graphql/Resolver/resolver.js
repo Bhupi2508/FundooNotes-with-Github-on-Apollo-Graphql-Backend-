@@ -65,10 +65,14 @@ const addCollaboration = require('../Mutation/collaboratorMutation').addCollabor
 const removeCollaboration = require('../Mutation/collaboratorMutation').removeCollaboration  //removeCollaboration mutation
 const addCollaboratorGithub = require('../Mutation/gitCollaborators').addCollaboratorGithub  //addCollaboratorGithub mutation
 const removeCollaboratorGithub = require('../Mutation/gitCollaborators').removeCollaboratorGithub  //removeCollaboratorGithub
-const changeStatusInGithub = require('../Mutation/gitAuthMutation').changeStatusInGithub  //changeStatusInGithub mutation
-const gitRepoCommits = require('../Mutation/gitAuthMutation').gitRepoCommits  //gitRepoCommits mutation
+const changeStatusInGithub = require('../Mutation/gitAuthMutation').changeStatusInGithub   //changeStatusInGithub mutation
+const gitRepoCommits = require('../Mutation/gitAuthMutation').gitRepoCommits   //gitRepoCommits mutation
 const gitCollaboratorsList = require('../Mutation/gitCollaborators').gitCollaboratorsList  //gitRepoCommits mutation
-const gitRepoWebhook = require('../Mutation/gitAuthMutation').gitRepoWebhook  //gitRepoWebhook mutation
+const gitRepoWebhook = require('../Mutation/gitAuthMutation').gitRepoWebhook   //gitRepoWebhook mutation
+const createLabelInGit = require('../Mutation/labelAndIssueMutation').createLabelInGit  //createLabelInGit mutation
+const updateLabelInGit = require('../Mutation/labelAndIssueMutation').updateLabelInGit  //updateLabelInGit mutation
+const GetLabelList = require('../Mutation/labelAndIssueMutation').GetLabelList  //GetLabelList mutation
+
 
 //create a empty function
 var userResolver = function () { }
@@ -133,7 +137,10 @@ userResolver.prototype.resolvers = {
         changeStatusInGithub,
         gitRepoCommits,
         gitCollaboratorsList,
-        gitRepoWebhook
+        gitRepoWebhook,
+        createLabelInGit,
+        updateLabelInGit,
+        GetLabelList
 
     },
     User: {

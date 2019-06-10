@@ -90,6 +90,16 @@ type User {
       login: String
    }
 
+   type GitLabel {
+      message: String
+      data: [name]
+   }
+
+   type name {
+      name: String
+   }
+
+
    type UploadPic {
       uploadURL: String!
       Key: String!
@@ -160,6 +170,9 @@ type User {
     gitRepoCommits(ownerName:String!, repoName:String!):RepoCommits
     gitCollaboratorsList(ownerName:String!, repoName:String!):GitHub
     gitRepoWebhook(ownerName:String!, repoName:String!, url:String!):GitHub
+    createLabelInGit(color:String!, labelName:String!, description:String, OwnerName:String!, repoName:String!): GitHub
+    updateLabelInGit(color:String!, labelName:String!, description:String, OwnerName:String!, repoName:String!, currentLabelName:String!):GitHub
+    GetLabelList(OwnerName:String!, repoName:String!):GitLabel
 
  }`;
 
