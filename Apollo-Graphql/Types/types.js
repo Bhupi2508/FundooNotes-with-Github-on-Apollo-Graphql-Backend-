@@ -170,9 +170,14 @@ type User {
     gitRepoCommits(ownerName:String!, repoName:String!):RepoCommits
     gitCollaboratorsList(ownerName:String!, repoName:String!):GitHub
     gitRepoWebhook(ownerName:String!, repoName:String!, url:String!):GitHub
+    createIssueForGit(repositoryId:ID, title:String, description:String, assigneeId:[String]):GitHub
+    deleteIssueForGit(issueId:ID):GitHub
     createLabelInGit(color:String!, labelName:String!, description:String, OwnerName:String!, repoName:String!): GitHub
     updateLabelInGit(color:String!, labelName:String!, description:String, OwnerName:String!, repoName:String!, currentLabelName:String!):GitHub
+    deleteLabelInGit(labelName:String!, OwnerName:String!, repoName:String!):GitHub
     GetLabelList(OwnerName:String!, repoName:String!):GitLabel
+    addLabelInIssue(OwnerName:String!, repoName:String!, issueNumber:Int!, labelName:[String]): GitHub
+    removeLabelFromIssue(OwnerName:String!, repoName:String!, issueNumber:Int!, labelName:[String]): GitHub
 
  }`;
 
