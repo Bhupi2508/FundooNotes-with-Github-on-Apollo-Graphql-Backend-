@@ -36,6 +36,9 @@ var IssueSchema = new mongoSchema({
     },
     assignees: [{
         type: String
+    }],
+    labelName: [{
+        type: String,
     }]
 },
     {

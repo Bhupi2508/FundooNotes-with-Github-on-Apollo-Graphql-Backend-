@@ -471,7 +471,30 @@ userAddLabelMutation.prototype.addLabelInIssue = async (root, params, context) =
             )
         })
 
-        console.log("res", res)
+        console.log("res", res.data)
+
+        /**
+         * @purpose : find labelName that is present in database or not
+         * @return {String} message
+         */
+        var labelFind = await issueModel.find({ "labelName": params.labelName })
+        console.log(labelFind);
+
+        if (labelFind.length > 0) {
+            return { "message": "label is already present in database" }
+        }
+
+
+        // label update in mongodb
+        var updateLabel = await issueModel.findOneAndUpdate({ issueNumber: params.issueNumber },
+            {
+                $push: {
+                    labelName: params.labelName
+                }
+            })
+        if (!updateLabel) {
+            return { "message": "label not added in issue" }
+        }
 
         return {
             "message": "add label in issue successfully",
