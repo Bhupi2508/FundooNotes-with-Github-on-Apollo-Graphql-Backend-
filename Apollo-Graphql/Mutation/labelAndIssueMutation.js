@@ -477,8 +477,7 @@ userAddLabelMutation.prototype.addLabelInIssue = async (root, params, context) =
          * @purpose : find labelName that is present in database or not
          * @return {String} message
          */
-        var labelFind = await issueModel.find({ "labelName": params.labelName })
-        console.log(labelFind);
+        var labelFind = await issueModel.find({ labelName: params.labelName[0] })
 
         if (labelFind.length > 0) {
             return { "message": "label is already present in database" }
