@@ -65,7 +65,7 @@ userAddLabelMutation.prototype.createIssueForGit = async (root, params, context)
 
         //pass the query mutation for data fetching
         const res = await fetch({
-            query: `mutation {createIssue(input:{repositoryId:"${params.repositoryId}" title:"${params.title}" body:"${params.description}" assigneeIds:[${params.assigneeId}]}){ issue{number id assignees(first:10){nodes{ login }}}}}`,
+            query: `mutation {createIssue(input:{repositoryId:"${params.repositoryId}" title:"${params.title}" body:"${params.description}" assigneeIds:[${params.assigneeId}]}){ issue{number title body id assignees(first:10){nodes{ login }}}}}`,
         })
 
         console.log("res", res.data)
@@ -75,7 +75,11 @@ userAddLabelMutation.prototype.createIssueForGit = async (root, params, context)
         for (var i = 0; i < res.data.createIssue.issue.assignees.nodes.length; i++) {
             assignees.push(res.data.createIssue.issue.assignees.nodes[i].login)
         }
+
+        //pass those arguments
         var issueSave = new issueModel({
+            title: res.data.createIssue.issue.title,
+            description: res.data.createIssue.issue.body,
             issueID: res.data.createIssue.issue.id,
             issueNumber: res.data.createIssue.issue.number,
             assignees: assignees
@@ -93,6 +97,91 @@ userAddLabelMutation.prototype.createIssueForGit = async (root, params, context)
         return { "message": "issue not created" }
     }
 }
+
+
+
+
+
+
+
+/*******************************************************************************************************************/
+/**
+ * @description : updateIssueForGit APIs update issue for github using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+userAddLabelMutation.prototype.updateIssueForGit = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+        // Access_token
+        var access_token = user[0].access_Token
+        console.log("access_token", access_token)
+
+        //fetch github data from github
+        const fetch = createApolloFetch({
+            uri: `${process.env.GIT_FETCH_REPO}${access_token}`
+        });
+
+
+        //pass the query mutation for data fetching
+        const res = await fetch({
+            query: `mutation {updateIssue(input:{id:"${params.issueId}" title:"${params.title}" body:"${params.description}"}){ issue { title body }}}`,
+        })
+
+        console.log("res", res.data)
+
+        /**
+      * @purpose : update title that is present in database or not
+      * @return {String} message
+      */
+        var issueFind = await issueModel.find({ issueID: params.issueId })
+        console.log("data", issueFind)
+        if (!issueFind.length > 0) {
+            return { "message": "issue is not present in database" }
+        }
+
+
+        // issue update in mongodb
+        var updateIssue = await issueModel.findOneAndUpdate({ issueID: params.issueId },
+            {
+                $set: {
+                    title: params.title,
+                    description: params.description
+                }
+            })
+        if (!updateIssue) {
+            return { "message": "issue not added in issue" }
+        }
+
+        return {
+            "message": "issue created successfully",
+        }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": "issue not created" }
+    }
+}
+
+
 
 
 
@@ -149,6 +238,151 @@ userAddLabelMutation.prototype.deleteIssueForGit = async (root, params, context)
         return { "message": "issue not deleted" }
     }
 }
+
+
+
+
+
+
+
+/*******************************************************************************************************************/
+/**
+ * @description : addIssueCommentForGit APIs create issue comments for github using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+userAddLabelMutation.prototype.addIssueCommentForGit = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+        // Access_token
+        var access_token = user[0].access_Token
+        console.log("access_token", access_token)
+
+        //fetch github data from github
+        const fetch = createApolloFetch({
+            uri: `${process.env.GIT_FETCH_REPO}${access_token}`
+        });
+
+
+        //pass the query mutation for data fetching
+        const res = await fetch({
+            query: `mutation {addComment(input:{subjectId:"${params.issueId}" body:"${params.comment}"}){ subject { id } commentEdge { node {id body issue { title }}}}}`,
+        })
+
+        console.log("res", res.data)
+
+        // label update in mongodb
+        var updateComment = await issueModel.findOneAndUpdate({ issueID: params.issueId },
+            {
+                $push: {
+                    issueComment: {
+                        commentId: res.data.addComment.commentEdge.node.id,
+                        issueComment: res.data.addComment.commentEdge.node.body
+                    }
+                }
+            })
+        if (!updateComment) {
+            return { "message": "comment not added in issue" }
+        }
+
+        return {
+            "message": "comment added successfully",
+        }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": "comment not added" }
+    }
+}
+
+
+
+
+
+
+
+
+/*******************************************************************************************************************/
+/**
+ * @description : deleteIssueCommentForGit APIs delete issue comments for github using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+userAddLabelMutation.prototype.deleteIssueCommentForGit = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+        // Access_token
+        var access_token = user[0].access_Token
+        console.log("access_token", access_token)
+
+        //fetch github data from github
+        const fetch = createApolloFetch({
+            uri: `${process.env.GIT_FETCH_REPO}${access_token}`
+        });
+
+
+        //pass the query mutation for data fetching
+        const res = await fetch({
+            query: `mutation {deleteIssueComment(input:{id:"${params.commentId}" clientMutationId:"${params.clientMutationId}"}){ clientMutationId}}`,
+        })
+
+        console.log("res", res.data)
+
+        //comments deleted from mongodb
+        var updateComment = await issueModel.find({issueComment:{commentId: params.commentId }})
+        console.log("data", updateComment);
+
+        if (!updateComment) {
+            return { "message": "comment not deleted from issue" }
+        }
+        return {
+            "message": "comment delete successfully",
+        }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": "comment not deleted" }
+    }
+}
+
+
+
 
 
 
@@ -273,7 +507,30 @@ userAddLabelMutation.prototype.updateLabelInGit = async (root, params, context) 
             })
         })
 
-        console.log("res", res)
+        console.log("res", res.data)
+
+        /**
+        * @purpose : update labelName that is present in database or not
+        * @return {String} message
+        */
+        var labelFind = await issueModel.find({ label: params.labelName[0] })
+
+        if (labelFind.length > 0) {
+            return { "message": "label is already present in database" }
+        }
+
+
+        // label update in mongodb
+        var updateLabel = await issueModel.findOneAndUpdate({ issueNumber: params.issueNumber },
+            {
+                $set: {
+                    label: params.labelName
+                }
+            })
+        if (!updateLabel) {
+            return { "message": "label not added in issue" }
+        }
+
 
         return {
             "message": "Label Updated successfully",
@@ -477,8 +734,8 @@ userAddLabelMutation.prototype.addLabelInIssue = async (root, params, context) =
          * @purpose : find labelName that is present in database or not
          * @return {String} message
          */
-        var labelFind = await issueModel.find({ labelName: params.labelName[0] })
-
+        var labelFind = await issueModel.find({ label: params.labelName[0], issueNumber: params.issueNumber })
+        console.log(labelFind)
         if (labelFind.length > 0) {
             return { "message": "label is already present in database" }
         }
@@ -488,7 +745,7 @@ userAddLabelMutation.prototype.addLabelInIssue = async (root, params, context) =
         var updateLabel = await issueModel.findOneAndUpdate({ issueNumber: params.issueNumber },
             {
                 $push: {
-                    labelName: params.labelName
+                    label: params.labelName
                 }
             })
         if (!updateLabel) {

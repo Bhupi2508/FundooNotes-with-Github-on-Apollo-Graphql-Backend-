@@ -28,6 +28,12 @@ var mongoSchema = mongoose.Schema;
  * @param {timestamps} timestamps
  */
 var IssueSchema = new mongoSchema({
+    title: {
+        type: String
+    },
+    description: {
+        type: String
+    },
     issueID: {
         type: String,
     },
@@ -37,8 +43,16 @@ var IssueSchema = new mongoSchema({
     assignees: [{
         type: String
     }],
-    labelName: [{
-        type: String,
+    label: [{
+        type: String
+    }],
+    issueComment: [{
+        commentId: {
+            type: String
+        },
+        issueComment: {
+            type: String
+        }
     }]
 },
     {

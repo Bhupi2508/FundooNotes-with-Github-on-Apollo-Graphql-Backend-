@@ -70,7 +70,10 @@ const gitRepoCommits = require('../Mutation/gitAuthMutation').gitRepoCommits   /
 const gitCollaboratorsList = require('../Mutation/gitCollaborators').gitCollaboratorsList  //gitRepoCommits mutation
 const gitRepoWebhook = require('../Mutation/gitAuthMutation').gitRepoWebhook   //gitRepoWebhook mutation
 const createIssueForGit = require('../Mutation/labelAndIssueMutation').createIssueForGit  //createIssueForGit mutation
+const updateIssueForGit = require('../Mutation/labelAndIssueMutation').updateIssueForGit  //updateIssueForGit mutation
 const deleteIssueForGit = require('../Mutation/labelAndIssueMutation').deleteIssueForGit  //deleteIssueForGit mutation
+const addIssueCommentForGit = require('../Mutation/labelAndIssueMutation').addIssueCommentForGit  //addIssueCommentForGit mutation
+const deleteIssueCommentForGit = require('../Mutation/labelAndIssueMutation').deleteIssueCommentForGit  //deleteIssueCommentForGit mutation
 const createLabelInGit = require('../Mutation/labelAndIssueMutation').createLabelInGit  //createLabelInGit mutation
 const updateLabelInGit = require('../Mutation/labelAndIssueMutation').updateLabelInGit  //updateLabelInGit mutation
 const deleteLabelInGit = require('../Mutation/labelAndIssueMutation').deleteLabelInGit  //deleteLabelInGit mutation
@@ -145,13 +148,16 @@ userResolver.prototype.resolvers = {
         gitCollaboratorsList,
         gitRepoWebhook,
         createLabelInGit,
+        updateIssueForGit,
         updateLabelInGit,
         GetLabelList,
         addLabelInIssue,
         deleteLabelInGit,
         createIssueForGit,
         deleteIssueForGit,
-        removeLabelFromIssue
+        removeLabelFromIssue,
+        addIssueCommentForGit,
+        deleteIssueCommentForGit
 
     },
     User: {
