@@ -295,7 +295,7 @@ userAddLabelMutation.prototype.addIssueCommentForGit = async (root, params, cont
                 $push: {
                     issueComment: {
                         commentId: res.data.addComment.commentEdge.node.id,
-                        issueComment: res.data.addComment.commentEdge.node.body
+                        commentIssue: res.data.addComment.commentEdge.node.body
                     }
                 }
             })
@@ -365,8 +365,11 @@ userAddLabelMutation.prototype.deleteIssueCommentForGit = async (root, params, c
         console.log("res", res.data)
 
         //comments deleted from mongodb
-        var updateComment = await issueModel.find({issueComment:{commentId: params.commentId }})
-        console.log("data", updateComment);
+        var updateComment = await issueModel.find({ "issueComment.commentId": params.commentId })
+        console.log(updateComment[0].issueComment)
+        var new12 = await issueModel.findByIdAndUpdate({ _id: updateComment[0]._id }, { issueComment: { $pull: { commentId: params.commentId } } })
+        //{$pull: {"issueComment.commentId":params.commentId}})
+        console.log("data", updateComment.length);
 
         if (!updateComment) {
             return { "message": "comment not deleted from issue" }

@@ -50,7 +50,7 @@ var IssueSchema = new mongoSchema({
         commentId: {
             type: String
         },
-        issueComment: {
+        commentIssue: {
             type: String
         }
     }]
