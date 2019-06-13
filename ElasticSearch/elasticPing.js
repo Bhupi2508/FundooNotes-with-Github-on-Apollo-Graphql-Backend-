@@ -1,15 +1,15 @@
 /******************************************************************************
- *  @Execution      : default node          : cmd> nodemon elasticCount.js
+ *  @Execution      : default node          : cmd> nodemon elasticPing.js
  *                      
  * 
- *  @Purpose        : Elastic search count the data
+ *  @Purpose        : Elastic search ping the data from Index
  * 
  *  @description    : Using ElasticSearch we can search anything from DataBase 
  * 
  *  @overview       : ElasticSearch connections
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
  *  @version        : 1.0
- *  @since          : 13-jun-2019
+ *  @since          : 08-jun-2019
  *
  ******************************************************************************/
 /**
@@ -17,12 +17,11 @@
  */
 var client = require('./elastic');
 
-//count the data which is in index
-client.count(
-  {
-    index: 'project',
-    type: 'constituencies'
-  },
+// ping the client to be sure Elasticsearch is up
+client.cluster.health({},
   function (err, resp, status) {
-    console.log("constituencies count : ", resp);
+    if (err) {
+      console.error('Elasticsearch cluster is down!');
+    }
+    console.log("-- Client Health --ok : ", resp);
   });

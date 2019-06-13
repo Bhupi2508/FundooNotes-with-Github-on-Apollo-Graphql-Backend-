@@ -1,5 +1,5 @@
 /******************************************************************************
- *  @Execution      : default node          : cmd> nodemon elasticCreate.js
+ *  @Execution      : default node          : cmd> nodemon elasticCreateIndex.js
  *                      
  * 
  *  @Purpose        : Elastic search create a new data 
@@ -17,13 +17,16 @@
  */
 var client = require('./elastic');
 
-client.indices.create({
-    index: 'project'
-}, function (err, resp, status) {
-    if (err) {
-        console.log(err);
-    }
-    else {
-        console.log("create", resp);
-    }
-});
+//create client index
+client.indices.create(
+    {
+        index: 'data'
+    },
+    function (err, resp, status) {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            console.log("create : ", resp);
+        }
+    });
