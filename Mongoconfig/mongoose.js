@@ -31,8 +31,8 @@ module.exports = function () {
     var db = mongoose.connect(config.db, { useNewUrlParser: true });
 
     mongoose.connection.on('open', function () {
-        console.log('#####################################################################################');
-        console.log('##############                connected with MongoDb                   ##############');
+      //  console.log('#####################################################################################');
+        console.log('##############                connected with MongoDB                   ##############');
         console.log('#####################################################################################\n');
     })
     mongoose.connection.on('error', function (err) {

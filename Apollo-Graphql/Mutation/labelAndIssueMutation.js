@@ -366,12 +366,26 @@ userAddLabelMutation.prototype.deleteIssueCommentForGit = async (root, params, c
 
         //comments deleted from mongodb
         var updateComment = await issueModel.find({ "issueComment.commentId": params.commentId })
-        console.log(updateComment[0].issueComment)
-        var new12 = await issueModel.findByIdAndUpdate({ _id: updateComment[0]._id }, { issueComment: { $pull: { commentId: params.commentId } } })
-        //{$pull: {"issueComment.commentId":params.commentId}})
-        console.log("data", updateComment.length);
 
-        if (!updateComment) {
+        for (let i = 0; i < updateComment[0].issueComment.length; i++) {
+            if (updateComment[0].issueComment[i].commentId === params.commentId) {
+                index = updateComment[0].issueComment.indexOf(updateComment[0].issueComment[i]);
+            }
+        }
+
+        //slice the index
+        updateComment[0].issueComment.splice(index, 1);
+
+        //after slice update your database
+        var new12 = await issueModel.findOneAndUpdate({ "issueComment.commentId": params.commentId },
+            {
+                $set: {
+                    issueComment: updateComment[0].issueComment
+                }
+            })
+
+        //check whether update or not
+        if (!new12) {
             return { "message": "comment not deleted from issue" }
         }
         return {
