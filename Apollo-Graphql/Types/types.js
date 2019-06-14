@@ -1,7 +1,7 @@
 /******************************************************************************
  *  @Execution      : default node          : cmd> types.js
  * 
- *  @Purpose        : apollo-graphql Schema for all users
+ *  @Purpose        : apollo-graphql Schema for all users and return type for the users
  * 
  *  @description    : types has apollo-graphql schema which we used to fetch data for
  *                    users or do some CURD operation for manipulate data.
@@ -14,6 +14,7 @@
  ******************************************************************************/
 /**
  * @requires files
+ * @param {gql}, it's a tag for graphql schema
  */
 const { gql } = require('apollo-server');
 
