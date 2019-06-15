@@ -21,14 +21,14 @@ var client = require('./elastic');
 client.index(
     {
         index: 'details',
-        id: '3',
+        id: '4',
         type: 'constituencies',
         body: {
-            "First Name": "Bhupendra",
+            "First Name": "Hemendra",
             "Last Name": "Singh",
-            "Email": "bhupi@gmail.com",
+            "Email": "heman@gmail.com",
             "City": "Jaipur",
-            "Company": "JP Morgan",
+            "Company": "TCS",
         }
     },
     function (err, resp, status) {

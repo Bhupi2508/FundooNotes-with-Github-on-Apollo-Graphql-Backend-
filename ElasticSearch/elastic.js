@@ -20,7 +20,7 @@ var elasticsearch = require('elasticsearch');
 // instantiate an Elasticsearch client
 var client = new elasticsearch.Client(
     {
-        host: 'localhost:9200',
+        host: process.env.ELASTIC_PORT,
         log: 'trace',
         keepAlive: false
     }
@@ -28,7 +28,7 @@ var client = new elasticsearch.Client(
 
 console.log('#####################################################################################');
 console.log('##############                 Elastic Search Connected                ##############');
-console.log('#####################################################################################');
+//console.log('#####################################################################################');
 
 /**
  * @exports client
