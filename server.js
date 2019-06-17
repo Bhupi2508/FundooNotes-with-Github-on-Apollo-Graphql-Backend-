@@ -49,7 +49,7 @@ var server = new ApolloServer({
 //listen the given port
 var userPort = (process.env.PORT)
 server.listen(userPort, () => {
-    console.log('#####################################################################################');
+    //console.log('#####################################################################################');
     console.log('##############             STARTING SERVER at port : ',userPort, '            ##############');
     //console.log('#####################################################################################');
 });

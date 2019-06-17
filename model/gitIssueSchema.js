@@ -23,8 +23,13 @@ var mongoSchema = mongoose.Schema;
 
 /**
  * @purpose : store data in database based on this schema
- * @param {number} userID
- * @param {String} labelName
+ * @param {String} title
+ * @param {String} description
+ * @param {number} issueNumber
+ * @param {String} issueID
+ * @param {Array} assignees
+ * @param {Array} label
+ * @param {Array} issueComment
  * @param {timestamps} timestamps
  */
 var IssueSchema = new mongoSchema({

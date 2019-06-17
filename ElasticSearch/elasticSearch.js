@@ -24,7 +24,7 @@ client.search(
     type: 'constituencies',
     body: {
       query: {
-        match: { "First Name": "Andi" }
+        match: { "First Name": "cp" }
       },
     }
   },

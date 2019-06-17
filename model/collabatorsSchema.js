@@ -24,7 +24,8 @@ var mongoSchema = mongoose.Schema;
 /**
  * @purpose : store data in database based on this schema
  * @param {number} userID
- * @param {String} labelName
+ * @param {number} noteID
+ * @param {number} collaboratorID
  * @param {timestamps} timestamps
  */
 var collaboratorSchema = new mongoSchema({
