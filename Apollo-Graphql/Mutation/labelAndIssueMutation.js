@@ -48,15 +48,21 @@ userAddLabelMutation.prototype.createIssueForGit = async (root, params, context)
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
 
+
+
         // Access_token
         var access_token = user[0].access_Token
         console.log("access_token", access_token)
+
+
 
         //fetch github data from github
         const fetch = createApolloFetch({
@@ -64,18 +70,25 @@ userAddLabelMutation.prototype.createIssueForGit = async (root, params, context)
         });
 
 
+
         //pass the query mutation for data fetching
         const res = await fetch({
             query: `mutation {createIssue(input:{repositoryId:"${params.repositoryId}" title:"${params.title}" body:"${params.description}" assigneeIds:[${params.assigneeId}]}){ issue{number title body id assignees(first:10){nodes{ login }}}}}`,
         })
 
+
+
         console.log("res", res.data)
         var assignees = [];
+
+
 
         //pass params in issueModel
         for (var i = 0; i < res.data.createIssue.issue.assignees.nodes.length; i++) {
             assignees.push(res.data.createIssue.issue.assignees.nodes[i].login)
         }
+
+
 
         //pass those arguments
         var issueSave = new issueModel({
@@ -85,6 +98,8 @@ userAddLabelMutation.prototype.createIssueForGit = async (root, params, context)
             issueNumber: res.data.createIssue.issue.number,
             assignees: assignees
         })
+
+
 
         //issue saved in database
         var savedIssues = await issueSave.save()
@@ -126,15 +141,21 @@ userAddLabelMutation.prototype.updateIssueForGit = async (root, params, context)
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
 
+
+
         // Access_token
         var access_token = user[0].access_Token
         console.log("access_token", access_token)
+
+
 
         //fetch github data from github
         const fetch = createApolloFetch({
@@ -142,12 +163,15 @@ userAddLabelMutation.prototype.updateIssueForGit = async (root, params, context)
         });
 
 
+
         //pass the query mutation for data fetching
         const res = await fetch({
             query: `mutation {updateIssue(input:{id:"${params.issueId}" title:"${params.title}" body:"${params.description}"}){ issue { title body }}}`,
         })
 
+
         console.log("res", res.data)
+
 
         /**
       * @purpose : update title that is present in database or not
@@ -209,20 +233,27 @@ userAddLabelMutation.prototype.deleteIssueForGit = async (root, params, context)
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
 
+
+
         // Access_token
         var access_token = user[0].access_Token
         console.log("access_token", access_token)
+
+
 
         //fetch github data from github
         const fetch = createApolloFetch({
             uri: `${process.env.GIT_FETCH_REPO}${access_token}`
         });
+
 
 
         //pass the query mutation for data fetching
@@ -267,15 +298,21 @@ userAddLabelMutation.prototype.addIssueCommentForGit = async (root, params, cont
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
 
+
+
         // Access_token
         var access_token = user[0].access_Token
         console.log("access_token", access_token)
+
+
 
         //fetch github data from github
         const fetch = createApolloFetch({
@@ -283,12 +320,15 @@ userAddLabelMutation.prototype.addIssueCommentForGit = async (root, params, cont
         });
 
 
+
         //pass the query mutation for data fetching
         const res = await fetch({
             query: `mutation {addComment(input:{subjectId:"${params.issueId}" body:"${params.comment}"}){ subject { id } commentEdge { node {id body issue { title }}}}}`,
         })
 
+
         console.log("res", res.data)
+
 
         // label update in mongodb
         var updateComment = await issueModel.findOneAndUpdate({ issueID: params.issueId },
@@ -342,15 +382,21 @@ userAddLabelMutation.prototype.deleteIssueCommentForGit = async (root, params, c
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
 
+
+
         // Access_token
         var access_token = user[0].access_Token
         console.log("access_token", access_token)
+
+
 
         //fetch github data from github
         const fetch = createApolloFetch({
@@ -363,7 +409,9 @@ userAddLabelMutation.prototype.deleteIssueCommentForGit = async (root, params, c
             query: `mutation {deleteIssueComment(input:{id:"${params.commentId}" clientMutationId:"${params.clientMutationId}"}){ clientMutationId}}`,
         })
 
+
         console.log("res", res.data)
+
 
         //comments deleted from mongodb
         var updateComment = await issueModel.find({ "issueComment.commentId": params.commentId })
@@ -374,8 +422,11 @@ userAddLabelMutation.prototype.deleteIssueCommentForGit = async (root, params, c
             }
         }
 
+
+
         //slice the index
         updateComment[0].issueComment.splice(index, 1);
+
 
         //after slice update your database
         var new12 = await issueModel.findOneAndUpdate({ "issueComment.commentId": params.commentId },
@@ -384,6 +435,7 @@ userAddLabelMutation.prototype.deleteIssueCommentForGit = async (root, params, c
                     issueComment: updateComment[0].issueComment
                 }
             })
+
 
         //check whether update or not
         if (!new12) {
@@ -427,11 +479,15 @@ userAddLabelMutation.prototype.createLabelInGit = async (root, params, context) 
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
+
+
 
         // Access_token
         var access_token = user[0].access_Token
@@ -444,18 +500,6 @@ userAddLabelMutation.prototype.createLabelInGit = async (root, params, context) 
          * @param {headers}
          * @purpose : get response from given url
          */
-        // var res = await axios({
-        //     method: 'POST',
-        //     url: `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/labels`,
-        //     headers: {
-        //         Authorization: `Bearer ${access_token}`
-        //     },
-        //     data: JSON.stringify({
-        //         "name": `${params.labelName}`,
-        //         "description": `${params.description}`,
-        //         "color": `${params.color}`
-        //     })
-        // })
         var url = `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/labels`
         var data =
         {
@@ -463,6 +507,7 @@ userAddLabelMutation.prototype.createLabelInGit = async (root, params, context) 
             "description": `${params.description}`,
             "color": `${params.color}`
         }
+
 
         //send to axios_services and take response from it
         var res = await axios_data('POST', url, access_token, data)
@@ -505,11 +550,15 @@ userAddLabelMutation.prototype.updateLabelInGit = async (root, params, context) 
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
+
+
 
         // Access_token
         var access_token = user[0].access_Token
@@ -522,18 +571,6 @@ userAddLabelMutation.prototype.updateLabelInGit = async (root, params, context) 
          * @param {headers}
          * @purpose : get response from given url
          */
-        // var res = await axios({
-        //     method: 'PATCH',
-        //     url: `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/labels/${params.currentLabelName}`,
-        //     headers: {
-        //         Authorization: `Bearer ${access_token}`
-        //     },
-        //     data: JSON.stringify({
-        //         "name": `${params.labelName}`,
-        //         "description": `${params.description}`,
-        //         "color": `${params.color}`
-        //     })
-        // })
         var url = `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/labels/${params.currentLabelName}`
         var data =
         {
@@ -542,10 +579,14 @@ userAddLabelMutation.prototype.updateLabelInGit = async (root, params, context) 
             "color": `${params.color}`
         }
 
+
+
         //send to axios_services and take response from it
         var res = await axios_data('PATCH', url, access_token, data)
 
+
         console.log("res", res.data)
+
 
         /**
         * @purpose : update labelName that is present in database or not
@@ -607,11 +648,15 @@ userAddLabelMutation.prototype.deleteLabelInGit = async (root, params, context) 
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
+
+
 
         // Access_token
         var access_token = user[0].access_Token
@@ -624,13 +669,11 @@ userAddLabelMutation.prototype.deleteLabelInGit = async (root, params, context) 
          * @param {headers}
          * @purpose : get response from given url
          */
-        var res = await axios({
-            method: 'DELETE',
-            url: `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/labels/${params.labelName}`,
-            headers: {
-                Authorization: `Bearer ${access_token}`
-            },
-        })
+        var url = `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/labels/${params.labelName}`
+
+
+        //send to axios_services and take response from it
+        var res = await axios_data('DELETE', url, access_token)
 
         console.log("res", res)
 
@@ -672,11 +715,15 @@ userAddLabelMutation.prototype.GetLabelList = async (root, params, context) => {
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
+
+
 
         // Access_token
         var access_token = user[0].access_Token
@@ -689,13 +736,11 @@ userAddLabelMutation.prototype.GetLabelList = async (root, params, context) => {
          * @param {headers}
          * @purpose : get response from given url
          */
-        var res = await axios({
-            method: 'GET',
-            url: `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/labels`,
-            headers: {
-                Authorization: `Bearer ${access_token}`
-            },
-        })
+        var url = `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/labels`
+
+
+        //send to axios_services and take response from it
+        var res = await axios_data('GET', url, access_token)
 
         console.log("res", res)
 
@@ -736,11 +781,15 @@ userAddLabelMutation.prototype.addLabelInIssue = async (root, params, context) =
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
+
+
 
         // Access_token
         var access_token = user[0].access_Token
@@ -753,20 +802,19 @@ userAddLabelMutation.prototype.addLabelInIssue = async (root, params, context) =
          * @param {headers}
          * @purpose : get response from given url
          */
-        var res = await axios({
-            method: 'POST',
-            url: `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/issues/${params.issueNumber}/labels`,
-            headers: {
-                Authorization: `Bearer ${access_token}`
-            },
-            data: JSON.stringify(
-                {
-                    "labels": params.labelName
-                }
-            )
-        })
+        var url = `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/issues/${params.issueNumber}/labels`
+        var data =
+        {
+            "labels": params.labelName
+        }
+
+
+
+        //send to axios_services and take response from it
+        var res = await axios_data('POST', url, access_token, data)
 
         console.log("res", res.data)
+
 
         /**
          * @purpose : find labelName that is present in database or not
@@ -827,11 +875,15 @@ userAddLabelMutation.prototype.removeLabelFromIssue = async (root, params, conte
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
+
+
 
         // Access_token
         var access_token = user[0].access_Token
@@ -844,13 +896,11 @@ userAddLabelMutation.prototype.removeLabelFromIssue = async (root, params, conte
          * @param {headers}
          * @purpose : get response from given url
          */
-        var res = await axios({
-            method: 'DELETE',
-            url: `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/issues/${params.issueNumber}/labels/${params.labelName}`,
-            headers: {
-                Authorization: `Bearer ${access_token}`
-            },
-        })
+        var url = `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/issues/${params.issueNumber}/labels/${params.labelName}`
+
+
+        //send to axios_services and take response from it
+        await axios_data('DELETE', url, access_token)
 
         return {
             "message": "remove label from issue successfully",

@@ -22,6 +22,7 @@ var noteModel = require('../../model/noteSchema')
 var axios = require('axios')
 var jwt = require('jsonwebtoken')
 var tokenVerify = require('../../Authentication/authenticationUser')
+var axios_service = require('../../services/axios-services').axiosService
 
 //create a empty function
 var gitAuthMutation = function () { }
@@ -37,11 +38,13 @@ var gitAuthMutation = function () { }
 gitAuthMutation.prototype.GithubAuth = async (root, params) => {
     try {
 
+
         /**
          * @param {String}, create a code, which is redirect in graphiql
          * @returns {String} message
          */
         var url = `${process.env.GIT_CODE}?client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.GIT_LINK}&scope=repo`
+
 
         //sent mail to the mail id
         var mail = sendMail.sendEmailFunction(url, params.email)
@@ -83,6 +86,7 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
         headers: {
             accept: 'application/json',
         }
+
     }).then(response => {
 
         // Once we get the response, extract the access token from
@@ -442,11 +446,15 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
+
+
 
         // Access_token
         var access_token = user[0].access_Token
@@ -459,14 +467,11 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
          * @param {headers}
          * @purpose : get response from given url
          */
-        var res = await axios({
-            method: 'get',
-            url: `${process.env.GET_CREATE_BRANCH}${params.gitUsername}/${params.repoName}/git/refs/heads`,
-            headers: {
-                Authorization: `Bearer ${access_token}`
-            },
+        var url = `${process.env.GET_CREATE_BRANCH}${params.gitUsername}/${params.repoName}/git/refs/heads`
 
-        })
+
+        //send to axios_services and take response from it
+        var res_Data = await axios_service('GET', url, access_token)
 
         //console.log("\nRepository Branch Response Data : ", res.data);
         //console.log("\nRepository Branch Object Data : ", res.data[0].object.sha);
@@ -479,19 +484,17 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
          * @Data : send the given data depend on what you doing
          * @purpose : get response from given url
          */
-        await axios({
-            method: 'post',
-            url: `${process.env.POST_CREATE_BRANCH}${params.gitUsername}/${params.repoName}/git/refs`,
-            headers: {
-                Authorization: `Bearer ${access_token1}`
-            },
-            data: JSON.stringify({
-                'ref': `refs/heads/${params.newBranch}`,
-                'sha': `${res.data[0].object.sha}`
-            }),
+        var url = `${process.env.POST_CREATE_BRANCH}${params.gitUsername}/${params.repoName}/git/refs`
+        var data =
+        {
+            'ref': `refs/heads/${params.newBranch}`,
+            'sha': `${res.data[0].object.sha}`
+        }
 
-        })
-        // console.log("\nRepository Branch after post Data : ", branchResponse.data);
+        //send to axios_services and take response from it
+        var res_Data = await axios_service('POST', url, access_token1, data)
+
+        console.log("\nRepository Branch after post Data : ", res_Data);
 
         return { "message": "git branch create Successfully" }
 
@@ -527,15 +530,20 @@ gitAuthMutation.prototype.deleteGitBranch = async (root, params, context) => {
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
 
+
+
         // Access_token
         var access_token = user[0].access_Token
         console.log("access_token", access_token)
+
 
 
         /**
@@ -544,14 +552,13 @@ gitAuthMutation.prototype.deleteGitBranch = async (root, params, context) => {
          * @param {headers}
          * @purpose : get response from given url
          */
-        await axios({
-            method: 'DELETE',
-            url: `${process.env.DELETE_BRANCH}${params.gitUsername}/${params.repoName}/git/refs/heads/${params.DeleteBranch}`,
-            headers: {
-                Authorization: `Bearer ${access_token}`
-            }
-        })
-        // console.log("\nRepository Branch Response Data : ", res);
+        var url = `${process.env.DELETE_BRANCH}${params.gitUsername}/${params.repoName}/git/refs/heads/${params.DeleteBranch}`
+
+        //send to axios_services and take response from it
+        var res = await axios_service('DELETE', url, access_token)
+
+
+        console.log("\nRepository Branch Response Data : ", res);
 
         return { "message": "git branch delete Successfully" }
 
@@ -587,11 +594,15 @@ gitAuthMutation.prototype.fetchRepository = async (root, params, context) => {
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
+
+
 
         // Access_token
         var access_token = user[0].access_Token;
@@ -607,6 +618,7 @@ gitAuthMutation.prototype.fetchRepository = async (root, params, context) => {
         const res = await fetch({
             query: `{ repositoryOwner(login: ${params.login_Name}) { id login avatarUrl repositories(first:10){ nodes{ isPrivate name description} } } }`,
         })
+
 
         //for loop for save the repository in database
         for (var i = 0; i < res.data.repositoryOwner.repositories.nodes.length; i++) {
@@ -667,11 +679,15 @@ gitAuthMutation.prototype.starRepository = async (root, params, context) => {
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
+
+
 
         // Access_token and Git Node ID
         var gitNodeID = user[0].gitNodeID;
@@ -684,6 +700,7 @@ gitAuthMutation.prototype.starRepository = async (root, params, context) => {
         const fetch = createApolloFetch({
             uri: `${process.env.GIT_FETCH_REPO}${access_token}`
         });
+
 
 
         //pass the query mutation for data fetching
@@ -730,15 +747,20 @@ gitAuthMutation.prototype.removeStarRepository = async (root, params, context) =
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
 
+
+
         // Access_token and Git Node ID
         var gitNodeID = user[0].gitNodeID;
         var access_token = user[0].access_Token;
+
 
 
         //fetch repository data from github
@@ -791,11 +813,15 @@ gitAuthMutation.prototype.createGitRepository = async (root, params, context) =>
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
+
+
 
         // Access_token
         var access_token = user[0].access_Token
@@ -808,17 +834,15 @@ gitAuthMutation.prototype.createGitRepository = async (root, params, context) =>
          * @param {headers}
          * @purpose : get response from given url
          */
-        var res = await axios({
-            method: 'POST',
-            url: `${process.env.CREATE_REPO}`,
-            headers: {
-                Authorization: `Bearer ${access_token}`
-            },
-            data: JSON.stringify({
-                'name': `${params.repoName}`,
-            })
+        var url = `${process.env.CREATE_REPO}`
+        var data =
+        {
+            'name': `${params.repoName}`,
+        }
 
-        })
+
+        //send to axios_services and take response from it
+        var res = await axios_service('POST', url, access_token, data)
 
         console.log("\nRepository Branch Response Data : ", res);
         console.log("\nRepository Branch Object Data : ", res.data[0]);
@@ -858,14 +882,18 @@ gitAuthMutation.prototype.removeGitRepository = async (root, params, context) =>
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
 
+
+
         // Access_token
-        var access_token = user[0].access_Token
+        var access_token = process.env.DELETE_TOKEN
         console.log("access_token", access_token)
 
 
@@ -875,14 +903,11 @@ gitAuthMutation.prototype.removeGitRepository = async (root, params, context) =>
          * @param {headers}
          * @purpose : get response from given url
          */
-        var res = await axios({
-            method: 'DELETE',
-            url: `${process.env.DELETE_REPO}${params.ownerName}/${params.repoName}`,
-            headers: {
-                Authorization: `Bearer ${process.env.DELETE_TOKEN}`
-            }
+        var url = `${process.env.DELETE_REPO}${params.ownerName}/${params.repoName}`
 
-        })
+
+        //send to axios_services and take response from it
+        var res = await axios_service('DELETE', url, access_token)
 
         console.log("\nRepository Branch Response Data : ", res);
         console.log("\nRepository Branch Object Data : ", res.data[0]);
@@ -922,19 +947,26 @@ gitAuthMutation.prototype.changeStatusInGithub = async (root, params, context) =
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
 
+
+
         // Access_token from github
         var access_token = process.env.USER_TOKEN_FOR_STATUS
+
+
 
         //fetch github data from github
         const fetch = createApolloFetch({
             uri: `${process.env.GIT_FETCH_REPO}${access_token}`
         });
+
 
 
         //pass the query mutation for data fetching
@@ -979,11 +1011,15 @@ gitAuthMutation.prototype.gitRepoCommits = async (root, params, context) => {
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
+
+
 
         // Access_token
         var access_token = user[0].access_Token
@@ -995,14 +1031,11 @@ gitAuthMutation.prototype.gitRepoCommits = async (root, params, context) => {
          * @param {headers}
          * @purpose : get response from given url
          */
-        var res = await axios({
-            method: 'GET',
-            url: `${process.env.DELETE_REPO}${params.ownerName}/${params.repoName}/commits`,
-            headers: {
-                Authorization: `Bearer ${access_token}`
-            }
+        var url = `${process.env.DELETE_REPO}${params.ownerName}/${params.repoName}/commits`
 
-        })
+
+        //send to axios_services and take response from it
+        var res = await axios_service('GET', url, access_token)
 
         console.log("res", res.data[0]);
 
@@ -1050,11 +1083,15 @@ gitAuthMutation.prototype.gitRepoWebhook = async (root, params, context) => {
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
+
+
 
         // Access_token
         var access_token = process.env.GIT_REPO_TOKEN
@@ -1067,25 +1104,24 @@ gitAuthMutation.prototype.gitRepoWebhook = async (root, params, context) => {
          * @param {headers}
          * @purpose : get response from given url
          */
-        var res = await axios({
-            method: 'POST',
-            url: `${process.env.DELETE_REPO}${params.ownerName}/${params.repoName}/hooks`,
-            headers: {
-                Authorization: `Bearer ${access_token}`
-            },
-            data: JSON.stringify({
-                "active": true,
-                "events": [
-                    "push",
-                    "pull_request"
-                ],
-                "config": {
-                    "url": `${params.url}`,
-                    "content_type": "json",
-                    "insecure_ssl": "0"
-                }
-            }),
-        })
+        var url = `${process.env.DELETE_REPO}${params.ownerName}/${params.repoName}/hooks`
+        var data =
+        {
+            "active": true,
+            "events": [
+                "push",
+                "pull_request"
+            ],
+            "config": {
+                "url": `${params.url}`,
+                "content_type": "json",
+                "insecure_ssl": "0"
+            }
+        }
+
+
+        //send to axios_services and take response from it
+        var res = await axios_service('POST', url, access_token, data)
 
         console.log("\nGithub response : ", res)
         return {

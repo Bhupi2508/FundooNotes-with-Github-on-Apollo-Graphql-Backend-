@@ -24,15 +24,25 @@ const axios = require("axios")
  */
 exports.axiosService = (method, url, access_token, data) => {
     return new Promise((resolve, reject) => {
-        var a = axios({
-            method: method,
-            url: url,
-            headers: {
-                Accept: "application/json",
-                Authorization: `Bearer ${access_token}`
-            },
-            data: data
-        }
+
+        /**
+        * @function (Axios), which is used to handle http request
+        * @method (method), method, that which method you perform
+        * @param {headers}
+        * @param {data} Data, data take from params
+        * @purpose : get response from given url
+        */
+        var a = axios(
+            {
+                method: method,
+                url: url,
+                headers:
+                {
+                    Accept: "application/json",
+                    Authorization: `Bearer ${access_token}`
+                },
+                data: data
+            }
         )
             .then(function (res) {
                 resolve(res)
