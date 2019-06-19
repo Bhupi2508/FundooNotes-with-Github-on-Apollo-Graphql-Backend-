@@ -15,6 +15,7 @@
 /**
  * @requires files
  */
+const { AuthenticationError } = require('apollo-server')
 var redis = require('async-redis')
 var bcrypt = require('bcrypt')
 var jsonwebtoken = require('jsonwebtoken')
@@ -32,6 +33,10 @@ var saltRounds = 10;
 //create a empty function
 var userMutation = function () { }
 
+//error message
+var errorMessage = {
+    "message": "Something bad happend",
+}
 
 /*******************************************************************************************************************/
 /**
@@ -49,6 +54,7 @@ userMutation.prototype.signup = async (root, params, context) => {
         var emailformat = (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/);
 
         if (!emailformat.test(params.email)) {
+            //throw new AuthenticationError('not valid email');
             return { "message": "not valid email", }
         }
 
@@ -56,12 +62,14 @@ userMutation.prototype.signup = async (root, params, context) => {
          * @param {number}, password validation 
          */
         if (params.password.length < 8) {
+            //throw new AuthenticationError('Enter pasword more than 8 letters ');
             return { "message": "Enter pasword more than 8 letters " }
         }
 
         //for email id cheking
         var verify = await userModel.find({ "email": params.email })
         if (verify.length > 0) {
+            //throw new AuthenticationError('email already exists');
             return { "message": "email already exists" }
         }
 
@@ -72,6 +80,7 @@ userMutation.prototype.signup = async (root, params, context) => {
         //save in database
         const uModel = usersMdl.save();
         if (!uModel) {
+            //throw new AuthenticationError('Register unsuccessfull');
             return { "message": "Register unsuccessfull" }
         } else {
 
@@ -86,6 +95,8 @@ userMutation.prototype.signup = async (root, params, context) => {
              * @returns {String} message
              */
 
+
+
             // var url = `${process.env.link}${token}`
             /**
              * @purpose : we can also use origin(port) from headers for 
@@ -94,16 +105,27 @@ userMutation.prototype.signup = async (root, params, context) => {
              */
             var url = `${context.origin}?token=${token}`
 
+
+            //send mail
             sendMail.sendEmailFunction(url, params.email)
             return {
                 "message": "Register successfull",
                 "token": token
             }
         }
-    } catch (err) {
-        console.log("!Error")
-        return { "message": err }
+
+
     }
+    catch (err) {
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
+    }
+
 }
 
 
@@ -120,14 +142,18 @@ userMutation.prototype.signup = async (root, params, context) => {
 userMutation.prototype.emailVerify = async (root, params, context) => {
     try {
 
+
         /**
          * @param {token}, send token for verify
          * @returns {String} message, token verification
          */
         var afterVerify = tokenVerify.verification(context.token)
         if (!afterVerify > 0) {
+            //throw new AuthenticationError('token is not verify');
             return { "message": "token is not verify" }
         }
+
+
 
         /**
          * @param {String} email
@@ -137,14 +163,23 @@ userMutation.prototype.emailVerify = async (root, params, context) => {
         var update = await userModel.updateOne({ "email": afterVerify.email },
             { $set: { verification: true } },
             { new: true })
+
+
         if (!update) {
+            //throw new AuthenticationError('verification unsuccessfull');
             return { "message": "verification unsuccessfull" }
         }
         return { "message": "verification successfull" }
 
+
     } catch (err) {
-        console.log("!Error")
-        return { "message": err }
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -169,15 +204,22 @@ userMutation.prototype.login = async (root, params, context) => {
          * @return {String} message
          */
         if (!emailformat.test(params.email)) {
-            return { "message": "not valid email" }
+            throw new AuthenticationError('not valid email');
+            //return { "message": "not valid email" }
         }
+
+
 
         //find email that is present in database or not
         var user = await userModel.find({ "email": params.email })
         if (!user.length > 0) {
-            return { "message": "email is not present" }
+            throw new AuthenticationError('email is not present');
+            //return { "message": "email is not present" }
         }
+
+
         if (user[0].verification === false) {
+            //throw new AuthenticationError('Email not verified');
             return { "message": "Email not verified" }
         }
 
@@ -186,17 +228,23 @@ userMutation.prototype.login = async (root, params, context) => {
          */
         var token = jsonwebtoken.sign({ email: params.email, userID: user[0].id }, process.env.SECRET_KEY, { expiresIn: 86400000 })
 
+
+
         //create a url
         //var url = `${context.origin}?token=${token}`
+
+
 
         //take id for current user from database
         var id = user[0].id
 
+
+
         //compare password that is present in database or not
         const valid = await bcrypt.compare(params.password, user[0].password)
-
         if (!valid) {
-            return { "message": "unauthonticate password" }
+            throw new AuthenticationError('unauthonticate password');
+            //return { "message": "unauthonticate password" }
         }
 
 
@@ -218,9 +266,15 @@ userMutation.prototype.login = async (root, params, context) => {
             "message": "!Login....Successfully"
         }
 
-    } catch (err) {
-        console.log("!Error")
-        return { "message": err }
+    }
+    catch (err) {
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -240,13 +294,17 @@ userMutation.prototype.forgotPassword = async (root, params, context) => {
     try {
         var emailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
+
         /**
          * @purpose : check that email is valid or not
          * @return {String} message
          */
         if (!emailformat.test(params.email)) {
+            //throw new AuthenticationError('not valid email');
             return { "message": "not valid email" }
         }
+
+
 
         /**
          * @purpose : find email that is present in database or not
@@ -254,17 +312,24 @@ userMutation.prototype.forgotPassword = async (root, params, context) => {
          */
         var user = await userModel.find({ "email": params.email })
         if (!user.length > 0) {
+            //throw new AuthenticationError('email is not present in database');
             return { "message": "email is not present in database" }
         }
+
+
 
         /**
          * @purpose : generate a token for send a mail
          */
         var token = jsonwebtoken.sign({ email: params.email }, process.env.SECRET_KEY, { expiresIn: 86400000 });
 
+
+
         //send token to sendmail function, which is send to the link(token)
         var url = `http://localhost:4000/?token=${token}`
         //var url = `${context.origin}/graphql?token=${token}`
+
+
 
         /**
          * @param {token}, for sending mail to the mail
@@ -272,6 +337,7 @@ userMutation.prototype.forgotPassword = async (root, params, context) => {
          */
         var mail = sendMail.sendEmailFunction(url, params.email)
         if (!mail > 0) {
+            //throw new AuthenticationError('!Error, mail not send ');
             return { "mesage": "!Error, mail not send " }
         }
         return {
@@ -279,9 +345,16 @@ userMutation.prototype.forgotPassword = async (root, params, context) => {
             "token": token
         }
 
+
+
     } catch (err) {
-        console.log("!Error")
-        return { "message": err }
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -299,22 +372,31 @@ userMutation.prototype.forgotPassword = async (root, params, context) => {
 userMutation.prototype.resetPassword = async (root, params, context) => {
     try {
 
+
         /**
          * @purpose : for token verification
          * @returns {String} message
          */
         var afterVerify = tokenVerify.verification(context.token)
         if (!afterVerify > 0) {
+            //throw new AuthenticationError('token is not verify');
             return { "message": "token is not verify" }
         }
 
+
+
         //password matching
         if (params.newPassword != params.confirmPassword) {
+            //throw new AuthenticationError('password and confirm password are not match');
             return { "message": "password and confirm password are not match" }
         }
 
+
+
         //bcrypt new password
         params.newPassword = await bcrypt.hashSync(params.newPassword, saltRounds)
+
+
 
         /**
          * @purpose : for updated password
@@ -327,13 +409,19 @@ userMutation.prototype.resetPassword = async (root, params, context) => {
             { new: true })
 
         if (!update) {
+            //throw new AuthenticationError('Password not reset');
             return { "message": "Password not reset" }
         }
         return { "message": "resetPassword Successfully" }
 
     } catch (err) {
-        console.log("!Error")
-        return { "message": err }
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -351,12 +439,14 @@ userMutation.prototype.update = async (root, params, context) => {
 
     try {
 
+
         /** 
         * @purpose : for token v erification
         * @returns {String} mess age
         */
         var afterVerify = tokenVerify.verification(context.token)
         if (!afterVerify > 0) {
+            //throw new AuthenticationError('token is not verify');
             return { "message": "token is not verify" }
         }
 
@@ -369,15 +459,22 @@ userMutation.prototype.update = async (root, params, context) => {
             },
             { new: true }
         )
+
         if (!update) {
+            //throw new AuthenticationError('check user id or name, try again');
             return { "message": "check user id or name, try again" }
         }
         return { "message": "user update successfully" };
 
 
     } catch (err) {
-        console.log("!Error in catch")
-        return { "message": err }
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -395,16 +492,26 @@ userMutation.prototype.update = async (root, params, context) => {
 userMutation.prototype.remove = async (root, params) => {
 
     try {
+
+
         //find id and remove from the user Data
         const removeduser = await userModel.findByIdAndRemove(params.id).exec();
+
         if (!removeduser) {
+            //throw new AuthenticationError('check user id, try again');
             return { "message": "check user id, try again" }
         }
         return { "message": "user delete successfully" };
 
+
     } catch (err) {
-        console.log("!Error")
-        return { "message": err }
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
