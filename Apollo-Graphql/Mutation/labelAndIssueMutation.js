@@ -18,6 +18,7 @@ const { createApolloFetch } = require('apollo-fetch')
 var model = require('../../model/userSchema')
 var tokenVerify = require('../../Authentication/authenticationUser')
 var issueModel = require('../../model/gitIssueSchema')
+var axios_data = require('../../services/axios-services').axiosService
 
 
 //create a empty function
@@ -443,18 +444,28 @@ userAddLabelMutation.prototype.createLabelInGit = async (root, params, context) 
          * @param {headers}
          * @purpose : get response from given url
          */
-        var res = await axios({
-            method: 'POST',
-            url: `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/labels`,
-            headers: {
-                Authorization: `Bearer ${access_token}`
-            },
-            data: JSON.stringify({
-                "name": `${params.labelName}`,
-                "description": `${params.description}`,
-                "color": `${params.color}`
-            })
-        })
+        // var res = await axios({
+        //     method: 'POST',
+        //     url: `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/labels`,
+        //     headers: {
+        //         Authorization: `Bearer ${access_token}`
+        //     },
+        //     data: JSON.stringify({
+        //         "name": `${params.labelName}`,
+        //         "description": `${params.description}`,
+        //         "color": `${params.color}`
+        //     })
+        // })
+        var url = `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/labels`
+        var data =
+        {
+            "name": `${params.labelName}`,
+            "description": `${params.description}`,
+            "color": `${params.color}`
+        }
+
+        //send to axios_services and take response from it
+        var res = await axios_data('POST', url, access_token, data)
 
         console.log("res", res)
 
@@ -511,18 +522,28 @@ userAddLabelMutation.prototype.updateLabelInGit = async (root, params, context) 
          * @param {headers}
          * @purpose : get response from given url
          */
-        var res = await axios({
-            method: 'PATCH',
-            url: `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/labels/${params.currentLabelName}`,
-            headers: {
-                Authorization: `Bearer ${access_token}`
-            },
-            data: JSON.stringify({
-                "name": `${params.labelName}`,
-                "description": `${params.description}`,
-                "color": `${params.color}`
-            })
-        })
+        // var res = await axios({
+        //     method: 'PATCH',
+        //     url: `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/labels/${params.currentLabelName}`,
+        //     headers: {
+        //         Authorization: `Bearer ${access_token}`
+        //     },
+        //     data: JSON.stringify({
+        //         "name": `${params.labelName}`,
+        //         "description": `${params.description}`,
+        //         "color": `${params.color}`
+        //     })
+        // })
+        var url = `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/labels/${params.currentLabelName}`
+        var data =
+        {
+            "name": `${params.labelName}`,
+            "description": `${params.description}`,
+            "color": `${params.color}`
+        }
+
+        //send to axios_services and take response from it
+        var res = await axios_data('PATCH', url, access_token, data)
 
         console.log("res", res.data)
 
