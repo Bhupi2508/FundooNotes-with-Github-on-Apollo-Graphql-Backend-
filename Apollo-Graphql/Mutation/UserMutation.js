@@ -26,7 +26,7 @@ var tokenVerify = require('../../Authentication/authenticationUser')
 
 //create a redis client
 var client = redis.createClient({
-    host: 'redis',
+    host: 'localhost',
     port: process.env.REDIS_PORT
 })
 

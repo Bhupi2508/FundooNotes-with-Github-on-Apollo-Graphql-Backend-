@@ -17,7 +17,7 @@
  */
 const redis = require("async-redis");
 const client = redis.createClient({
-    host: 'redis',
+    host: 'localhost',
     port: process.env.REDIS_PORT
 })
 var labelModel = require('../../model/labelSchema')
