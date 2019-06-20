@@ -25,7 +25,10 @@ var sendMail = require('../../sendMailer/sendMail')
 var tokenVerify = require('../../Authentication/authenticationUser')
 
 //create a redis client
-var client = redis.createClient()
+var client = redis.createClient({
+    host: 'redis',
+    port: process.env.REDIS_PORT
+})
 
 //saltrounds for hash password
 var saltRounds = 10;

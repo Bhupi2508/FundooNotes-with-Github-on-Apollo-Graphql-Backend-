@@ -15,7 +15,10 @@
  * @requires files
  */
 const redis = require("async-redis");
-const client = redis.createClient()
+const client = redis.createClient({
+    host: 'redis',
+    port: process.env.REDIS_PORT
+})
 const labelModel = require('../../model/labelSchema')  //labelModels  
 const noteModel = require('../../model/noteSchema')   //noteModel
 const colabModel = require('../../model/collabatorsSchema')   //colabModel

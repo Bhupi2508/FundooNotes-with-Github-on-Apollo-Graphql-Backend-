@@ -16,7 +16,10 @@
  * @requires files
  */
 const redis = require("async-redis");
-const client = redis.createClient()
+const client = redis.createClient({
+    host: 'redis',
+    port: process.env.REDIS_PORT
+})
 var labelModel = require('../../model/labelSchema')
 var tokenVerify = require('../../Authentication/authenticationUser')
 
