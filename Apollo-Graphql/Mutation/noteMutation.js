@@ -258,6 +258,8 @@ noteMutation.prototype.removeLabelFromNote = async (root, params) => {
 
 
 
+
+
 /*******************************************************************************************************************/
 /**
  * @description : set Reminder APIs in notes for using apollo-graphql
@@ -301,6 +303,7 @@ noteMutation.prototype.Reminder = async (root, params) => {
         return { "message": error }
     }
 }
+
 
 
 /*******************************************************************************************************************/

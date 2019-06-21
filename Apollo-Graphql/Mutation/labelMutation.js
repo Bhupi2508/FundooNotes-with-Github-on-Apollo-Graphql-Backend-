@@ -26,6 +26,11 @@ var tokenVerify = require('../../Authentication/authenticationUser')
 //create a empty function
 var labelMutation = function () { }
 
+//error message
+var errorMessage = {
+    "message": "Something bad happend",
+}
+
 /*******************************************************************************************************************/
 /**
  * @description : create a APIs for add lebel for using apollo-graphql
@@ -78,9 +83,14 @@ labelMutation.prototype.createLabel = async (root, params, context) => {
             return { "message": "Label created" }
         }
 
-    } catch (error) {
-        console.log("error")
-        return { "message": err }
+    } catch (err) {
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -122,9 +132,14 @@ labelMutation.prototype.editLabel = async (root, params, context) => {
         }
 
 
-    } catch (error) {
-        console.log("error")
-        return { "message": err }
+    } catch (err) {
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -163,9 +178,14 @@ labelMutation.prototype.removeLabel = async (root, params, context) => {
         }
 
 
-    } catch (error) {
-        console.log("error")
-        return { "message": err }
+    } catch (err) {
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
