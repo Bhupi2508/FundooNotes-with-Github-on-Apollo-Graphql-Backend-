@@ -16,7 +16,7 @@
  * @requires files
  */
 const { ApolloServer } = require('apollo-server');
-//require('dotenv').config();
+require('dotenv').config();
 const express = require('express')
 const { typeDefs } = require('./Apollo-Graphql/Types/types');
 const resolvers = require('./Apollo-Graphql/Resolver/resolver').resolvers
@@ -50,7 +50,7 @@ var server = new ApolloServer({
 var userPort = process.env.PORT
 server.listen(userPort, () => {
     //console.log('#####################################################################################');
-    console.log('##############             STARTING SERVER at port : ',userPort, '            ##############');
+    console.log('##############              Server Running at port :',userPort, '             ##############');
     //console.log('#####################################################################################');
 });
 
