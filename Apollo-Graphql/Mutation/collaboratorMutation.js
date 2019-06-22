@@ -28,6 +28,12 @@ var saltRounds = 10;
 var collaboratorMutation = function () { }
 
 
+//error message
+var errorMessage = {
+    "message": "Something bad happend",
+}
+
+
 /*******************************************************************************************************************/
 /**
  * @description : addCollaboration APIs for collaborators to add user using apollo-graphql
@@ -104,8 +110,13 @@ collaboratorMutation.prototype.addCollaboration = async (root, args, context) =>
 
 
     } catch (err) {
-        console.log("!Error")
-        return { "message": err }
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -166,8 +177,13 @@ collaboratorMutation.prototype.removeCollaboration = async (root, args, context)
 
 
     } catch (err) {
-        console.log("!Error")
-        return { "message": err }
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
