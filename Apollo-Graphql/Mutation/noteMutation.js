@@ -22,6 +22,11 @@ var tokenVerify = require('../../Authentication/authenticationUser')
 //create a empty function
 var noteMutation = function () { }
 
+//error message
+var errorMessage = {
+    "message": "Something bad happend",
+}
+
 /*******************************************************************************************************************/
 /**
  * @description : create a APIs for add notes for using apollo-graphql
@@ -90,9 +95,14 @@ noteMutation.prototype.createNote = async (root, params, context) => {
             return { "message": "note created" }
         }
 
-    } catch (error) {
-        console.log("error in catch")
-        return { "message": err }
+    } catch (err) {
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -127,9 +137,14 @@ noteMutation.prototype.editNote = async (root, params) => {
         }
 
 
-    } catch (error) {
-        console.log("error")
-        return { "message": err }
+    } catch (err) {
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -157,9 +172,14 @@ noteMutation.prototype.removeNote = async (root, params) => {
         }
 
 
-    } catch (error) {
-        console.log("error")
-        return { "message": err }
+    } catch (err) {
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -200,9 +220,14 @@ noteMutation.prototype.saveLabelToNote = async (root, params) => {
             return { "message": "label added on note successfully " }
         }
 
-    } catch (error) {
-        console.log("error in catch")
-        return { "message": err }
+    } catch (err) {
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -250,9 +275,14 @@ noteMutation.prototype.removeLabelFromNote = async (root, params) => {
         }
 
 
-    } catch (error) {
-        console.log("error in catch")
-        return { "message": err }
+    } catch (err) {
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -298,9 +328,14 @@ noteMutation.prototype.Reminder = async (root, params) => {
         return { "message": "reminder set in note successfully" }
 
 
-    } catch (error) {
-        console.log("error in catch")
-        return { "message": error }
+    } catch (err) {
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -336,9 +371,14 @@ noteMutation.prototype.deleteReminder = async (root, params) => {
         return { "message": "reminder remove successfully" }
 
 
-    } catch (error) {
-        console.log("error in catch")
-        return { "message": err }
+    } catch (err) {
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -392,9 +432,14 @@ noteMutation.prototype.Archieve = async (root, params, context) => {
         return { "message": "note already Archieve" }
 
 
-    } catch (error) {
-        console.log("error")
-        return { "message": err }
+    } catch (err) {
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -451,9 +496,14 @@ noteMutation.prototype.ArchieveRemove = async (root, params, context) => {
         }
 
 
-    } catch (error) {
-        console.log("error")
-        return { "message": err }
+    } catch (err) {
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -510,9 +560,14 @@ noteMutation.prototype.Trash = async (root, params, context) => {
         return { "message": "This note is already in trash" }
 
 
-    } catch (error) {
-        console.log("error")
-        return { "message": err }
+    } catch (err) {
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -570,9 +625,14 @@ noteMutation.prototype.TrashRemove = async (root, params, context) => {
         }
 
 
-    } catch (error) {
-        console.log("error")
-        return { "message": err }
+    } catch (err) {
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
