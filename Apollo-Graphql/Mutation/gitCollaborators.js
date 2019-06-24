@@ -23,6 +23,12 @@ var tokenVerify = require('../../Authentication/authenticationUser')
 var userAddInCollaborator = function () { }
 
 
+//error message
+var errorMessage = {
+    "message": "Something bad happend",
+}
+
+
 /*******************************************************************************************************************/
 /**
  * @description : addCollaboratorGithub APIs for add collaborators in github repository using apollo-graphql
@@ -44,11 +50,15 @@ userAddInCollaborator.prototype.addCollaboratorGithub = async (root, params, con
             return { "message": "token is not verify" }
         }
 
+
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
+
+
 
         // Access_token
         var access_token = user[0].access_Token
@@ -72,7 +82,13 @@ userAddInCollaborator.prototype.addCollaboratorGithub = async (root, params, con
         return { "message": "user collaborators added successfully" }
 
     } catch (err) {
-        return { "message": "user collaborators added unsuccessfully" }
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -130,7 +146,13 @@ userAddInCollaborator.prototype.removeCollaboratorGithub = async (root, params, 
         return { "message": "collborators remove successfully" }
 
     } catch (err) {
-        return { "message": "collborators alredy removed " }
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -198,7 +220,13 @@ userAddInCollaborator.prototype.gitCollaboratorsList = async (root, params, cont
         }
 
     } catch (err) {
-        return { "message": "error in fetch collaborators list" }
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
