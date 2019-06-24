@@ -25,7 +25,7 @@ const colabModel = require('../../model/collabatorsSchema')   //colabModel
 const user = require('../Query/query').user;   //user queries
 const labelUser = require('../Query/query').labelUser   //labelUser queries
 const notesUser = require('../Query/query').notesUser   //notesUser queries
-const gitUser = require('../Query/query').gitUser    //gitUser queries
+const gitRepo = require('../Query/query').gitRepo   //gitUser queries
 const colabUser = require('../Query/query').colabUser   //colabUser queries
 const searchNoteByTitle = require('../Query/query').searchNoteByTitle   //searchNoteByTitle queries
 const searchNoteByDescription = require('../Query/query').searchNoteByDescription   //searchNoteByDescription queries
@@ -101,7 +101,7 @@ userResolver.prototype.resolvers = {
         user,
         labelUser,
         notesUser,
-        gitUser,
+        gitRepo,
         colabUser,
         searchNoteByTitle,
         searchNoteByDescription

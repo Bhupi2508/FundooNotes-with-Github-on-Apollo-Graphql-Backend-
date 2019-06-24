@@ -93,8 +93,8 @@ userQueries.prototype.colabUser = async (root, params) => {
  * @param {args}
  * @param {context}
  */
-userQueries.prototype.gitUser = async (root, params) => {
-    var git_User = await userModel.find().exec().limit(params.first).skip(params.offset)
+userQueries.prototype.gitRepo = async (root, params) => {
+    var git_User = await notesModel.find().exec()
     console.log(git_User[0]);
     return git_User
 }

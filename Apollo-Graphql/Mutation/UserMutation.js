@@ -136,7 +136,7 @@ userMutation.prototype.signup = async (root, params, context) => {
 
 /*******************************************************************************************************************/
 /**
- * @description : emailverification APIs for verify a eamil that is valid or not using apollo-graphql
+ * @description : emailverification APIs for verify a email that is valid or not using apollo-graphql
  * @purpose : For register emailverification by using CURD operation
  * @param {root}, which has data information
  * @param {params}, input by users

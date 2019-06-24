@@ -119,7 +119,7 @@ type User {
     labelUser(userID:String, first: Int, offset: Int): [Label]
     notesUser(userID:String,title: String,description: String, first: Int, offset: Int): [Notes]
     colabUser(userID:String, first: Int, offset: Int): [Colab]
-    gitUser: [GitHub]
+    gitRepo: [Notes]
     PicUser: [UploadPic]
     gitHubRepository: [User]
     searchNoteByTitle(title: String!):[Notes]
