@@ -21,9 +21,6 @@ var colModel = require('../../model/collabatorsSchema');
 var tokenVerify = require('../../Authentication/authenticationUser')
 
 
-//saltrounds for hash password
-var saltRounds = 10;
-
 //create a empty function
 var collaboratorMutation = function () { }
 
@@ -34,7 +31,7 @@ var errorMessage = {
 }
 
 
-/*******************************************************************************************************************/
+/********************************************************   addCollaboration   ***********************************************************/
 /**
  * @description : addCollaboration APIs for collaborators to add user using apollo-graphql
  * @purpose : addCollaborator ID for which user you add in database
@@ -82,12 +79,14 @@ collaboratorMutation.prototype.addCollaboration = async (root, args, context) =>
             return { "message": "user already colabrated" }
         }
 
+
         //take those var from input 
         var newColab = new colModel({
             "userID": payload.userID,
             "noteID": args.noteID,
             "collaboratorID": args.colabID
         })
+
 
         //save in given database
         var save = newColab.save()
@@ -97,18 +96,20 @@ collaboratorMutation.prototype.addCollaboration = async (root, args, context) =>
         var findEmail = await userModel.find({ _id: args.colabID })
         var email = findEmail[0].email
 
+
         //message for mail
         var url = "This " + email + " email is collaborate with me for Fundoo Notes"
-
         //condition
         if (save) {
             sendMail.sendEmailFunction(url, email)
             return { "message": "colabbed successfully" }
         }
 
+        //return the response
         return { "message": "colab unsuccessful" }
 
 
+        //catch the error 
     } catch (err) {
         if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
             return errorMessage;
@@ -125,7 +126,7 @@ collaboratorMutation.prototype.addCollaboration = async (root, args, context) =>
 
 
 
-/*******************************************************************************************************************/
+/********************************************************  removeCollaboration  ***********************************************************/
 /**
  * @description : removeCollaboration APIs for collaborators to remove from user using apollo-graphql
  * @purpose : removeCollaboration ID for which user you remove from database
@@ -173,9 +174,11 @@ collaboratorMutation.prototype.removeCollaboration = async (root, args, context)
             return { "message": "collaborator removed successfully" }
         }
 
+        //return the response
         return { "message": "This collaborator is not present" }
 
 
+        //catch the error 
     } catch (err) {
         if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
             return errorMessage;

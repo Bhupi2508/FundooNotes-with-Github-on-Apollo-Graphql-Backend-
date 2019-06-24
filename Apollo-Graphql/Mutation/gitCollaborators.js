@@ -29,7 +29,7 @@ var errorMessage = {
 }
 
 
-/*******************************************************************************************************************/
+/********************************************************  addCollaboratorGithub  ***********************************************************/
 /**
  * @description : addCollaboratorGithub APIs for add collaborators in github repository using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -79,6 +79,7 @@ userAddInCollaborator.prototype.addCollaboratorGithub = async (root, params, con
         })
         //console.log("\nRepository collaborators Details : ", res);
 
+        //return the response
         return { "message": "user collaborators added successfully" }
 
     } catch (err) {
@@ -97,7 +98,7 @@ userAddInCollaborator.prototype.addCollaboratorGithub = async (root, params, con
 
 
 
-/*******************************************************************************************************************/
+/*****************************************************  removeCollaboratorGithub  ***********************************************************/
 /**
  * @description : removeCollaboratorGithub APIs for delete collaborators in github repository using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -143,6 +144,7 @@ userAddInCollaborator.prototype.removeCollaboratorGithub = async (root, params, 
         })
         //console.log("\nRepository collaborators Details : ", res);
 
+        //return the response
         return { "message": "collborators remove successfully" }
 
     } catch (err) {
@@ -160,7 +162,7 @@ userAddInCollaborator.prototype.removeCollaboratorGithub = async (root, params, 
 
 
 
-/*******************************************************************************************************************/
+/*******************************************************  gitCollaboratorsList  ************************************************************/
 /**
  * @description : gitCollaboratorsList APIs for show all the collaborators list using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -214,6 +216,7 @@ userAddInCollaborator.prototype.gitCollaboratorsList = async (root, params, cont
             array.push(res.data[i].login)
         }
 
+        //return the response
         return {
             "message": "Collaborators list fetch successfully",
             "data": res.data

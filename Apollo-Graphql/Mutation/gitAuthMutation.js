@@ -28,7 +28,7 @@ var axios_service = require('../../services/axios-services').axiosService
 var gitAuthMutation = function () { }
 
 
-/*******************************************************************************************************************/
+/********************************************************    GithubAuth    ***********************************************************/
 /**
  * @description : social auth2.0 for github login using apollo-graphql
  * @purpose : For fetch data by using CURD operation
@@ -51,6 +51,8 @@ gitAuthMutation.prototype.GithubAuth = async (root, params) => {
         if (!mail) {
             return { "message": "mail not sent" }
         }
+
+        //return the response
         return {
             "message": "Mail sent to your mail ID"
         }
@@ -65,7 +67,7 @@ gitAuthMutation.prototype.GithubAuth = async (root, params) => {
 
 
 
-/*******************************************************************************************************************/
+/***********************************************************    codeVerify    ********************************************************/
 /**
  * @description : code verify for auth2.0 for github login using apollo-graphql
  * @purpose : For fetch data by using CURD operation
@@ -102,6 +104,7 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
         })
 
 
+    //use the access_token in another function, which is came from previous function
     /**
      * @param {*} access_token 
      * @headers : application/json
@@ -135,6 +138,7 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
 
                 });
 
+
                 //save data into database
                 var saveuser = await gituser.save();
                 console.log("\nData : ", saveuser)
@@ -144,6 +148,7 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
                 //token created for gitAuth login verification and send to git mail
                 var token = await jwt.sign({ "userID": saveuser.id, "id": response.data.id, "login": response.data.login }, process.env.SECRET_KEY, { expiresIn: 86400000 })
 
+
                 //send mail to the given mail id
                 var url = `http://localhost:4000?token=${token}`
                 sendMail.sendEmailFunction(url, response.data.email)
@@ -152,6 +157,8 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
                 if (!saveuser.id.length > 0) {
                     return { "message": "data not save successfully" }
                 }
+
+                //return the response
                 return {
                     "message": "Data save successfully",
                     "token": token
@@ -162,6 +169,7 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
             })
     }
 
+    //return the response
     return { "message": "Data save successfully" }
 }
 
@@ -169,8 +177,7 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
 
 
 
-
-/*******************************************************************************************************************/
+/*****************************************************   GitAuthTokenVerify  ************************************************************/
 /**
 @description : tokenverification APIs for verify a eamil that is valid or not using apollo-graphql
 @purpose : For gitAuth verification by using CURD operation
@@ -187,6 +194,7 @@ gitAuthMutation.prototype.GitAuthTokenVerify = async (root, params, context) => 
             return { "message": "token is not verify" }
         }
 
+
         /**
          * @param {String} email
          * @returns {String} message
@@ -201,9 +209,12 @@ gitAuthMutation.prototype.GitAuthTokenVerify = async (root, params, context) => 
             var login = await model.find({ "gitID": afterVerify.id, "loginName": afterVerify.login })
             console.log(afterVerify.id);
 
+            //condition
             if (!login) {
                 return { "message": "Login unsucessful" }
             }
+
+            //return the response
             return { "message": "login & verification successfull" }
         }
 
@@ -218,7 +229,7 @@ gitAuthMutation.prototype.GitAuthTokenVerify = async (root, params, context) => 
 
 
 
-/*******************************************************************************************************************/
+/*******************************************************   pullGitRepository   ***********************************************************/
 /**
  * @description : pullGitRepository APIs for fetching repository Details using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -239,11 +250,13 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
             return { "message": "token is not verify" }
         }
 
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
+
 
         // Access_token
         var access_token = user[0].access_Token;
@@ -288,6 +301,7 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
             }
         })
 
+        //return the response
         return { "message": "git  repository fetch Successfully" }
 
     } catch (err) {
@@ -300,7 +314,7 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
 
 
 
-/*******************************************************************************************************************/
+/********************************************************   addWatchInGitRepo   ***********************************************************/
 /**
  * @description : addWatchInGitRepo APIs for add watch repository Details using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -321,11 +335,13 @@ gitAuthMutation.prototype.addWatchInGitRepo = async (root, params, context) => {
             return { "message": "token is not verify" }
         }
 
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
+
 
         // Access_token
         var access_token = user[0].access_Token;
@@ -349,6 +365,7 @@ gitAuthMutation.prototype.addWatchInGitRepo = async (root, params, context) => {
             console.log("Repository Branch Name : ", res);
         })
 
+        //return the response
         return { "message": "Watch add successfully in Git Repository" }
 
     } catch (err) {
@@ -362,8 +379,7 @@ gitAuthMutation.prototype.addWatchInGitRepo = async (root, params, context) => {
 
 
 
-
-/*******************************************************************************************************************/
+/********************************************************   deleteWatchInGitRepo   *******************************************************/
 /**
  * @description : deleteWatchInGitRepo APIs for delete watch from repository Details using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -384,11 +400,13 @@ gitAuthMutation.prototype.deleteWatchInGitRepo = async (root, params, context) =
             return { "message": "token is not verify" }
         }
 
+
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
             return { "message": "user not verified" }
         }
+
 
         // Access_token
         var access_token = user[0].access_Token
@@ -412,6 +430,7 @@ gitAuthMutation.prototype.deleteWatchInGitRepo = async (root, params, context) =
             console.log("Repository Branch Name : ", res);
         })
 
+        //return the response
         return { "message": "Watch Remove successfully from Git Repository" }
 
     } catch (err) {
@@ -425,7 +444,7 @@ gitAuthMutation.prototype.deleteWatchInGitRepo = async (root, params, context) =
 
 
 
-/*******************************************************************************************************************/
+/*******************************************************   createGitBranch   ************************************************************/
 /**
  * @description : createGitBranch APIs for create Branch in github using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -496,6 +515,7 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
 
         console.log("\nRepository Branch after post Data : ", res_Data);
 
+        //return the response
         return { "message": "git branch create Successfully" }
 
     } catch (err) {
@@ -509,7 +529,7 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
 
 
 
-/*******************************************************************************************************************/
+/**********************************************************   deleteGitBranch   *********************************************************/
 /**
  * @description : deleteGitBranch APIs for delete branch from github repository using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -560,6 +580,7 @@ gitAuthMutation.prototype.deleteGitBranch = async (root, params, context) => {
 
         console.log("\nRepository Branch Response Data : ", res);
 
+        //return the response
         return { "message": "git branch delete Successfully" }
 
     } catch (err) {
@@ -573,7 +594,7 @@ gitAuthMutation.prototype.deleteGitBranch = async (root, params, context) => {
 
 
 
-/*******************************************************************************************************************/
+/*********************************************************   fetchRepository   **********************************************************/
 /**
  * @description : fetchRepository APIs for fetching repository Details using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -642,6 +663,8 @@ gitAuthMutation.prototype.fetchRepository = async (root, params, context) => {
             }
         }
 
+
+        //return the response
         return {
             "message": "git  repository fetch Successfully",
             "repo": res.data.repositoryOwner.repositories.nodes
@@ -658,7 +681,7 @@ gitAuthMutation.prototype.fetchRepository = async (root, params, context) => {
 
 
 
-/*******************************************************************************************************************/
+/*********************************************************   starRepository   **********************************************************/
 /**
  * @description : starRepository APIs for give the star for selected repository Details using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -710,6 +733,7 @@ gitAuthMutation.prototype.starRepository = async (root, params, context) => {
 
         console.log("res", res)
 
+        //return the response
         return {
             "message": "Star the repository Successfully",
             // "clientMutationId": res.data.addStar.clientMutationId
@@ -726,7 +750,7 @@ gitAuthMutation.prototype.starRepository = async (root, params, context) => {
 
 
 
-/*******************************************************************************************************************/
+/********************************************************  removeStarRepository  ***********************************************************/
 /**
  * @description : removeStarRepository APIs for remove star from git repository using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -775,7 +799,8 @@ gitAuthMutation.prototype.removeStarRepository = async (root, params, context) =
             query: `mutation {removeStar(input: {starrableId: "${process.env.GIT_ID}" clientMutationId:"${gitNodeID}"}) { clientMutationId}}`,
         })
 
-        console.log(res)
+
+        //return the response
         return {
             "message": "remove Star from repository Successfully",
         }
@@ -792,7 +817,7 @@ gitAuthMutation.prototype.removeStarRepository = async (root, params, context) =
 
 
 
-/*******************************************************************************************************************/
+/******************************************************  createGitRepository  *************************************************************/
 /**
  * @description : createGitBranch APIs for create Branch in github using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -847,6 +872,8 @@ gitAuthMutation.prototype.createGitRepository = async (root, params, context) =>
         console.log("\nRepository Branch Response Data : ", res);
         console.log("\nRepository Branch Object Data : ", res.data[0]);
 
+
+        //return the response
         return { "message": "Repository created Successfully" }
 
     } catch (err) {
@@ -861,7 +888,7 @@ gitAuthMutation.prototype.createGitRepository = async (root, params, context) =>
 
 
 
-/*******************************************************************************************************************/
+/******************************************************  removeGitRepository  *************************************************************/
 /**
  * @description : createGitBranch APIs for create Branch in github using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -912,6 +939,8 @@ gitAuthMutation.prototype.removeGitRepository = async (root, params, context) =>
         console.log("\nRepository Branch Response Data : ", res);
         console.log("\nRepository Branch Object Data : ", res.data[0]);
 
+
+        //return the response
         return { "message": "Repository deleted Successfully" }
 
     } catch (err) {
@@ -926,7 +955,7 @@ gitAuthMutation.prototype.removeGitRepository = async (root, params, context) =>
 
 
 
-/*******************************************************************************************************************/
+/***********************************************************  changeStatusInGithub  ********************************************************/
 /**
  * @description : Change Status APIs for change the status in github using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -976,6 +1005,7 @@ gitAuthMutation.prototype.changeStatusInGithub = async (root, params, context) =
 
         console.log("res", res)
 
+        //return the response
         return {
             "message": "Status updated successfully",
         }
@@ -990,7 +1020,7 @@ gitAuthMutation.prototype.changeStatusInGithub = async (root, params, context) =
 
 
 
-/*******************************************************************************************************************/
+/**********************************************************   gitRepoCommits   *********************************************************/
 /**
  * @description : gitRepoCommits APIs for fetch commits from github using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -1046,6 +1076,7 @@ gitAuthMutation.prototype.gitRepoCommits = async (root, params, context) => {
             console.log("Repository Commits message  : ", res.data[i].commit.message);
         }
 
+        //return the response
         return {
             "message": "commits fetch successfully",
             "data": res.data
@@ -1062,7 +1093,7 @@ gitAuthMutation.prototype.gitRepoCommits = async (root, params, context) => {
 
 
 
-/*******************************************************************************************************************/
+/*********************************************************   gitRepoWebhook   **********************************************************/
 /**
  * @description : gitRepoWebhook APIs for create a webhook in github using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -1124,6 +1155,7 @@ gitAuthMutation.prototype.gitRepoWebhook = async (root, params, context) => {
         var res = await axios_service('POST', url, access_token, data)
 
         console.log("\nGithub response : ", res)
+        //return the response
         return {
             "message": "Repository webhook response successfully",
         }

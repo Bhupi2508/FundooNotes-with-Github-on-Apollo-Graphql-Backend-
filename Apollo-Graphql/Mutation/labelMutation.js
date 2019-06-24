@@ -31,7 +31,7 @@ var errorMessage = {
     "message": "Something bad happend",
 }
 
-/*******************************************************************************************************************/
+/******************************************************   createLabel   *************************************************************/
 /**
  * @description : create a APIs for add lebel for using apollo-graphql
  * @purpose : For fetch data by using CURD operation
@@ -43,12 +43,15 @@ var errorMessage = {
 labelMutation.prototype.createLabel = async (root, params, context) => {
     try {
 
+
         /**
          * @param {number} Name validation 
          */
         if (params.labelName.length < 4) {
             return { "message": "Enter name min 4 letter " }
         }
+
+
 
         /**
          * @payload send token for verification
@@ -60,6 +63,8 @@ labelMutation.prototype.createLabel = async (root, params, context) => {
         }
         var labelfind = await labelModel.find({ labelName: params.labelName })
 
+
+
         /**
         @param {number} label.length, check the label name already present or not
         */
@@ -67,12 +72,16 @@ labelMutation.prototype.createLabel = async (root, params, context) => {
             return { "message": "labelName already present" }
         }
 
+
+
         //find id from users models
         const model = new labelModel({ labelName: params.labelName, userID: payload.userID })
         const label = model.save()
 
+
         // delete labels from redis
         client.del("labels" + payload.userID)
+
 
         /**
          * @return {String}, message
@@ -82,6 +91,7 @@ labelMutation.prototype.createLabel = async (root, params, context) => {
         } else {
             return { "message": "Label created" }
         }
+
 
     } catch (err) {
         if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
@@ -94,7 +104,11 @@ labelMutation.prototype.createLabel = async (root, params, context) => {
     }
 }
 
-/*******************************************************************************************************************/
+
+
+
+
+/**********************************************************   editLabel   *********************************************************/
 /**
 * @description : update a APIs for edit lebel for using apollo-graphql
 * @purpose : For fetch data by using CURD operation
@@ -105,6 +119,7 @@ labelMutation.prototype.createLabel = async (root, params, context) => {
 labelMutation.prototype.editLabel = async (root, params, context) => {
     try {
 
+
         /**
          * @payload send token for verification
          * @condition if present or not
@@ -114,6 +129,8 @@ labelMutation.prototype.editLabel = async (root, params, context) => {
             return { "message": "token is not verify" }
         }
 
+
+
         //find id from users models
         var model = await labelModel.findOneAndUpdate({ _id: params.labelID },
             {
@@ -121,6 +138,8 @@ labelMutation.prototype.editLabel = async (root, params, context) => {
                     labelName: params.editlabelName
                 }
             })
+
+
 
         /**
          * @return {String} message
@@ -144,7 +163,7 @@ labelMutation.prototype.editLabel = async (root, params, context) => {
 }
 
 
-/*******************************************************************************************************************/
+/********************************************************   removeLabel   ***********************************************************/
 /**
 * @description : remove APIs for remove label for using apollo-graphql
 * @purpose : For fetch data by using CURD operation
@@ -156,6 +175,7 @@ labelMutation.prototype.editLabel = async (root, params, context) => {
 labelMutation.prototype.removeLabel = async (root, params, context) => {
     try {
 
+
         /**
          * @payload send token for verification
          * @condition if present or not
@@ -164,6 +184,8 @@ labelMutation.prototype.removeLabel = async (root, params, context) => {
         if (!payload) {
             return { "message": "token is not verify" }
         }
+
+
 
         /**
          * @purpose : find id from database then remove from dataase

@@ -27,7 +27,8 @@ var errorMessage = {
     "message": "Something bad happend",
 }
 
-/*******************************************************************************************************************/
+
+/******************************************************   createNote   *************************************************************/
 /**
  * @description : create a APIs for add notes for using apollo-graphql
  * @purpose : For fetch data by using CURD operation
@@ -37,6 +38,7 @@ var errorMessage = {
  */
 noteMutation.prototype.createNote = async (root, params, context) => {
     try {
+
 
         /**
          * @param {String} title validation 
@@ -50,6 +52,7 @@ noteMutation.prototype.createNote = async (root, params, context) => {
         }
 
 
+
         /**
          * @payload send token for verification
          * @condition if present or not
@@ -59,6 +62,7 @@ noteMutation.prototype.createNote = async (root, params, context) => {
         if (!payload) {
             return { "message": "token is not verify" }
         }
+
 
 
         //find title from database
@@ -73,6 +77,7 @@ noteMutation.prototype.createNote = async (root, params, context) => {
         }
 
 
+
         //find id from users models
         const model = new noteModel({
             title: params.title,
@@ -83,6 +88,8 @@ noteMutation.prototype.createNote = async (root, params, context) => {
             userID: payload.userID
 
         })
+
+        //save data in dataBase
         const note = model.save()
 
 
@@ -94,6 +101,7 @@ noteMutation.prototype.createNote = async (root, params, context) => {
         } else {
             return { "message": "note created" }
         }
+
 
     } catch (err) {
         if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
@@ -107,7 +115,7 @@ noteMutation.prototype.createNote = async (root, params, context) => {
 }
 
 
-/*******************************************************************************************************************/
+/******************************************************   editNote   *************************************************************/
 /**
  * @description : update data APIs for updated notes for using apollo-graphql
  * @purpose : For fetch data by using CURD operation
@@ -118,6 +126,7 @@ noteMutation.prototype.createNote = async (root, params, context) => {
 noteMutation.prototype.editNote = async (root, params) => {
     try {
 
+
         //find id from users models
         var note = await noteModel.findOneAndUpdate({ _id: params.noteID },
             {
@@ -126,6 +135,8 @@ noteMutation.prototype.editNote = async (root, params) => {
                     description: params.editDescription
                 }
             })
+
+
 
         /**
          * @return {String} message
@@ -149,7 +160,7 @@ noteMutation.prototype.editNote = async (root, params) => {
 }
 
 
-/*******************************************************************************************************************/
+/********************************************************   removeNote   ***********************************************************/
 /**
  * @description : remove APIs for remove note for using apollo-graphql
  * @purpose : For fetch data by using CURD operation
@@ -158,6 +169,7 @@ noteMutation.prototype.editNote = async (root, params) => {
  */
 noteMutation.prototype.removeNote = async (root, params) => {
     try {
+
 
         /**
          * @purpose : find id from database then remove from dataase
@@ -185,7 +197,7 @@ noteMutation.prototype.removeNote = async (root, params) => {
 
 
 
-/*******************************************************************************************************************/
+/*********************************************************   saveLabelToNote   **********************************************************/
 /**
  * @description : save label into notes APIs for updated notes for using apollo-graphql
  * @purpose : For fetch data by using CURD operation
@@ -195,13 +207,18 @@ noteMutation.prototype.removeNote = async (root, params) => {
 noteMutation.prototype.saveLabelToNote = async (root, params) => {
     try {
 
+
         //find labelID from noteModel Schema
         var id = await noteModel.find({ _id: params.noteID, "labelID": params.label_ID })
+
+
 
         //if id is already present
         if (id.length > 0) {
             return { "message": "This label is already added in note" }
         }
+
+
 
         //find id from noteModel and update(push) into notes
         var note = await noteModel.findOneAndUpdate({ _id: params.noteID },
@@ -211,14 +228,13 @@ noteMutation.prototype.saveLabelToNote = async (root, params) => {
                 }
             })
 
-        /**
-         * @return {String}, message
-         */
+        //condition
         if (!note) {
             return { "message": "label not added " }
         } else {
             return { "message": "label added on note successfully " }
         }
+
 
     } catch (err) {
         if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
@@ -234,7 +250,7 @@ noteMutation.prototype.saveLabelToNote = async (root, params) => {
 
 
 
-/*******************************************************************************************************************/
+/*******************************************************   removeLabelFromNote   **********************************************************/
 /**
  * @description : save label into notes APIs for updated notes for using apollo-graphql
  * @purpose : For fetch data by using CURD operation
@@ -244,13 +260,18 @@ noteMutation.prototype.saveLabelToNote = async (root, params) => {
 noteMutation.prototype.removeLabelFromNote = async (root, params) => {
     try {
 
+
         //find labelID from noteModel Schema
         var id = await noteModel.find({ "labelID": params.label_ID })
+
+
 
         //if id is already present
         if (!id.length > 0) {
             return { "message": "This label is not present in notes" }
         }
+
+
 
         //find id from noteModel and update(push) into notes
         var note = await noteModel.findOneAndUpdate({ _id: params.noteID },
@@ -260,9 +281,7 @@ noteMutation.prototype.removeLabelFromNote = async (root, params) => {
                 }
             })
 
-        /**
-         * @return {String}, message
-         */
+        //condition
         if (!note) {
             return { "message": "label not deleted " }
         } else {
@@ -271,6 +290,8 @@ noteMutation.prototype.removeLabelFromNote = async (root, params) => {
                     note.labelID.splice(i, 1);
                 }
             }
+
+            //return the response
             return { "message": "label delete from note successfully " }
         }
 
@@ -290,7 +311,7 @@ noteMutation.prototype.removeLabelFromNote = async (root, params) => {
 
 
 
-/*******************************************************************************************************************/
+/******************************************************   Reminder   *************************************************************/
 /**
  * @description : set Reminder APIs in notes for using apollo-graphql
  * @purpose : For fetch data by using CURD operation
@@ -298,16 +319,22 @@ noteMutation.prototype.removeLabelFromNote = async (root, params) => {
 noteMutation.prototype.Reminder = async (root, params) => {
     try {
 
+
         //find noteID from noteModel Schema
         var id = await noteModel.find({ "_id": params.noteID })
+
 
         //if id is already present
         if (!id.length > 0) {
             return { "message": "This noteID is not present in notes" }
         }
 
+
+        //set a date for reminder
         var date = new Date(params.reminder)
         console.log(date)
+
+
         //find id from noteModel and update(push) into notes
         var note = await noteModel.findOneAndUpdate({ _id: params.noteID },
             {
@@ -325,6 +352,8 @@ noteMutation.prototype.Reminder = async (root, params) => {
         if (!note) {
             return { "message": "reminder not set " }
         }
+
+        //return the response
         return { "message": "reminder set in note successfully" }
 
 
@@ -341,13 +370,14 @@ noteMutation.prototype.Reminder = async (root, params) => {
 
 
 
-/*******************************************************************************************************************/
+/*******************************************************   deleteReminder   ************************************************************/
 /**
  * @description : deleteReminder APIs from notes for using apollo-graphql
  * @purpose : For fetch data by using CURD operation
  */
 noteMutation.prototype.deleteReminder = async (root, params) => {
     try {
+
 
         //find noteID from noteModel Schema
         var id = await noteModel.find({ "_id": params.noteID })
@@ -356,6 +386,8 @@ noteMutation.prototype.deleteReminder = async (root, params) => {
         if (!id.length > 0) {
             return { "message": "This noteID is not present in notes" }
         }
+
+
 
         //find id from noteModel and update(push) into notes
         var note = await noteModel.findOneAndUpdate({ _id: params.noteID }, { $set: { reminder: "" } })
@@ -368,6 +400,8 @@ noteMutation.prototype.deleteReminder = async (root, params) => {
         if (!note) {
             return { "message": "reminder not remove " }
         }
+
+        //return the response
         return { "message": "reminder remove successfully" }
 
 
@@ -383,7 +417,7 @@ noteMutation.prototype.deleteReminder = async (root, params) => {
 }
 
 
-/*******************************************************************************************************************/
+/******************************************************   Archieve   *************************************************************/
 /**
  * @description : Archieve data APIs check whether is archieve or not for using apollo-graphql
  * @purpose : For fetch data by using CURD operation
@@ -404,6 +438,8 @@ noteMutation.prototype.Archieve = async (root, params, context) => {
         if (!payload) {
             return { "message": "token is not verify" }
         }
+
+
 
         //find that id id presen or not
         var checkNote = await noteModel.find({ _id: params.noteID })
@@ -429,6 +465,7 @@ noteMutation.prototype.Archieve = async (root, params, context) => {
             return { "message": "note Archieve" }
         }
 
+        //return the response
         return { "message": "note already Archieve" }
 
 
@@ -447,7 +484,7 @@ noteMutation.prototype.Archieve = async (root, params, context) => {
 
 
 
-/*******************************************************************************************************************/
+/*********************************************************   ArchieveRemove   **********************************************************/
 /**
  * @description : Archieve data APIs check whether is archieve or not for using apollo-graphql
  * @purpose : For fetch data by using CURD operation
@@ -492,6 +529,7 @@ noteMutation.prototype.ArchieveRemove = async (root, params, context) => {
                     }
                 })
 
+            //return the response
             return { "message": "note remove from Archieve" }
         }
 
@@ -511,7 +549,7 @@ noteMutation.prototype.ArchieveRemove = async (root, params, context) => {
 
 
 
-/*******************************************************************************************************************/
+/************************************************************     Trash      *******************************************************/
 /**
  * @description : Trash data APIs check whether is Trash/Delete or not for using apollo-graphql
  * @purpose : For fetch data by using CURD operation
@@ -557,6 +595,7 @@ noteMutation.prototype.Trash = async (root, params, context) => {
 
         }
 
+        //return the response
         return { "message": "This note is already in trash" }
 
 
@@ -576,7 +615,7 @@ noteMutation.prototype.Trash = async (root, params, context) => {
 
 
 
-/*******************************************************************************************************************/
+/*******************************************************   TrashRemove   ************************************************************/
 /**
  * @description : Trash data APIs check whether is Trash/Delete or not for using apollo-graphql
  * @purpose : For fetch data by using CURD operation
@@ -598,8 +637,12 @@ noteMutation.prototype.TrashRemove = async (root, params, context) => {
             return { "message": "token is not verify" }
         }
 
+
+
         //find that id id presen or not
         var checkNote = await noteModel.find({ _id: params.noteID })
+
+
 
         //check whether is false or true in database
         if (checkNote[0].trash == false) {

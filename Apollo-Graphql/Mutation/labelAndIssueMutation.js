@@ -27,7 +27,7 @@ var userAddLabelMutation = function () { }
 
 
 
-/*******************************************************************************************************************/
+/*******************************************************  createIssueForGit  ************************************************************/
 /**
  * @description : createIssueForGit APIs create issue for github using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -104,6 +104,8 @@ userAddLabelMutation.prototype.createIssueForGit = async (root, params, context)
         //issue saved in database
         var savedIssues = await issueSave.save()
         console.log(savedIssues)
+
+        //return the response
         return {
             "message": "issue created successfully",
         }
@@ -120,7 +122,7 @@ userAddLabelMutation.prototype.createIssueForGit = async (root, params, context)
 
 
 
-/*******************************************************************************************************************/
+/***********************************************************  updateIssueForGit  ********************************************************/
 /**
  * @description : updateIssueForGit APIs update issue for github using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -196,6 +198,8 @@ userAddLabelMutation.prototype.updateIssueForGit = async (root, params, context)
             return { "message": "issue not added in issue" }
         }
 
+
+        //return the response
         return {
             "message": "issue created successfully",
         }
@@ -212,7 +216,7 @@ userAddLabelMutation.prototype.updateIssueForGit = async (root, params, context)
 
 
 
-/*******************************************************************************************************************/
+/*******************************************************  deleteIssueForGit  ************************************************************/
 /**
  * @description : deleteIssueForGit APIs delete issue for github using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -261,6 +265,8 @@ userAddLabelMutation.prototype.deleteIssueForGit = async (root, params, context)
             query: `mutation {deleteIssue(input:{issueId:"${params.issueId}"}){ clientMutationId}}`,
         })
 
+
+        //return the response
         return {
             "message": "issue deleted successfully",
         }
@@ -277,7 +283,7 @@ userAddLabelMutation.prototype.deleteIssueForGit = async (root, params, context)
 
 
 
-/*******************************************************************************************************************/
+/********************************************************  addIssueCommentForGit  ***********************************************************/
 /**
  * @description : addIssueCommentForGit APIs create issue comments for github using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -344,6 +350,8 @@ userAddLabelMutation.prototype.addIssueCommentForGit = async (root, params, cont
             return { "message": "comment not added in issue" }
         }
 
+
+        //return the response
         return {
             "message": "comment added successfully",
         }
@@ -361,7 +369,7 @@ userAddLabelMutation.prototype.addIssueCommentForGit = async (root, params, cont
 
 
 
-/*******************************************************************************************************************/
+/********************************************************  deleteIssueCommentForGit  ********************************************************/
 /**
  * @description : deleteIssueCommentForGit APIs delete issue comments for github using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -441,6 +449,8 @@ userAddLabelMutation.prototype.deleteIssueCommentForGit = async (root, params, c
         if (!new12) {
             return { "message": "comment not deleted from issue" }
         }
+
+        //return the response
         return {
             "message": "comment delete successfully",
         }
@@ -458,7 +468,7 @@ userAddLabelMutation.prototype.deleteIssueCommentForGit = async (root, params, c
 
 
 
-/*******************************************************************************************************************/
+/**********************************************************   createLabelInGit   *********************************************************/
 /**
  * @description : createLabelInGit APIs for create a label for Git in github using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -514,6 +524,8 @@ userAddLabelMutation.prototype.createLabelInGit = async (root, params, context) 
 
         console.log("res", res)
 
+
+        //return the response
         return {
             "message": "Label Created successfully",
         }
@@ -529,7 +541,7 @@ userAddLabelMutation.prototype.createLabelInGit = async (root, params, context) 
 
 
 
-/*******************************************************************************************************************/
+/**********************************************************   updateLabelInGit   *********************************************************/
 /**
  * @description : updateLabelInGit APIs for update a label for Git in github using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -610,7 +622,7 @@ userAddLabelMutation.prototype.updateLabelInGit = async (root, params, context) 
             return { "message": "label not added in issue" }
         }
 
-
+        //return the response
         return {
             "message": "Label Updated successfully",
         }
@@ -627,7 +639,7 @@ userAddLabelMutation.prototype.updateLabelInGit = async (root, params, context) 
 
 
 
-/*******************************************************************************************************************/
+/***********************************************************  deleteLabelInGit  ********************************************************/
 /**
  * @description : deleteLabelInGit APIs delete label in github using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -677,6 +689,7 @@ userAddLabelMutation.prototype.deleteLabelInGit = async (root, params, context) 
 
         console.log("res", res)
 
+        //return the response
         return {
             "message": "Label delete successfully",
         }
@@ -694,7 +707,7 @@ userAddLabelMutation.prototype.deleteLabelInGit = async (root, params, context) 
 
 
 
-/*******************************************************************************************************************/
+/**********************************************************   GetLabelList   *********************************************************/
 /**
  * @description : GetLabelList APIs get list from github using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -744,6 +757,7 @@ userAddLabelMutation.prototype.GetLabelList = async (root, params, context) => {
 
         console.log("res", res)
 
+        //return the response
         return {
             "message": "Label Data Fetch successfully",
             "data": res.data
@@ -760,7 +774,7 @@ userAddLabelMutation.prototype.GetLabelList = async (root, params, context) => {
 
 
 
-/*******************************************************************************************************************/
+/************************************************************   addLabelInIssue   *******************************************************/
 /**
  * @description : addLabelInIssue APIs add label in issue github using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -838,6 +852,8 @@ userAddLabelMutation.prototype.addLabelInIssue = async (root, params, context) =
             return { "message": "label not added in issue" }
         }
 
+
+        //return the response
         return {
             "message": "add label in issue successfully",
             "data": res.data
@@ -854,7 +870,7 @@ userAddLabelMutation.prototype.addLabelInIssue = async (root, params, context) =
 
 
 
-/*******************************************************************************************************************/
+/*********************************************************  removeLabelFromIssue  **********************************************************/
 /**
  * @description : removeLabelInIssue APIs remove label from issue github using apollo-graphql
  * @purpose : For gitAuth verification by using CURD operation
@@ -902,6 +918,8 @@ userAddLabelMutation.prototype.removeLabelFromIssue = async (root, params, conte
         //send to axios_services and take response from it
         await axios_data('DELETE', url, access_token)
 
+
+        //return the response
         return {
             "message": "remove label from issue successfully",
         }

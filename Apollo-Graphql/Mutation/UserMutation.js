@@ -41,7 +41,7 @@ var errorMessage = {
     "message": "Something bad happend",
 }
 
-/*******************************************************************************************************************/
+/*********************************************************     signup     **********************************************************/
 /**
  * @description : register APIs for register a new user using apollo-graphql
  * @purpose : register user in database
@@ -61,6 +61,8 @@ userMutation.prototype.signup = async (root, params, context) => {
             return { "message": "not valid email", }
         }
 
+
+
         /**
          * @param {number}, password validation 
          */
@@ -69,6 +71,8 @@ userMutation.prototype.signup = async (root, params, context) => {
             return { "message": "Enter pasword more than 8 letters " }
         }
 
+
+
         //for email id cheking
         var verify = await userModel.find({ "email": params.email })
         if (verify.length > 0) {
@@ -76,9 +80,13 @@ userMutation.prototype.signup = async (root, params, context) => {
             return { "message": "email already exists" }
         }
 
+
+
         //for bcrypt password
         params.password = await bcrypt.hashSync(params.password, saltRounds)
         var usersMdl = new userModel(params)
+
+
 
         //save in database
         const uModel = usersMdl.save();
@@ -93,12 +101,6 @@ userMutation.prototype.signup = async (root, params, context) => {
             var token = jsonwebtoken.sign({ email: params.email }, process.env.SECRET_KEY, { expiresIn: 86400000 })
 
 
-            /**
-             * @param {token}, send token for verification to the mail
-             * @returns {String} message
-             */
-
-
 
             // var url = `${process.env.link}${token}`
             /**
@@ -111,6 +113,9 @@ userMutation.prototype.signup = async (root, params, context) => {
 
             //send mail
             sendMail.sendEmailFunction(url, params.email)
+
+
+            //return the response
             return {
                 "message": "Register successfull",
                 "token": token
@@ -134,7 +139,7 @@ userMutation.prototype.signup = async (root, params, context) => {
 
 
 
-/*******************************************************************************************************************/
+/*****************************************************    emailVerify    **************************************************************/
 /**
  * @description : emailverification APIs for verify a email that is valid or not using apollo-graphql
  * @purpose : For register emailverification by using CURD operation
@@ -172,6 +177,8 @@ userMutation.prototype.emailVerify = async (root, params, context) => {
             //throw new AuthenticationError('verification unsuccessfull');
             return { "message": "verification unsuccessfull" }
         }
+
+        //return the response
         return { "message": "verification successfull" }
 
 
@@ -190,7 +197,7 @@ userMutation.prototype.emailVerify = async (root, params, context) => {
 
 
 
-/*******************************************************************************************************************/
+/*****************************************************    login    **************************************************************/
 /**
  * @description : Login APIs for login user using apollo-graphql
  * @purpose : For login user by which is already exists in database using CURD operation
@@ -201,6 +208,8 @@ userMutation.prototype.emailVerify = async (root, params, context) => {
 userMutation.prototype.login = async (root, params, context) => {
 
     try {
+
+        //regex for email
         var emailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
         /**
@@ -225,6 +234,7 @@ userMutation.prototype.login = async (root, params, context) => {
             //throw new AuthenticationError('Email not verified');
             return { "message": "Email not verified" }
         }
+
 
         /**
          * @param {token}, generate a token with expire time and provide a secret key
@@ -261,7 +271,7 @@ userMutation.prototype.login = async (root, params, context) => {
         /**
          * @return {token}
          * @return {number} id
-         * @return {String} message
+         * @return {String} message, response
          */
         return {
             "token": token,
@@ -270,6 +280,7 @@ userMutation.prototype.login = async (root, params, context) => {
         }
 
     }
+
     catch (err) {
         if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
             return errorMessage;
@@ -285,7 +296,7 @@ userMutation.prototype.login = async (root, params, context) => {
 
 
 
-/*******************************************************************************************************************/
+/*******************************************************   forgotPassword   ************************************************************/
 /**
  * @description : forgotPassword APIs for updatePassword user using apollo-graphql
  * @purpose : For deletion by using CURD operation
@@ -295,6 +306,8 @@ userMutation.prototype.login = async (root, params, context) => {
 userMutation.prototype.forgotPassword = async (root, params, context) => {
 
     try {
+
+        //regex for email
         var emailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
 
@@ -343,6 +356,8 @@ userMutation.prototype.forgotPassword = async (root, params, context) => {
             //throw new AuthenticationError('!Error, mail not send ');
             return { "mesage": "!Error, mail not send " }
         }
+
+        //return the response
         return {
             "message": "Mail sent to your given email id",
             "token": token
@@ -364,7 +379,7 @@ userMutation.prototype.forgotPassword = async (root, params, context) => {
 
 
 
-/*******************************************************************************************************************/
+/***************************************************    resetPassword    ****************************************************************/
 /**
  * @description : resetPassword APIs for resetPassword user using apollo-graphql
  * @purpose : For resetPassword by using CURD operation
@@ -415,6 +430,8 @@ userMutation.prototype.resetPassword = async (root, params, context) => {
             //throw new AuthenticationError('Password not reset');
             return { "message": "Password not reset" }
         }
+
+        //return the response
         return { "message": "resetPassword Successfully" }
 
     } catch (err) {
@@ -431,7 +448,7 @@ userMutation.prototype.resetPassword = async (root, params, context) => {
 
 
 
-/*******************************************************************************************************************/
+/*****************************************************     update    **************************************************************/
 /**
  * @description : update APIs for updateUser data using apollo-graphql
  * @purpose : For updation by using CURD operation
@@ -467,6 +484,8 @@ userMutation.prototype.update = async (root, params, context) => {
             //throw new AuthenticationError('check user id or name, try again');
             return { "message": "check user id or name, try again" }
         }
+
+        //return the response
         return { "message": "user update successfully" };
 
 
@@ -484,7 +503,7 @@ userMutation.prototype.update = async (root, params, context) => {
 
 
 
-/*******************************************************************************************************************/
+/*********************************************************     remove     **********************************************************/
 /**
  * @description : REMOVE APIs for remove data from database using apollo-graphql
  * @purpose : remove user from database by using CURD operation
@@ -504,6 +523,8 @@ userMutation.prototype.remove = async (root, params) => {
             //throw new AuthenticationError('check user id, try again');
             return { "message": "check user id, try again" }
         }
+
+        //return the response
         return { "message": "user delete successfully" };
 
 
