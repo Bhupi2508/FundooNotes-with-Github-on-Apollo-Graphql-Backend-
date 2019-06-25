@@ -165,19 +165,26 @@ userResolver.prototype.resolvers = {
     },
     User: {
         async labels(root, params, context) {
+
+            //data retrive from redis
             var labels = await client.get('labels' + root._id)
             if (labels) {
                 var value = JSON.parse(labels)
+
+                //pagination
                 var offset = params.offset || 0;
                 var first = params.first || value.length;
                 return value.slice(offset, offset + first)
             }
             else {
+
+                //otherwise take from dataBase
                 var labels_find = await labelModel.find({ userID: root._id })
                 return labels_find
             }
         },
 
+        //notes retrive for active users
         async notes(root, params, context) {
             var regex1 = new RegExp(params.title)
             var regex2 = new RegExp(params.description)
@@ -185,6 +192,7 @@ userResolver.prototype.resolvers = {
             return notes
         },
 
+        //collabortaors for active users
         async colabs(root, params, context) {
             var colabs = await colabModel.find()
             return colabs
