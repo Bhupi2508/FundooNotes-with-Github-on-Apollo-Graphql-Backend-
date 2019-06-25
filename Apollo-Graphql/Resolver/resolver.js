@@ -168,7 +168,9 @@ userResolver.prototype.resolvers = {
             var labels = await client.get('labels' + root._id)
             if (labels) {
                 var value = JSON.parse(labels)
-                return value
+                var offset = params.offset || 0;
+                var first = params.first || value.length;
+                return value.slice(offset, offset + first)
             }
             else {
                 var labels_find = await labelModel.find({ userID: root._id })

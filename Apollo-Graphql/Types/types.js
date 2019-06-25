@@ -36,7 +36,7 @@ type User {
     password : String!
     message : String!
     token : String
-    labels : [Label]
+    labels(first:Int, offset: Int) : [Label]
     notes(title: String, description: String, first:Int, offset: Int) : [Notes]
     colabs : [Colab]
  }
