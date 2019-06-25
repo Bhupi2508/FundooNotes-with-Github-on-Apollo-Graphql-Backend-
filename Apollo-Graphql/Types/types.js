@@ -37,7 +37,7 @@ type User {
     message : String!
     token : String
     labels : [Label]
-    notes(title: String,description: String) : [Notes]
+    notes(title: String, description: String, first:Int, offset: Int) : [Notes]
     colabs : [Colab]
  }
 

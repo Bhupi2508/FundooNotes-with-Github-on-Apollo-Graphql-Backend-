@@ -179,7 +179,7 @@ userResolver.prototype.resolvers = {
         async notes(root, params, context) {
             var regex1 = new RegExp(params.title)
             var regex2 = new RegExp(params.description)
-            var notes = await noteModel.find({ userID: root._id, title: regex1, description: regex2 })
+            var notes = await noteModel.find({ userID: root._id, title: regex1, description: regex2 }).limit(params.first).skip(params.offset)
             return notes
         },
 
