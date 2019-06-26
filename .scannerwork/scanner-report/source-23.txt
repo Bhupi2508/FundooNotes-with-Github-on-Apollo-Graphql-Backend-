@@ -490,7 +490,7 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
 
 
         //send to axios_services and take response from it
-        var res_Data = await axios_service('GET', url, access_token)
+        await axios_service('GET', url, access_token)
 
         //console.log("\nRepository Branch Response Data : ", res.data);
         //console.log("\nRepository Branch Object Data : ", res.data[0].object.sha);
@@ -503,7 +503,7 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
          * @Data : send the given data depend on what you doing
          * @purpose : get response from given url
          */
-        var url = `${process.env.POST_CREATE_BRANCH}${params.gitUsername}/${params.repoName}/git/refs`
+        var url_data = `${process.env.POST_CREATE_BRANCH}${params.gitUsername}/${params.repoName}/git/refs`
         var data =
         {
             'ref': `refs/heads/${params.newBranch}`,
@@ -511,9 +511,9 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
         }
 
         //send to axios_services and take response from it
-        var res_Data = await axios_service('POST', url, access_token1, data)
+        var res_Data_1 = await axios_service('POST', url_data, access_token1, data)
 
-        console.log("\nRepository Branch after post Data : ", res_Data);
+        console.log("\nRepository Branch after post Data : ", res_Data_1);
 
         //return the response
         return { "message": "git branch create Successfully" }
@@ -795,7 +795,7 @@ gitAuthMutation.prototype.removeStarRepository = async (root, params, context) =
 
 
         //pass the query mutation for data fetching
-        const res = await fetch({
+        await fetch({
             query: `mutation {removeStar(input: {starrableId: "${process.env.GIT_ID}" clientMutationId:"${gitNodeID}"}) { clientMutationId}}`,
         })
 

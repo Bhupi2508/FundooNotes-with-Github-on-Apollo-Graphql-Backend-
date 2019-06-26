@@ -1,52 +1,27 @@
 /******************************************************************************
- *  @Execution      : default node          : cmd> nodemon sendMail.js
+ *  @Execution      : default node          : cmd> nodemon elasticPing.js
  *                      
  * 
- *  @Purpose        : send a mail 
+ *  @Purpose        : Elastic search ping the data from Index
  * 
- *  @description    : send mail for verifications token, url, response, etc.
+ *  @description    : Using ElasticSearch we can search anything from DataBase 
  * 
- *  @overview       : fundoo app
+ *  @overview       : ElasticSearch connections
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
  *  @version        : 1.0
- *  @since          : 04-april-2019
+ *  @since          : 08-jun-2019
  *
  ******************************************************************************/
 /**
  * @requires files
  */
-const nodemailer = require('nodemailer');
+var client = require('./elastic');
 
-/**
- * @purpose : send mail to the given mail id for verification
- * @exports sendEmailFunction
- * @param {String} url
- * @param {String} email
- * @returns {String} message
- */
-exports.sendEmailFunction = (url, email) => {
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-
-        //email and password are hidden by using of env file, these are users information 
-        auth: {
-            user: process.env.EMAIL,
-            pass: process.env.PASSWORD
-        },
-    });
-
-    const mailOptions = {
-        from: process.env.EMAIL,
-        to: email,
-        subject: 'fundoo password reset link ',
-        text: 'Please go through the e-mail verifaction link provided in this mail:\n\n' + url
-    };
-
-    //send mail from given mail id, by using authriozation info
-    var mail = transporter.sendMail(mailOptions)
-    if (!mail) {
-        return { "message": "is it is invalid, error on sending mail--" }
+// ping the client to be sure Elasticsearch is up
+client.cluster.health({},
+  function (err, resp, status) {
+    if (err) {
+      console.error('Elasticsearch cluster is down!');
     }
-    return { "message": "Messsage sent successfully" }
-
-}
+    console.log("-- Client Health --ok : ", resp);
+  });

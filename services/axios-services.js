@@ -32,7 +32,7 @@ exports.axiosService = (method, url, access_token, data) => {
         * @param {data} Data, data take from params
         * @purpose : get response from given url
         */
-        var a = axios(
+        axios(
             {
                 method: method,
                 url: url,

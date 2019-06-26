@@ -1,40 +1,52 @@
 /******************************************************************************
- *  @Execution      : default node          : cmd> nodemon authenticationUser.js
+ *  @Execution      : default node          : cmd> nodemon sendMail.js
  *                      
  * 
- *  @Purpose        : verification 
+ *  @Purpose        : send a mail 
  * 
- *  @description    : token verification by using jsonWebToken
+ *  @description    : send mail for verifications token, url, response, etc.
  * 
- *  @overview       : fundoo application
+ *  @overview       : fundoo app
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
  *  @version        : 1.0
- *  @since          : 27-april-2019
+ *  @since          : 04-april-2019
  *
  ******************************************************************************/
 /**
  * @requires files
  */
-var jwt = require('jsonwebtoken');
-
+const nodemailer = require('nodemailer');
 
 /**
- * @exports verification
+ * @purpose : send mail to the given mail id for verification
+ * @exports sendEmailFunction
+ * @param {String} url
+ * @param {String} email
+ * @returns {String} message
  */
-exports.verification = (token) => {
-    try {
+exports.sendEmailFunction = (url, email) => {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
 
-        /**
-         * @param {String}, secretKey is string used for hidden data
-         * @return {String}, value of verify token
-         * @param {String}, secretKey
-         */
-        var value = jwt.verify(token, process.env.SECRET_KEY)
-        return value
-    }
+        //email and password are hidden by using of env file, these are users information 
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.PASSWORD
+        },
+    });
 
-    catch (err) {
-        console.log("Error during Authentication time (Token Verification Time)")
-        return { "message": err }
+    const mailOptions = {
+        from: process.env.EMAIL,
+        to: email,
+        subject: 'fundoo password reset link ',
+        text: 'Please go through the e-mail verifaction link provided in this mail:\n\n' + url
+    };
+
+    //send mail from given mail id, by using authriozation info
+    var mail = transporter.sendMail(mailOptions)
+    if (!mail) {
+        return { "message": "is it is invalid, error on sending mail--" }
     }
+    return { "message": "Messsage sent successfully" }
+
 }

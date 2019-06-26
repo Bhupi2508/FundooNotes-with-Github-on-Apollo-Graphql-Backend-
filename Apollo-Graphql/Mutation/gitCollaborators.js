@@ -70,7 +70,7 @@ userAddInCollaborator.prototype.addCollaboratorGithub = async (root, params, con
          * @param {headers}
          * @purpose : get response from given url
          */
-        var res = await axios({
+        await axios({
             method: 'PUT',
             url: `${process.env.GIT_COLAB}${params.ownerName}/${params.repoName}/collaborators/${params.colabUserName}`,
             headers: {
@@ -135,7 +135,7 @@ userAddInCollaborator.prototype.removeCollaboratorGithub = async (root, params, 
          * @param {headers}
          * @purpose : get response from given url
          */
-        var res = await axios({
+        await axios({
             method: 'DELETE',
             url: `${process.env.GIT_COLAB}${params.ownerName}/${params.repoName}/collaborators/${params.colabUserName}`,
             headers: {

@@ -1,1 +1,1 @@
-*$Authentication/authenticationUser.js 2jsX)h
+*sendMailer/sendMail.js 2jsX5h

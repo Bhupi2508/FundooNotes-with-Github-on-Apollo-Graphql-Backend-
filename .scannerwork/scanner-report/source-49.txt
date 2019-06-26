@@ -1,8 +1,8 @@
 /******************************************************************************
- *  @Execution      : default node          : cmd> nodemon elasticAddData.js
+ *  @Execution      : default node          : cmd> nodemon elasticSearch.js
  *                      
  * 
- *  @Purpose        : Elastic search add a new data 
+ *  @Purpose        : Elastic search Search the data from the index 
  * 
  *  @description    : Using ElasticSearch we can search anything from DataBase 
  * 
@@ -17,20 +17,27 @@
  */
 var client = require('./elastic');
 
-// add a data to the index that has already been created
-client.index(
-    {
-        index: 'details',
-        id: '4',
-        type: 'constituencies',
-        body: {
-            "First Name": "Hemendra",
-            "Last Name": "Singh",
-            "Email": "heman@gmail.com",
-            "City": "Jaipur",
-            "Company": "TCS",
-        }
-    },
-    function (err, resp, status) {
-        console.log("Add new data : ", resp);
-    });
+//search data
+client.search(
+  {
+    index: 'details',
+    type: 'constituencies',
+    body: {
+      query: {
+        match: { "First Name": "cp" }
+      },
+    }
+  },
+  function (error, response, status) {
+    if (error) {
+      console.log("search error: " + error)
+    }
+    else {
+      console.log("--- Response ---");
+      console.log(response);
+      console.log("\n----- full details ----- ");
+      response.hits.hits.forEach(function (hit) {
+        console.log("\nDetails : ", hit);
+      })
+    }
+  });

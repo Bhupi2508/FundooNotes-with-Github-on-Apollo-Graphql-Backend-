@@ -261,7 +261,7 @@ userAddLabelMutation.prototype.deleteIssueForGit = async (root, params, context)
 
 
         //pass the query mutation for data fetching
-        const res = await fetch({
+        await fetch({
             query: `mutation {deleteIssue(input:{issueId:"${params.issueId}"}){ clientMutationId}}`,
         })
 
@@ -426,7 +426,7 @@ userAddLabelMutation.prototype.deleteIssueCommentForGit = async (root, params, c
 
         for (let i = 0; i < updateComment[0].issueComment.length; i++) {
             if (updateComment[0].issueComment[i].commentId === params.commentId) {
-                index = updateComment[0].issueComment.indexOf(updateComment[0].issueComment[i]);
+               var index = updateComment[0].issueComment.indexOf(updateComment[0].issueComment[i]);
             }
         }
 

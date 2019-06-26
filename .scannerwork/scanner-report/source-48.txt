@@ -1,8 +1,8 @@
 /******************************************************************************
- *  @Execution      : default node          : cmd> nodemon elastic.js
+ *  @Execution      : default node          : cmd> nodemon elasticCount.js
  *                      
  * 
- *  @Purpose        : Elastic search 
+ *  @Purpose        : Elastic search count the data
  * 
  *  @description    : Using ElasticSearch we can search anything from DataBase 
  * 
@@ -13,24 +13,16 @@
  *
  ******************************************************************************/
 /**
- * @requires, the Elasticsearch librray
+ * @requires files
  */
-var elasticsearch = require('elasticsearch');
+var client = require('./elastic');
 
-// instantiate an Elasticsearch client
-var client = new elasticsearch.Client(
-    {
-        host: process.env.ELASTIC_PORT,
-        log: 'trace',
-        keepAlive: false
-    }
-);
-
-console.log('#####################################################################################');
-console.log('##############                 Elastic Search Connected                ##############');
-console.log('#####################################################################################');
-
-/**
- * @exports client
- */
-module.exports = client;  
+//count the data which is in index
+client.count(
+  {
+    index: 'project',
+    type: 'constituencies'
+  },
+  function (err, resp, status) {
+    console.log("constituencies count : ", resp);
+  });
