@@ -1,2 +1,1 @@
-	
-elastic.js 2jsXh
+	model/labelSchema.js 2jsX/h

@@ -10,7 +10,7 @@ Environment variables:
   - GDK_PIXBUF_MODULE_FILE=/home/admin1/snap/vscode/common/.cache/gdk-pixbuf-loaders.cache
   - GDMSESSION=ubuntu
   - GIO_LAUNCHED_DESKTOP_FILE=/var/lib/snapd/desktop/applications/vscode_vscode.desktop
-  - GIO_LAUNCHED_DESKTOP_FILE_PID=1226
+  - GIO_LAUNCHED_DESKTOP_FILE_PID=4785
   - GNOME_DESKTOP_SESSION_ID=this-is-deprecated
   - GNOME_SHELL_SESSION_MODE=ubuntu
   - GPG_AGENT_INFO=/run/user/1000/gnupg/S.gpg-agent:0:1
@@ -32,11 +32,11 @@ Environment variables:
   - QT4_IM_MODULE=xim
   - QT_ACCESSIBILITY=1
   - QT_IM_MODULE=xim
-  - SESSION_MANAGER=local/admin1-desktop:@/tmp/.ICE-unix/2850,unix/admin1-desktop:/tmp/.ICE-unix/2850
+  - SESSION_MANAGER=local/admin1-desktop:@/tmp/.ICE-unix/3688,unix/admin1-desktop:/tmp/.ICE-unix/3688
   - SHELL=/bin/bash
   - SHLVL=2
   - SONARQUBE_SCANNER_PARAMS={}
-  - SSH_AGENT_PID=2945
+  - SSH_AGENT_PID=3822
   - SSH_AUTH_SOCK=/run/user/1000/keyring/ssh
   - TERM=xterm-256color
   - TERM_PROGRAM=vscode
@@ -96,7 +96,7 @@ System properties:
 
   - os.arch=amd64
   - os.name=Linux
-  - os.version=4.15.0-50-generic
+  - os.version=4.15.0-52-generic
   - path.separator=:
   - project.home=/home/admin1/Desktop/fundoo(apollo)
   - scanner.home=/home/admin1/.sonar/native-sonar-scanner/sonar-scanner-3.3.0.1492-linux
@@ -130,11 +130,12 @@ SonarQube plugins:
   - SonarQube :: Plugins :: SCM :: SVN 1.6.0.860 (scmsvn)
   - SonarJS 3.2.0.5506 (javascript)
 Global properties:
-  - sonar.core.id=AWraFZPhLZesnf9Vzxcv
-  - sonar.core.startTime=2019-06-03T06:39:20+0000
+  - sonar.core.id=AWreIWDMlcvLErbzIWNX
+  - sonar.core.startTime=2019-06-26T10:35:16+0000
 Settings for module: fundoo_Apollo_GraphqL
-  - sonar.exclusions=node_modules/**/*
+  - sonar.exclusions=/node_modules/**/*,/coverage/**/*
   - sonar.host.url=http://localhost:9000
+  - sonar.javascript.lcov.reportPath=coverage/lcov.info
   - sonar.projectBaseDir=/home/admin1/Desktop/fundoo(apollo)
   - sonar.projectKey=fundoo_Apollo_GraphqL
   - sonar.projectName=fundoo(apollo)

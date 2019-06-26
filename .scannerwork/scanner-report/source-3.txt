@@ -1,11 +1,52 @@
-const { Client } = require('elasticsearch');
-const client = new Client({
-  host: 'localhost:4000'
-});
+/********************************************************************************************************************
+ *  @Execution      : default node          : cmd> s3-Services.js
+ *                      
+ * 
+ *  @Purpose        : upload a pic on aws-s3 services 
+ * 
+ *  @description    : using apollo-graphql upload a pic in s3 services for gitHub
+ * 
+ *  @overview       : fundoo application  
+ *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
+ *  @version        : 1.0
+ *  @since          : 30-april-2019
+ *
+ *******************************************************************************************************************/
+/**
+ * @requires files
+ */
+var aws = require('aws-sdk')
+var multer = require('multer')
+var multerS3 = require('multer-s3')
 
-const main = async () => {
-  const health = await client.cluster.health();
-  console.log(health)
-}
+//for s3 upload a pic in S# bucket
+var s3 = new aws.S3({
+    bucketName: 'myfundoo',
+    region: 'ap-south-1',
+    accessKeyId: process.env.AWS_ID,
+    secretAccessKey: process.env.AWS_SECRET
+})
 
-main()
+/**
+ * @description : create a uplaod file for given aws information
+ *                and use multer for upload image
+ * @purpose : for github profile
+ */
+var upload = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: 'myfundoo',
+        metadata: function (req, file, cb) {
+            cb(null, { fieldName: file.fieldname });
+        },
+        key: function (req, file, cb) {
+            cb(null, Date.now().toString())
+        }
+    })
+})
+
+
+/**
+ * @exports upload
+ */
+module.exports = upload

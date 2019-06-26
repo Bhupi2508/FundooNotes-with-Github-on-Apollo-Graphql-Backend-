@@ -1,414 +1,959 @@
 /********************************************************************************************************************
- *  @Execution      : default node          : cmd> userMutations.js
- *                      
- * 
- *  @Purpose        : perform operations by using users
- * 
+ *  @Execution      : default node          : cmd> labelAndIssueMutation.js
+ *
+ *  @Purpose        : create a label and updated your issue in github
  *  @description    : By using mutation we can manipulate the data (CURD)
- * 
- *  @overview       : fundoo application  
+ *
+ *  @overview       : fundoo application
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
  *  @version        : 1.0
- *  @since          : 27-april-2019
+ *  @since          : 10-june-2019
  *
  *******************************************************************************************************************/
 /**
  * @requires files
  */
-var redis = require('async-redis')
-var bcrypt = require('bcrypt')
-var jsonwebtoken = require('jsonwebtoken')
-var userModel = require('../../model/userSchema')
-var labelModel = require('../../model/labelSchema')
-var sendMail = require('../../sendMailer/sendMail')
+var axios = require('axios')
+const { createApolloFetch } = require('apollo-fetch')
+var model = require('../../model/userSchema')
 var tokenVerify = require('../../Authentication/authenticationUser')
+var issueModel = require('../../model/gitIssueSchema')
+var axios_data = require('../../services/axios-services').axiosService
 
-//create a redis client
-var client = redis.createClient()
-
-//saltrounds for hash password
-var saltRounds = 10;
 
 //create a empty function
-var userMutation = function () { }
+var userAddLabelMutation = function () { }
 
 
-/*******************************************************************************************************************/
+
+
+/*******************************************************  createIssueForGit  ************************************************************/
 /**
- * @description : register APIs for register a new user using apollo-graphql
- * @purpose : register user in database
- * @param {root}, which has data information
- * @param {params}, input by users
- * @param {context}, req from queries, headers, server
- */
-userMutation.prototype.signup = async (root, params, context) => {
-
-    try {
-
-        //for email validation
-        var emailformat = (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/);
-
-        if (!emailformat.test(params.email)) {
-            return { "message": "not valid email", }
-        }
-
-        /**
-         * @param {number}, password validation 
-         */
-        if (params.password.length < 8) {
-            return { "message": "Enter pasword more than 8 letters " }
-        }
-
-        //for email id cheking
-        var verify = await userModel.find({ "email": params.email })
-        if (verify.length > 0) {
-            return { "message": "email already exists" }
-        }
-
-        //for bcrypt password
-        params.password = await bcrypt.hashSync(params.password, saltRounds)
-        var usersMdl = new userModel(params)
-
-        //save in database
-        const uModel = usersMdl.save();
-        if (!uModel) {
-            return { "message": "Register unsuccessfull" }
-        } else {
-
-            /**
-             * @param {token}, a token and send for verification
-             */
-            var token = jsonwebtoken.sign({ email: params.email }, process.env.SECRET_KEY, { expiresIn: 86400000 })
-
-
-            /**
-             * @param {token}, send token for verification to the mail
-             * @returns {String} message
-             */
-
-            // var url = `${process.env.link}${token}`
-            /**
-             * @purpose : we can also use origin(port) from headers for 
-             *             query, instead of hard code
-             * @param {String} token
-             */
-            var url = `${context.origin}?token=${token}`
-
-            sendMail.sendEmailFunction(url, params.email)
-            return {
-                "message": "Register successfull",
-                "token": token
-            }
-        }
-    } catch (err) {
-        console.log("!Error")
-        return { "message": err }
-    }
-}
-
-
-
-
-/*******************************************************************************************************************/
-/**
- * @description : emailverification APIs for verify a eamil that is valid or not using apollo-graphql
- * @purpose : For register emailverification by using CURD operation
- * @param {root}, which has data information
- * @param {params}, input by users
- * @param {context}, req from queries, headers, server
- */
-userMutation.prototype.emailVerify = async (root, params, context) => {
-    try {
-
-        /**
-         * @param {token}, send token for verify
-         * @returns {String} message, token verification
-         */
-        var afterVerify = tokenVerify.verification(context.token)
-        if (!afterVerify > 0) {
-            return { "message": "token is not verify" }
-        }
-
-        /**
-         * @param {String} email
-         * @returns {String} message
-         * @param {$set}, for verification
-         */
-        var update = await userModel.updateOne({ "email": afterVerify.email },
-            { $set: { verification: true } },
-            { new: true })
-        if (!update) {
-            return { "message": "verification unsuccessfull" }
-        }
-        return { "message": "verification successfull" }
-
-    } catch (err) {
-        console.log("!Error")
-        return { "message": err }
-    }
-}
-
-
-
-
-
-/*******************************************************************************************************************/
-/**
- * @description : Login APIs for login user using apollo-graphql
- * @purpose : For login user by which is already exists in database using CURD operation
- * @param {root}, which has data information
- * @param {params}, input by users
- * @param {context}, req from queries, headers, server
- */
-userMutation.prototype.login = async (root, params, context) => {
-
-    try {
-        var emailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-
-        /**
-         * @return {String} message
-         */
-        if (!emailformat.test(params.email)) {
-            return { "message": "not valid email" }
-        }
-
-        //find email that is present in database or not
-        var user = await userModel.find({ "email": params.email })
-        if (!user.length > 0) {
-            return { "message": "email is not present" }
-        }
-        if (user[0].verification === false) {
-            return { "message": "Email not verified" }
-        }
-
-        /**
-         * @param {token}, generate a token with expire time and provide a secret key
-         */
-        var token = jsonwebtoken.sign({ email: params.email, userID: user[0].id }, process.env.SECRET_KEY, { expiresIn: 86400000 })
-
-        //create a url
-        //var url = `${context.origin}?token=${token}`
-
-        //take id for current user from database
-        var id = user[0].id
-
-        //compare password that is present in database or not
-        const valid = await bcrypt.compare(params.password, user[0].password)
-
-        if (!valid) {
-            return { "message": "unauthonticate password" }
-        }
-
-
-        //find user Id from database
-        var labelFind = await labelModel.find({ userID: user[0]._id })
-
-        //set the labels in redis
-        await client.set('labels' + user[0]._id, JSON.stringify(labelFind))
-
-
-        /**
-         * @return {token}
-         * @return {number} id
-         * @return {String} message
-         */
-        return {
-            "token": token,
-            "id": id,
-            "message": "!Login....Successfully"
-        }
-
-    } catch (err) {
-        console.log("!Error")
-        return { "message": err }
-    }
-}
-
-
-
-
-
-/*******************************************************************************************************************/
-/**
- * @description : forgotPassword APIs for updatePassword user using apollo-graphql
- * @purpose : For deletion by using CURD operation
+ * @description : createIssueForGit APIs create issue for github using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
  * @param {*} root
  * @param {*} params
+ * @param {*} token
  */
-userMutation.prototype.forgotPassword = async (root, params, context) => {
-
-    try {
-        var emailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-
-        /**
-         * @purpose : check that email is valid or not
-         * @return {String} message
-         */
-        if (!emailformat.test(params.email)) {
-            return { "message": "not valid email" }
-        }
-
-        /**
-         * @purpose : find email that is present in database or not
-         * @return {String} message
-         */
-        var user = await userModel.find({ "email": params.email })
-        if (!user.length > 0) {
-            return { "message": "email is not present in database" }
-        }
-
-        /**
-         * @purpose : generate a token for send a mail
-         */
-        var token = jsonwebtoken.sign({ email: params.email }, process.env.SECRET_KEY, { expiresIn: 86400000 });
-
-        //send token to sendmail function, which is send to the link(token)
-        var url = `http://localhost:4000/?token=${token}`
-        //var url = `${context.origin}/graphql?token=${token}`
-
-        /**
-         * @param {token}, for sending mail to the mail
-         * @returns {String} message
-         */
-        var mail = sendMail.sendEmailFunction(url, params.email)
-        if (!mail > 0) {
-            return { "mesage": "!Error, mail not send " }
-        }
-        return {
-            "message": "Mail sent to your given email id",
-            "token": token
-        }
-
-    } catch (err) {
-        console.log("!Error")
-        return { "message": err }
-    }
-}
-
-
-
-
-/*******************************************************************************************************************/
-/**
- * @description : resetPassword APIs for resetPassword user using apollo-graphql
- * @purpose : For resetPassword by using CURD operation
- * @param {*} root
- * @param {*} params
- * @param {*} context 
- */
-userMutation.prototype.resetPassword = async (root, params, context) => {
+userAddLabelMutation.prototype.createIssueForGit = async (root, params, context) => {
     try {
 
-        /**
-         * @purpose : for token verification
-         * @returns {String} message
-         */
-        var afterVerify = tokenVerify.verification(context.token)
-        if (!afterVerify > 0) {
-            return { "message": "token is not verify" }
-        }
-
-        //password matching
-        if (params.newPassword != params.confirmPassword) {
-            return { "message": "password and confirm password are not match" }
-        }
-
-        //bcrypt new password
-        params.newPassword = await bcrypt.hashSync(params.newPassword, saltRounds)
 
         /**
-         * @purpose : for updated password
-         * @param {String}, message
-         * @param {$set}, new passowrd in database
-         * @returns {String} message
-         */
-        var update = await userModel.updateOne({ "email": afterVerify.email },
-            { $set: { password: params.newPassword } },
-            { new: true })
-
-        if (!update) {
-            return { "message": "Password not reset" }
-        }
-        return { "message": "resetPassword Successfully" }
-
-    } catch (err) {
-        console.log("!Error")
-        return { "message": err }
-    }
-}
-
-
-
-
-/*******************************************************************************************************************/
-/**
- * @description : update APIs for updateUser data using apollo-graphql
- * @purpose : For updation by using CURD operation
- * @param {*} root
- * @param {*} params
- */
-userMutation.prototype.update = async (root, params, context) => {
-
-    try {
-
-        /** 
-        * @purpose : for token v erification
-        * @returns {String} mess age
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
         */
         var afterVerify = tokenVerify.verification(context.token)
         if (!afterVerify > 0) {
             return { "message": "token is not verify" }
         }
 
-        var update = await userModel.updateOne({ _id: afterVerify.userID },
-            {
-                $set:
-                {
-                    firstName: params.firstName,
-                }
-            },
-            { new: true }
-        )
-        if (!update) {
-            return { "message": "check user id or name, try again" }
-        }
-        return { "message": "user update successfully" };
 
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+
+
+        // Access_token
+        var access_token = user[0].access_Token
+        console.log("access_token", access_token)
+
+
+
+        //fetch github data from github
+        const fetch = createApolloFetch({
+            uri: `${process.env.GIT_FETCH_REPO}${access_token}`
+        });
+
+
+
+        //pass the query mutation for data fetching
+        const res = await fetch({
+            query: `mutation {createIssue(input:{repositoryId:"${params.repositoryId}" title:"${params.title}" body:"${params.description}" assigneeIds:[${params.assigneeId}]}){ issue{number title body id assignees(first:10){nodes{ login }}}}}`,
+        })
+
+
+
+        console.log("res", res.data)
+        var assignees = [];
+
+
+
+        //pass params in issueModel
+        for (var i = 0; i < res.data.createIssue.issue.assignees.nodes.length; i++) {
+            assignees.push(res.data.createIssue.issue.assignees.nodes[i].login)
+        }
+
+
+
+        //pass those arguments
+        var issueSave = new issueModel({
+            title: res.data.createIssue.issue.title,
+            description: res.data.createIssue.issue.body,
+            issueID: res.data.createIssue.issue.id,
+            issueNumber: res.data.createIssue.issue.number,
+            assignees: assignees
+        })
+
+
+
+        //issue saved in database
+        var savedIssues = await issueSave.save()
+        console.log(savedIssues)
+
+        //return the response
+        return {
+            "message": "issue created successfully",
+        }
 
     } catch (err) {
-        console.log("!Error in catch")
-        return { "message": err }
+        console.log("!Error", err)
+        return { "message": "issue not created" }
     }
 }
 
 
 
 
-/*******************************************************************************************************************/
+
+
+
+/***********************************************************  updateIssueForGit  ********************************************************/
 /**
- * @description : REMOVE APIs for remove data from database using apollo-graphql
- * @purpose : remove user from database by using CURD operation
+ * @description : updateIssueForGit APIs update issue for github using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
  * @param {*} root
  * @param {*} params
- * @returns {number} remove user id
+ * @param {*} token
  */
-userMutation.prototype.remove = async (root, params) => {
-
+userAddLabelMutation.prototype.updateIssueForGit = async (root, params, context) => {
     try {
-        //find id and remove from the user Data
-        const removeduser = await userModel.findByIdAndRemove(params.id).exec();
-        if (!removeduser) {
-            return { "message": "check user id, try again" }
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
         }
-        return { "message": "user delete successfully" };
+
+
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+
+
+        // Access_token
+        var access_token = user[0].access_Token
+        console.log("access_token", access_token)
+
+
+
+        //fetch github data from github
+        const fetch = createApolloFetch({
+            uri: `${process.env.GIT_FETCH_REPO}${access_token}`
+        });
+
+
+
+        //pass the query mutation for data fetching
+        const res = await fetch({
+            query: `mutation {updateIssue(input:{id:"${params.issueId}" title:"${params.title}" body:"${params.description}"}){ issue { title body }}}`,
+        })
+
+
+        console.log("res", res.data)
+
+
+        /**
+      * @purpose : update title that is present in database or not
+      * @return {String} message
+      */
+        var issueFind = await issueModel.find({ issueID: params.issueId })
+        console.log("data", issueFind)
+        if (!issueFind.length > 0) {
+            return { "message": "issue is not present in database" }
+        }
+
+
+        // issue update in mongodb
+        var updateIssue = await issueModel.findOneAndUpdate({ issueID: params.issueId },
+            {
+                $set: {
+                    title: params.title,
+                    description: params.description
+                }
+            })
+        if (!updateIssue) {
+            return { "message": "issue not added in issue" }
+        }
+
+
+        //return the response
+        return {
+            "message": "issue created successfully",
+        }
 
     } catch (err) {
-        console.log("!Error")
-        return { "message": err }
+        console.log("!Error", err)
+        return { "message": "issue not created" }
     }
 }
 
+
+
+
+
+
+
+/*******************************************************  deleteIssueForGit  ************************************************************/
 /**
- * @exports userMutation
+ * @description : deleteIssueForGit APIs delete issue for github using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
  */
-module.exports = new userMutation()
+userAddLabelMutation.prototype.deleteIssueForGit = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+
+
+        // Access_token
+        var access_token = user[0].access_Token
+        console.log("access_token", access_token)
+
+
+
+        //fetch github data from github
+        const fetch = createApolloFetch({
+            uri: `${process.env.GIT_FETCH_REPO}${access_token}`
+        });
+
+
+
+        //pass the query mutation for data fetching
+        const res = await fetch({
+            query: `mutation {deleteIssue(input:{issueId:"${params.issueId}"}){ clientMutationId}}`,
+        })
+
+
+        //return the response
+        return {
+            "message": "issue deleted successfully",
+        }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": "issue not deleted" }
+    }
+}
+
+
+
+
+
+
+
+/********************************************************  addIssueCommentForGit  ***********************************************************/
+/**
+ * @description : addIssueCommentForGit APIs create issue comments for github using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+userAddLabelMutation.prototype.addIssueCommentForGit = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+
+
+        // Access_token
+        var access_token = user[0].access_Token
+        console.log("access_token", access_token)
+
+
+
+        //fetch github data from github
+        const fetch = createApolloFetch({
+            uri: `${process.env.GIT_FETCH_REPO}${access_token}`
+        });
+
+
+
+        //pass the query mutation for data fetching
+        const res = await fetch({
+            query: `mutation {addComment(input:{subjectId:"${params.issueId}" body:"${params.comment}"}){ subject { id } commentEdge { node {id body issue { title }}}}}`,
+        })
+
+
+        console.log("res", res.data)
+
+
+        // label update in mongodb
+        var updateComment = await issueModel.findOneAndUpdate({ issueID: params.issueId },
+            {
+                $push: {
+                    issueComment: {
+                        commentId: res.data.addComment.commentEdge.node.id,
+                        commentIssue: res.data.addComment.commentEdge.node.body
+                    }
+                }
+            })
+        if (!updateComment) {
+            return { "message": "comment not added in issue" }
+        }
+
+
+        //return the response
+        return {
+            "message": "comment added successfully",
+        }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": "comment not added" }
+    }
+}
+
+
+
+
+
+
+
+
+/********************************************************  deleteIssueCommentForGit  ********************************************************/
+/**
+ * @description : deleteIssueCommentForGit APIs delete issue comments for github using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+userAddLabelMutation.prototype.deleteIssueCommentForGit = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+
+
+        // Access_token
+        var access_token = user[0].access_Token
+        console.log("access_token", access_token)
+
+
+
+        //fetch github data from github
+        const fetch = createApolloFetch({
+            uri: `${process.env.GIT_FETCH_REPO}${access_token}`
+        });
+
+
+        //pass the query mutation for data fetching
+        const res = await fetch({
+            query: `mutation {deleteIssueComment(input:{id:"${params.commentId}" clientMutationId:"${params.clientMutationId}"}){ clientMutationId}}`,
+        })
+
+
+        console.log("res", res.data)
+
+
+        //comments deleted from mongodb
+        var updateComment = await issueModel.find({ "issueComment.commentId": params.commentId })
+
+        for (let i = 0; i < updateComment[0].issueComment.length; i++) {
+            if (updateComment[0].issueComment[i].commentId === params.commentId) {
+                index = updateComment[0].issueComment.indexOf(updateComment[0].issueComment[i]);
+            }
+        }
+
+
+
+        //slice the index
+        updateComment[0].issueComment.splice(index, 1);
+
+
+        //after slice update your database
+        var new12 = await issueModel.findOneAndUpdate({ "issueComment.commentId": params.commentId },
+            {
+                $set: {
+                    issueComment: updateComment[0].issueComment
+                }
+            })
+
+
+        //check whether update or not
+        if (!new12) {
+            return { "message": "comment not deleted from issue" }
+        }
+
+        //return the response
+        return {
+            "message": "comment delete successfully",
+        }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": "comment not deleted" }
+    }
+}
+
+
+
+
+
+
+
+
+/**********************************************************   createLabelInGit   *********************************************************/
+/**
+ * @description : createLabelInGit APIs for create a label for Git in github using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+userAddLabelMutation.prototype.createLabelInGit = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+
+
+        //for color validation
+        var colorValidation = (/^#([A - Fa - f0 - 9]{ 6 }| [A - Fa - f0 - 9]{ 3 }) $/);
+        if (!colorValidation.test(params.color)) {
+            //throw new AuthenticationError('not valid email');
+            return { "message": "Invalid color", }
+        }
+
+
+
+
+        // Access_token
+        var access_token = user[0].access_Token
+        console.log("access_token", access_token)
+
+
+        /**
+         * @function (Axios), which is used to handle http request
+         * @method (POST), POST data from response when hit the url
+         * @param {headers}
+         * @purpose : get response from given url
+         */
+        var url = `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/labels`
+        var data =
+        {
+            "name": `${params.labelName}`,
+            "description": `${params.description}`,
+            "color": `${params.color}`
+        }
+
+
+        //send to axios_services and take response from it
+        var res = await axios_data('POST', url, access_token, data)
+
+        console.log("res", res)
+
+
+        //return the response
+        return {
+            "message": "Label Created successfully",
+        }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": "label is not created+" }
+    }
+}
+
+
+
+
+
+
+/**********************************************************   updateLabelInGit   *********************************************************/
+/**
+ * @description : updateLabelInGit APIs for update a label for Git in github using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+userAddLabelMutation.prototype.updateLabelInGit = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+
+        //for color validation
+        var colorValidation = (/^#([A - Fa - f0 - 9]{ 6 }| [A - Fa - f0 - 9]{ 3 }) $/);
+        if (!colorValidation.test(params.color)) {
+            //throw new AuthenticationError('not valid email');
+            return { "message": "Invalid color", }
+        }
+
+
+        // Access_token
+        var access_token = user[0].access_Token
+        console.log("access_token", access_token)
+
+
+        /**
+         * @function (Axios), which is used to handle http request
+         * @method (PATCH), PATCH data from response when hit the url
+         * @param {headers}
+         * @purpose : get response from given url
+         */
+        var url = `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/labels/${params.currentLabelName}`
+        var data =
+        {
+            "name": `${params.labelName}`,
+            "description": `${params.description}`,
+            "color": `${params.color}`
+        }
+
+
+
+        //send to axios_services and take response from it
+        var res = await axios_data('PATCH', url, access_token, data)
+
+
+        console.log("res", res.data)
+
+
+        /**
+        * @purpose : update labelName that is present in database or not
+        * @return {String} message
+        */
+        var labelFind = await issueModel.find({ label: params.labelName[0] })
+
+        if (labelFind.length > 0) {
+            return { "message": "label is already present in database" }
+        }
+
+
+        // label update in mongodb
+        var updateLabel = await issueModel.findOneAndUpdate({ issueNumber: params.issueNumber },
+            {
+                $set: {
+                    label: params.labelName
+                }
+            })
+        if (!updateLabel) {
+            return { "message": "label not added in issue" }
+        }
+
+        //return the response
+        return {
+            "message": "Label Updated successfully",
+        }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": "Label is not updated" }
+    }
+}
+
+
+
+
+
+
+
+/***********************************************************  deleteLabelInGit  ********************************************************/
+/**
+ * @description : deleteLabelInGit APIs delete label in github using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+userAddLabelMutation.prototype.deleteLabelInGit = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+
+
+        // Access_token
+        var access_token = user[0].access_Token
+        console.log("access_token", access_token)
+
+
+        /**
+         * @function (Axios), which is used to handle http request
+         * @method (DELETE), DELETE data from response when hit the url
+         * @param {headers}
+         * @purpose : get response from given url
+         */
+        var url = `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/labels/${params.labelName}`
+
+
+        //send to axios_services and take response from it
+        var res = await axios_data('DELETE', url, access_token)
+
+        console.log("res", res)
+
+        //return the response
+        return {
+            "message": "Label delete successfully",
+        }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": "Label is not deleted" }
+    }
+}
+
+
+
+
+
+
+
+
+/**********************************************************   GetLabelList   *********************************************************/
+/**
+ * @description : GetLabelList APIs get list from github using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+userAddLabelMutation.prototype.GetLabelList = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+
+
+        // Access_token
+        var access_token = user[0].access_Token
+        console.log("access_token", access_token)
+
+
+        /**
+         * @function (Axios), which is used to handle http request
+         * @method (GET), GET data from response when hit the url
+         * @param {headers}
+         * @purpose : get response from given url
+         */
+        var url = `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/labels`
+
+
+        //send to axios_services and take response from it
+        var res = await axios_data('GET', url, access_token)
+
+        console.log("res", res)
+
+        //return the response
+        return {
+            "message": "Label Data Fetch successfully",
+            "data": res.data
+        }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": "Label data not fetch successfully" }
+    }
+}
+
+
+
+
+
+
+/************************************************************   addLabelInIssue   *******************************************************/
+/**
+ * @description : addLabelInIssue APIs add label in issue github using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+userAddLabelMutation.prototype.addLabelInIssue = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+
+
+        // Access_token
+        var access_token = user[0].access_Token
+        console.log("access_token", access_token)
+
+
+        /**
+         * @function (Axios), which is used to handle http request
+         * @method (GET), GET data from response when hit the url
+         * @param {headers}
+         * @purpose : get response from given url
+         */
+        var url = `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/issues/${params.issueNumber}/labels`
+        var data =
+        {
+            "labels": params.labelName
+        }
+
+
+
+        //send to axios_services and take response from it
+        var res = await axios_data('POST', url, access_token, data)
+
+        console.log("res", res.data)
+
+
+        /**
+         * @purpose : find labelName that is present in database or not
+         * @return {String} message
+         */
+        var labelFind = await issueModel.find({ label: params.labelName[0], issueNumber: params.issueNumber })
+        console.log(labelFind)
+        if (labelFind.length > 0) {
+            return { "message": "label is already present in database" }
+        }
+
+
+        // label update in mongodb
+        var updateLabel = await issueModel.findOneAndUpdate({ issueNumber: params.issueNumber },
+            {
+                $push: {
+                    label: params.labelName
+                }
+            })
+        if (!updateLabel) {
+            return { "message": "label not added in issue" }
+        }
+
+
+        //return the response
+        return {
+            "message": "add label in issue successfully",
+            "data": res.data
+        }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": "label not added in issue" }
+    }
+}
+
+
+
+
+
+
+/*********************************************************  removeLabelFromIssue  **********************************************************/
+/**
+ * @description : removeLabelInIssue APIs remove label from issue github using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+userAddLabelMutation.prototype.removeLabelFromIssue = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+
+
+        // Access_token
+        var access_token = user[0].access_Token
+        console.log("access_token", access_token)
+
+
+        /**
+         * @function (Axios), which is used to handle http request
+         * @method (DELETE), DELETE data from response when hit the url
+         * @param {headers}
+         * @purpose : get response from given url
+         */
+        var url = `${process.env.DELETE_BRANCH}${params.OwnerName}/${params.repoName}/issues/${params.issueNumber}/labels/${params.labelName}`
+
+
+        //send to axios_services and take response from it
+        await axios_data('DELETE', url, access_token)
+
+
+        //return the response
+        return {
+            "message": "remove label from issue successfully",
+        }
+
+    } catch (err) {
+        console.log("!Error", err)
+        return { "message": "label not removed from issue" }
+    }
+}
+
+
+
+
+
+
+
+/**
+* @exports userAddLabelMutation
+*/
+module.exports = new userAddLabelMutation()

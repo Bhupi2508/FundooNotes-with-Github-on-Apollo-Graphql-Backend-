@@ -1,29 +1,47 @@
-import { GraphQLSchema, GraphQLObjectType } from 'graphql';
-import elasticsearch from 'elasticsearch';
-import { elasticApiFieldConfig } from 'graphql-compose-elasticsearch';
+/******************************************************************************
+ *  @Execution      : default node          : cmd> labelSchema.js
+ *                      
+ * 
+ *  @Purpose        : MongoDB schema for labels
+ * 
+ *  @description    : using this schema we store labels data in database
+ * 
+ *  @overview       : fundoo application
+ *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
+ *  @version        : 1.0
+ *  @since          : 29-april-2019
+ *
+ ******************************************************************************/
+/**
+ * @requires files
+ */
+var mongoose = require('mongoose');
 
-const schema = new GraphQLSchema({
-  query: new GraphQLObjectType({
-    name: 'Query',
-    fields: {
-      elastic50: elasticApiFieldConfig(
-        // you may provide existed Elastic Client instance
-        new elasticsearch.Client({
-          host: 'http://localhost:9200',
-          apiVersion: '5.0',
-        })
-      ),
+//connect the schema with database
+var mongoSchema = mongoose.Schema;
 
-      // or may provide just config
-      elastic24: elasticApiFieldConfig({
-        host: 'http://user:pass@localhost:9200',
-        apiVersion: '2.4',
-      }),
 
-      elastic17: elasticApiFieldConfig({
-        host: 'http://user:pass@localhost:9200',
-        apiVersion: '1.7',
-      }),
+/**
+ * @purpose : store data in database based on this schema
+ * @param {number} userID
+ * @param {String} labelName
+ * @param {timestamps} timestamps
+ */
+var labelSchema = new mongoSchema({
+    userID: {
+        type: mongoSchema.Types.ObjectId,
+        ref: 'schemaData'
     },
-  }),
-});
+    labelName: {
+        type: String,
+        required: [true, "labelName is required"],
+    }
+},
+    {
+        timestamps: true
+    })
+
+
+//connect database using mongoose
+var userLabel = mongoose.model('label', labelSchema);
+module.exports = userLabel

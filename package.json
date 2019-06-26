@@ -4,9 +4,11 @@
   "description": "Fundoo application using apollo graphql",
   "main": "index.js",
   "scripts": {
-    "test": "mocha testing/test.js",
+    "test": "nyc --reporter=lcov --reporter=text-lcov mocha testing/test.js",
+    "coverage": "./node_modules/.bin/nyc -r cobertura -r text-summary -r html npm test",
     "nodemon": "nodemon server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "showcoverage": "open coverage/lcov-report/index.html"
   },
   "author": "Bhupendra Singh",
   "license": "ISC",
@@ -33,6 +35,7 @@
     "multer-s3": "^2.9.0",
     "nodemailer": "^6.1.1",
     "nodemon": "^1.18.11",
+    "nyc": "^14.1.1",
     "redis": "^2.8.0",
     "request-promise": "^4.2.4",
     "supertest": "^4.0.2"

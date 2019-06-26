@@ -1,111 +1,235 @@
 /********************************************************************************************************************
- *  @Execution      : default node          : cmd> collaboratorMutation.js
- *                      
- *  @Purpose        : perform operations by using users for collaborate
- * 
+ *  @Execution      : default node          : cmd> addCollaboratorsInGithub.js
+ *
+ *  @Purpose        : add collaborators in github with another collaborators
+ *
  *  @description    : By using mutation we can manipulate the data (CURD)
- * 
- *  @overview       : fundoo application  
+ *
+ *  @overview       : fundoo application
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
  *  @version        : 1.0
- *  @since          : 15-may-2019
+ *  @since          : 04-june-2019
  *
  *******************************************************************************************************************/
 /**
  * @requires files
  */
-var userModel = require('../../model/userSchema')
-var noteModel = require('../../model/noteSchema')
-var sendMail = require('../../sendMailer/sendMail')
-var colModel = require('../../model/collabatorsSchema');
+var model = require('../../model/userSchema')
+var axios = require('axios')
+var jwt = require('jsonwebtoken')
 var tokenVerify = require('../../Authentication/authenticationUser')
 
-
-//saltrounds for hash password
-var saltRounds = 10;
-
 //create a empty function
-var collaboratorMutation = function () { }
+var userAddInCollaborator = function () { }
 
 
-/*******************************************************************************************************************/
+//error message
+var errorMessage = {
+    "message": "Something bad happend",
+}
+
+
+/********************************************************  addCollaboratorGithub  ***********************************************************/
 /**
- * @description : addCollaboration APIs for collaborators to add user using apollo-graphql
- * @purpose : addCollaborator ID for which user you add in database
- * @param {root}, which has data information
- * @param {params}, input by users
- * @param {context}, req from queries, headers, server
+ * @description : addCollaboratorGithub APIs for add collaborators in github repository using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
  */
-collaboratorMutation.prototype.addCollaboration = async (root, args, context) => {
-
+userAddInCollaborator.prototype.addCollaboratorGithub = async (root, params, context) => {
     try {
-        if (!context.token) {
-            return { "message": "token not provided" }
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
         }
 
 
-        /**
-         * @var payload, to take token after verify
-         */
-        var payload = await tokenVerify.verification(context.token)
 
-
-        /**
-         * @var user, find the user ID from userModel
-         */
-        var user = await userModel.find({ "_id": payload.userID });
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
         if (!user) {
-            return { "message": "user not found" }
+            return { "message": "user not verified" }
         }
+
+
+
+        // Access_token
+        var access_token = user[0].access_Token
 
 
         /**
-         * @var note,find the note ID from noteModel
+         * @function (Axios), which is used to handle http request
+         * @method (PUT), PUT data from response when hit the url
+         * @param {headers}
+         * @purpose : get response from given url
          */
-        var note = await noteModel.find({ "_id": args.noteID })
-        if (!note) {
-            return { "message": "note not found" }
+        var res = await axios({
+            method: 'PUT',
+            url: `${process.env.GIT_COLAB}${params.ownerName}/${params.repoName}/collaborators/${params.colabUserName}`,
+            headers: {
+                Authorization: `Bearer ${access_token}`
+            }
+        })
+        //console.log("\nRepository collaborators Details : ", res);
+
+        //return the response
+        return { "message": "user collaborators added successfully" }
+
+    } catch (err) {
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
         }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
+    }
+}
+
+
+
+
+
+
+/*****************************************************  removeCollaboratorGithub  ***********************************************************/
+/**
+ * @description : removeCollaboratorGithub APIs for delete collaborators in github repository using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+userAddInCollaborator.prototype.removeCollaboratorGithub = async (root, params, context) => {
+    try {
 
 
         /**
-         * @var colab, find colab ID from colModel
-         */
-        var colab = await colModel.find({ "collaboratorID": args.colabID })
-        if (colab.length > 0) {
-            return { "message": "user already colabrated" }
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
         }
 
-        //take those var from input 
-        var newColab = new colModel({
-            "userID": payload.userID,
-            "noteID": args.noteID,
-            "collaboratorID": args.colabID
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+        // Access_token
+        var access_token = user[0].access_Token
+
+
+        /**
+         * @function (Axios), which is used to handle http request
+         * @method (DELETE), DELETE data from response when hit the url
+         * @param {headers}
+         * @purpose : get response from given url
+         */
+        var res = await axios({
+            method: 'DELETE',
+            url: `${process.env.GIT_COLAB}${params.ownerName}/${params.repoName}/collaborators/${params.colabUserName}`,
+            headers: {
+                Authorization: `Bearer ${access_token}`
+            }
+        })
+        //console.log("\nRepository collaborators Details : ", res);
+
+        //return the response
+        return { "message": "collborators remove successfully" }
+
+    } catch (err) {
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
+    }
+}
+
+
+
+
+
+/*******************************************************  gitCollaboratorsList  ************************************************************/
+/**
+ * @description : gitCollaboratorsList APIs for show all the collaborators list using apollo-graphql
+ * @purpose : For gitAuth verification by using CURD operation
+ * @param {*} root
+ * @param {*} params
+ * @param {*} token
+ */
+userAddInCollaborator.prototype.gitCollaboratorsList = async (root, params, context) => {
+    try {
+
+
+        /**
+        * @param {token}, send token for verify
+        * @returns {String} message, token verification 
+        */
+        var afterVerify = tokenVerify.verification(context.token)
+        if (!afterVerify > 0) {
+            return { "message": "token is not verify" }
+        }
+
+        //find token from dataBase
+        var user = await model.find({ _id: afterVerify.userID })
+        if (!user) {
+            return { "message": "user not verified" }
+        }
+
+        // Access_token
+        var access_token = user[0].access_Token
+
+
+        /**
+         * @function (Axios), which is used to handle http request
+         * @method (GET), GET data from response when hit the url
+         * @param {headers}
+         * @purpose : get response from given url
+         */
+        var res = await axios({
+            method: 'GET',
+            url: `${process.env.GIT_COMMITS}${params.ownerName}/${params.repoName}/collaborators`,
+            headers: {
+                Authorization: `Bearer ${access_token}`
+            }
         })
 
-        //save in given database
-        var save = newColab.save()
+        console.log("res", res.data);
 
-
-        //email which we collaborate
-        var findEmail = await userModel.find({ _id: args.colabID })
-        var email = findEmail[0].email
-
-        //message for mail
-        var url = "This " + email + " email is collaborate with me for Fundoo Notes"
-
-        //condition
-        if (save) {
-            sendMail.sendEmailFunction(url, email)
-            return { "message": "colabbed successfully" }
+        //create a array
+        var array = [];
+        for (var i = 0; i < res.data.length; i++) {
+            console.log("\nRepository collaborators Details : ", res.data[i].login);
+            array.push(res.data[i].login)
         }
 
-        return { "message": "colab unsuccessful" }
-
+        //return the response
+        return {
+            "message": "Collaborators list fetch successfully",
+            "data": res.data
+        }
 
     } catch (err) {
-        console.log("!Error")
-        return { "message": err }
+        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
+            return errorMessage;
+        }
+        else {
+            errorMessage.message = err.message;
+            return errorMessage
+        }
     }
 }
 
@@ -113,68 +237,8 @@ collaboratorMutation.prototype.addCollaboration = async (root, args, context) =>
 
 
 
-
-/*******************************************************************************************************************/
 /**
- * @description : removeCollaboration APIs for collaborators to remove from user using apollo-graphql
- * @purpose : removeCollaboration ID for which user you remove from database
- * @param {root}, which has data information
- * @param {params}, input by users
- * @param {context}, req from queries, headers, server
- */
-collaboratorMutation.prototype.removeCollaboration = async (root, args, context) => {
+* @exports userAddInCollaborator
+*/
+module.exports = new userAddInCollaborator()
 
-    try {
-        if (!context.token) {
-            return { "message": "token not provided" }
-        }
-
-
-        /**
-         * @var payload, to take token after verify
-         */
-        var payload = await tokenVerify.verification(context.token)
-
-
-        /**
-         * @var user, find the user ID from userModel
-         */
-        var user = await userModel.find({ "_id": payload.userID });
-        if (!user) {
-            return { "message": "user not found" }
-        }
-
-
-        /**
-         * @var note,find the note ID from noteModel
-         */
-        var note = await noteModel.find({ "_id": args.noteID })
-        if (!note) {
-            return { "message": "note not found" }
-        }
-
-
-        /**
-         * @var colab, find colab ID from colModel
-         */
-        var findColab = await colModel.findOneAndDelete({ "collaboratorID": args.colabID })
-        if (findColab) {
-            return { "message": "collaborator removed successfully" }
-        }
-
-        return { "message": "This collaborator is not present" }
-
-
-    } catch (err) {
-        console.log("!Error")
-        return { "message": err }
-    }
-}
-
-
-
-
-/**
- * @exports collaboratorMutation
- */
-module.exports = new collaboratorMutation()

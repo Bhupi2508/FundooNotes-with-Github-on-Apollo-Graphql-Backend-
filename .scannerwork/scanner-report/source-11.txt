@@ -15,14 +15,17 @@
  * @requires files
  */
 const redis = require("async-redis");
-const client = redis.createClient()
+const client = redis.createClient({
+    host: 'localhost',
+    port: process.env.REDIS_PORT
+})
 const labelModel = require('../../model/labelSchema')  //labelModels  
 const noteModel = require('../../model/noteSchema')   //noteModel
 const colabModel = require('../../model/collabatorsSchema')   //colabModel
 const user = require('../Query/query').user;   //user queries
 const labelUser = require('../Query/query').labelUser   //labelUser queries
 const notesUser = require('../Query/query').notesUser   //notesUser queries
-const gitUser = require('../Query/query').gitUser    //gitUser queries
+const gitRepo = require('../Query/query').gitRepo   //gitUser queries
 const colabUser = require('../Query/query').colabUser   //colabUser queries
 const searchNoteByTitle = require('../Query/query').searchNoteByTitle   //searchNoteByTitle queries
 const searchNoteByDescription = require('../Query/query').searchNoteByDescription   //searchNoteByDescription queries
@@ -61,8 +64,27 @@ const deleteGitBranch = require('../Mutation/gitAuthMutation').deleteGitBranch  
 const createGitRepository = require('../Mutation/gitAuthMutation').createGitRepository   //createGitRepository mutation
 const removeGitRepository = require('../Mutation/gitAuthMutation').removeGitRepository   //removeGitRepository mutation
 const picUpload = require('../Mutation/uploadPicMutation').picUpload   //picUpload mutation
-const addCollaboration = require('../Mutation/collaboratorMutation').addCollaboration //picUpload mutation
+const addCollaboration = require('../Mutation/collaboratorMutation').addCollaboration //addCollaboration mutation
 const removeCollaboration = require('../Mutation/collaboratorMutation').removeCollaboration  //removeCollaboration mutation
+const addCollaboratorGithub = require('../Mutation/gitCollaborators').addCollaboratorGithub  //addCollaboratorGithub mutation
+const removeCollaboratorGithub = require('../Mutation/gitCollaborators').removeCollaboratorGithub  //removeCollaboratorGithub
+const changeStatusInGithub = require('../Mutation/gitAuthMutation').changeStatusInGithub   //changeStatusInGithub mutation
+const gitRepoCommits = require('../Mutation/gitAuthMutation').gitRepoCommits   //gitRepoCommits mutation
+const gitCollaboratorsList = require('../Mutation/gitCollaborators').gitCollaboratorsList  //gitRepoCommits mutation
+const gitRepoWebhook = require('../Mutation/gitAuthMutation').gitRepoWebhook   //gitRepoWebhook mutation
+const createIssueForGit = require('../Mutation/labelAndIssueMutation').createIssueForGit  //createIssueForGit mutation
+const updateIssueForGit = require('../Mutation/labelAndIssueMutation').updateIssueForGit  //updateIssueForGit mutation
+const deleteIssueForGit = require('../Mutation/labelAndIssueMutation').deleteIssueForGit  //deleteIssueForGit mutation
+const addIssueCommentForGit = require('../Mutation/labelAndIssueMutation').addIssueCommentForGit  //addIssueCommentForGit mutation
+const deleteIssueCommentForGit = require('../Mutation/labelAndIssueMutation').deleteIssueCommentForGit  //deleteIssueCommentForGit mutation
+const createLabelInGit = require('../Mutation/labelAndIssueMutation').createLabelInGit  //createLabelInGit mutation
+const updateLabelInGit = require('../Mutation/labelAndIssueMutation').updateLabelInGit  //updateLabelInGit mutation
+const deleteLabelInGit = require('../Mutation/labelAndIssueMutation').deleteLabelInGit  //deleteLabelInGit mutation
+const GetLabelList = require('../Mutation/labelAndIssueMutation').GetLabelList  //GetLabelList mutation
+const addLabelInIssue = require('../Mutation/labelAndIssueMutation').addLabelInIssue  //addLabelInIssue mutation
+const removeLabelFromIssue = require('../Mutation/labelAndIssueMutation').removeLabelFromIssue  //removeLabelFromIssue mutation
+
+
 
 //create a empty function
 var userResolver = function () { }
@@ -79,7 +101,7 @@ userResolver.prototype.resolvers = {
         user,
         labelUser,
         notesUser,
-        gitUser,
+        gitRepo,
         colabUser,
         searchNoteByTitle,
         searchNoteByDescription
@@ -121,29 +143,58 @@ userResolver.prototype.resolvers = {
         removeGitRepository,
         picUpload,
         addCollaboration,
-        removeCollaboration
+        removeCollaboration,
+        addCollaboratorGithub,
+        removeCollaboratorGithub,
+        changeStatusInGithub,
+        gitRepoCommits,
+        gitCollaboratorsList,
+        gitRepoWebhook,
+        createLabelInGit,
+        updateIssueForGit,
+        updateLabelInGit,
+        GetLabelList,
+        addLabelInIssue,
+        deleteLabelInGit,
+        createIssueForGit,
+        deleteIssueForGit,
+        removeLabelFromIssue,
+        addIssueCommentForGit,
+        deleteIssueCommentForGit
 
     },
+
+    //user queries, whos has active 
     User: {
         async labels(root, params, context) {
+
+            //data retrive from redis
             var labels = await client.get('labels' + root._id)
             if (labels) {
                 var value = JSON.parse(labels)
-                return value
+
+                //pagination
+                var offset = params.offset || 0;
+                var first = params.first || value.length;
+                return value.slice(offset, offset + first)
             }
             else {
+
+                //otherwise take from dataBase
                 var labels_find = await labelModel.find({ userID: root._id })
                 return labels_find
             }
         },
 
+        //notes retrive for active users
         async notes(root, params, context) {
             var regex1 = new RegExp(params.title)
             var regex2 = new RegExp(params.description)
-            var notes = await noteModel.find({ userID: root._id, title: regex1, description: regex2 })
+            var notes = await noteModel.find({ userID: root._id, title: regex1, description: regex2 }).limit(params.first).skip(params.offset)
             return notes
         },
 
+        //collabortaors for active users
         async colabs(root, params, context) {
             var colabs = await colabModel.find()
             return colabs

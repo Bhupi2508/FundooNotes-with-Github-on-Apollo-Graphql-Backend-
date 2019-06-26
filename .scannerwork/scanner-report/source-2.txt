@@ -1,52 +1,56 @@
 /********************************************************************************************************************
- *  @Execution      : default node          : cmd> s3-Services.js
+ *  @Execution      : default node          : cmd> axios-services.js
  *                      
  * 
- *  @Purpose        : upload a pic on aws-s3 services 
+ *  @Purpose        : Axios services for send the data to server and take response 
  * 
- *  @description    : using apollo-graphql upload a pic in s3 services for gitHub
+ *  @description    : using apollo-graphql upload a pic in axios services for gitHub
  * 
  *  @overview       : fundoo application  
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
  *  @version        : 1.0
- *  @since          : 30-april-2019
+ *  @since          : 19-june-2019
  *
  *******************************************************************************************************************/
 /**
  * @requires files
  */
-var aws = require('aws-sdk')
-var multer = require('multer')
-var multerS3 = require('multer-s3')
-
-//for s3 upload a pic in S# bucket
-var s3 = new aws.S3({
-    bucketName: 'myfundoo',
-    region: 'ap-south-1',
-    accessKeyId: process.env.AWS_ID,
-    secretAccessKey: process.env.AWS_SECRET
-})
+const axios = require("axios")
 
 /**
- * @description : create a uplaod file for given aws information
- *                and use multer for upload image
- * @purpose : for github profile
+ * @exports axiosService
+ * @param {String} url
+ * @param {method} method
  */
-var upload = multer({
-    storage: multerS3({
-        s3: s3,
-        bucket: 'myfundoo',
-        metadata: function (req, file, cb) {
-            cb(null, { fieldName: file.fieldname });
-        },
-        key: function (req, file, cb) {
-            cb(null, Date.now().toString())
-        }
+exports.axiosService = (method, url, access_token, data) => {
+    return new Promise((resolve, reject) => {
+
+        /**
+        * @function (Axios), which is used to handle http request
+        * @method (method), method, that which method you perform
+        * @param {headers}
+        * @param {data} Data, data take from params
+        * @purpose : get response from given url
+        */
+        var a = axios(
+            {
+                method: method,
+                url: url,
+                headers:
+                {
+                    Accept: "application/json",
+                    Authorization: `Bearer ${access_token}`
+                },
+                data: data
+            }
+        )
+            .then(function (res) {
+                resolve(res)
+            })
+            .catch(function (err) {
+                console.log("Error in axios service=>", err)
+                reject(err)
+            })
     })
-})
+}
 
-
-/**
- * @exports upload
- */
-module.exports = upload

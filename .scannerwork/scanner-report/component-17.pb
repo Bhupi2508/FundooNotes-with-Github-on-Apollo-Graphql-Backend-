@@ -1,1 +1,1 @@
-/Apollo-Graphql/Mutation/collaboratorMutation.js 2jsX´h
++Apollo-Graphql/Mutation/gitCollaborators.js 2jsXõh

@@ -1,1 +1,1 @@
-,Apollo-Graphql/Mutation/uploadPicMutation.js 2jsXAh
+Apollo-Graphql/Query/query.js 2jsXŒh

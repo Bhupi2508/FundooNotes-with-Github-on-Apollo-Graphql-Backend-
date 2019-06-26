@@ -1,1 +1,1 @@
-'Apollo-Graphql/Mutation/UserMutation.js 2jsXžh
+0Apollo-Graphql/Mutation/labelAndIssueMutation.js 2jsXÀh

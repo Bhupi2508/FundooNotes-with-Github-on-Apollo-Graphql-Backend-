@@ -2,5 +2,5 @@ projectKey=fundoo_Apollo_GraphqL
 serverUrl=http://localhost:9000
 serverVersion=6.7.1.35068
 dashboardUrl=http://localhost:9000/dashboard/index/fundoo_Apollo_GraphqL
-ceTaskId=AWsdlQ8cWXPP7-xe5bM8
-ceTaskUrl=http://localhost:9000/api/ce/task?id=AWsdlQ8cWXPP7-xe5bM8
+ceTaskId=AWuTiPkqMmbu6lnjDMtQ
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AWuTiPkqMmbu6lnjDMtQ
