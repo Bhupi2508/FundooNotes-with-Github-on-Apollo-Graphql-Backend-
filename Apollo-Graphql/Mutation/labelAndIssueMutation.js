@@ -499,6 +499,16 @@ userAddLabelMutation.prototype.createLabelInGit = async (root, params, context) 
 
 
 
+        //for color validation
+        var colorValidation = (/^#([A - Fa - f0 - 9]{ 6 }| [A - Fa - f0 - 9]{ 3 }) $/);
+        if (!colorValidation.test(params.color)) {
+            //throw new AuthenticationError('not valid email');
+            return { "message": "Invalid color", }
+        }
+
+
+
+
         // Access_token
         var access_token = user[0].access_Token
         console.log("access_token", access_token)
@@ -570,6 +580,13 @@ userAddLabelMutation.prototype.updateLabelInGit = async (root, params, context) 
             return { "message": "user not verified" }
         }
 
+
+        //for color validation
+        var colorValidation = (/^#([A - Fa - f0 - 9]{ 6 }| [A - Fa - f0 - 9]{ 3 }) $/);
+        if (!colorValidation.test(params.color)) {
+            //throw new AuthenticationError('not valid email');
+            return { "message": "Invalid color", }
+        }
 
 
         // Access_token

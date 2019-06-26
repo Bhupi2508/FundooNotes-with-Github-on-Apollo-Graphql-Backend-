@@ -163,6 +163,8 @@ userResolver.prototype.resolvers = {
         deleteIssueCommentForGit
 
     },
+
+    //user queries, whos has active 
     User: {
         async labels(root, params, context) {
 

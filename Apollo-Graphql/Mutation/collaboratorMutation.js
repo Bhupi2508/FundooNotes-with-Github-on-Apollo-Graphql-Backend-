@@ -42,6 +42,8 @@ var errorMessage = {
 collaboratorMutation.prototype.addCollaboration = async (root, args, context) => {
 
     try {
+
+        //token, that is valid or not
         if (!context.token) {
             return { "message": "token not provided" }
         }
@@ -137,6 +139,8 @@ collaboratorMutation.prototype.addCollaboration = async (root, args, context) =>
 collaboratorMutation.prototype.removeCollaboration = async (root, args, context) => {
 
     try {
+
+        //token, that is present or not
         if (!context.token) {
             return { "message": "token not provided" }
         }
