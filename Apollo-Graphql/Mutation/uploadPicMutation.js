@@ -40,7 +40,7 @@ uploadPicMutation.prototype.picUpload = async (root, args, context) => {
         if (!afterVerify > 0) {
             return { "message": "token is not verify" }
         }
-        console.log(context.req.file.location)
+        logger.info(context.req.file.location)
 
 
 

@@ -23,6 +23,7 @@ var axios = require('axios')
 var jwt = require('jsonwebtoken')
 var tokenVerify = require('../../Authentication/authenticationUser')
 var axios_service = require('../../services/axios-services').axiosService
+var logger = require('../../services/logger');
 
 //create a empty function
 var gitAuthMutation = function () { }
@@ -58,6 +59,7 @@ gitAuthMutation.prototype.GithubAuth = async (root, params) => {
         }
 
     } catch (err) {
+        logger.error("!Error")
         console.log("!Error")
     }
 }
@@ -96,10 +98,11 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
 
         //function for access token
         getToken(access_token)
-        console.log("Access token : ", access_token)
+        logger.info("Access token : ", access_token)
 
     })
         .catch(error => {
+            logger.error(error)
             console.log(error)
         })
 
@@ -125,8 +128,8 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
             }
         })
             .then(async response => {
-                console.log("\nResponse.Data : \n", response.data)
-                console.log("\nRepository details", response.data.repos_url);
+                logger.info("\nResponse.Data : \n", response.data)
+                logger.info("\nRepository details", response.data.repos_url);
 
 
                 //save those data in user database
@@ -141,7 +144,7 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
 
                 //save data into database
                 var saveuser = await gituser.save();
-                console.log("\nData : ", saveuser)
+                logger.info("\nData : ", saveuser)
 
 
 
@@ -165,6 +168,7 @@ gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
                 }
             })
             .catch(error => {
+                logger.error(error)
                 console.log(error)
             })
     }
@@ -207,7 +211,7 @@ gitAuthMutation.prototype.GitAuthTokenVerify = async (root, params, context) => 
 
             //find data from model that is present or not
             var login = await model.find({ "gitID": afterVerify.id, "loginName": afterVerify.login })
-            console.log(afterVerify.id);
+            logger.info("id after verification", afterVerify.id);
 
             //condition
             if (!login) {
@@ -219,6 +223,7 @@ gitAuthMutation.prototype.GitAuthTokenVerify = async (root, params, context) => 
         }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error", err)
         return { "message": err }
     }
@@ -280,9 +285,9 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
 
             //for loop for save the repository in database
             for (var i = 0; i < res.data.length; i++) {
-                console.log("\n", i, ". Repository Names : ", res.data[i].name)
-                console.log(i, ". Repository Description : ", res.data[i].description)
-                console.log(i, ". Repository watchers : ", res.data[i].watchers)
+                logger.info("\n", i, ". Repository Names : ", res.data[i].name)
+                logger.info(i, ". Repository Description : ", res.data[i].description)
+                logger.info(i, ". Repository watchers : ", res.data[i].watchers)
 
                 //find title from database
                 var findRepo = await noteModel.find({ title: res.data[i].name })
@@ -305,6 +310,7 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
         return { "message": "git  repository fetch Successfully" }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error", err)
         return { "message": err }
     }
@@ -345,7 +351,7 @@ gitAuthMutation.prototype.addWatchInGitRepo = async (root, params, context) => {
 
         // Access_token
         var access_token = user[0].access_Token;
-        console.log("access_token", access_token)
+        logger.info("access_token", access_token)
 
 
         /**
@@ -362,13 +368,14 @@ gitAuthMutation.prototype.addWatchInGitRepo = async (root, params, context) => {
             }
 
         }).then((res) => {
-            console.log("Repository Branch Name : ", res);
+            logger.info("Repository Branch Name : ", res);
         })
 
         //return the response
         return { "message": "Watch add successfully in Git Repository" }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error", err)
         return { "message": "Watch is not added in Github" }
     }
@@ -410,7 +417,7 @@ gitAuthMutation.prototype.deleteWatchInGitRepo = async (root, params, context) =
 
         // Access_token
         var access_token = user[0].access_Token
-        console.log("access_token", access_token)
+        logger.info("access_token", access_token)
 
 
         /**
@@ -427,13 +434,14 @@ gitAuthMutation.prototype.deleteWatchInGitRepo = async (root, params, context) =
             },
 
         }).then((res) => {
-            console.log("Repository Branch Name : ", res);
+            logger.info("Repository Branch Name : ", res);
         })
 
         //return the response
         return { "message": "Watch Remove successfully from Git Repository" }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error", err)
         return { "message": "Watch is not removed from Github" }
     }
@@ -477,7 +485,7 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
 
         // Access_token
         var access_token = user[0].access_Token
-        //console.log("access_token", access_token)
+        logger.info("access_token", access_token)
 
 
         /**
@@ -491,9 +499,6 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
 
         //send to axios_services and take response from it
         await axios_service('GET', url, access_token)
-
-        //console.log("\nRepository Branch Response Data : ", res.data);
-        //console.log("\nRepository Branch Object Data : ", res.data[0].object.sha);
         var access_token1 = user[0].access_Token
 
         /**
@@ -513,13 +518,13 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
         //send to axios_services and take response from it
         var res_Data_1 = await axios_service('POST', url_data, access_token1, data)
 
-        console.log("\nRepository Branch after post Data : ", res_Data_1);
+        logger.info("\nRepository Branch after post Data : ", res_Data_1);
 
         //return the response
         return { "message": "git branch create Successfully" }
 
     } catch (err) {
-        //console.log("!Error in catch : ", err)
+        logger.error("!Error", err)
         return { "message": "This branch is not created in Repository" }
     }
 }
@@ -562,7 +567,7 @@ gitAuthMutation.prototype.deleteGitBranch = async (root, params, context) => {
 
         // Access_token
         var access_token = user[0].access_Token
-        console.log("access_token", access_token)
+        logger.info("access_token", access_token)
 
 
 
@@ -578,13 +583,11 @@ gitAuthMutation.prototype.deleteGitBranch = async (root, params, context) => {
         await axios_service('DELETE', url, access_token)
 
 
-        //console.log("\nRepository Branch Response Data : ", res);
-
         //return the response
         return { "message": "git branch delete Successfully" }
 
     } catch (err) {
-        //console.log("!Error", err)
+        logger.error("!Error", err)
         return { "message": "This branch not present in Repository" }
     }
 }
@@ -627,7 +630,7 @@ gitAuthMutation.prototype.fetchRepository = async (root, params, context) => {
 
         // Access_token
         var access_token = user[0].access_Token;
-        console.log("acccess_token", access_token);
+        logger.info("acccess_token", access_token);
 
 
 
@@ -643,9 +646,7 @@ gitAuthMutation.prototype.fetchRepository = async (root, params, context) => {
 
         //for loop for save the repository in database
         for (var i = 0; i < res.data.repositoryOwner.repositories.nodes.length; i++) {
-            console.log("\n", i, ". Repository Names : ", res.data.repositoryOwner.repositories.nodes[i].name)
-            console.log(i, ". Repository Description : ", res.data.repositoryOwner.repositories.nodes[i].description)
-            // console.log(i, ". Repository watchers : ", res.data.repositoryOwner.repositories.nodes[i].watchers)
+            logger.info("\n", i, ". Repository Names : ", res.data.repositoryOwner.repositories.nodes[i].name)
 
             //find title from database
             var findRepo = await noteModel.find({ title: res.data.repositoryOwner.repositories.nodes[i].name })
@@ -671,6 +672,7 @@ gitAuthMutation.prototype.fetchRepository = async (root, params, context) => {
         }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error", err)
         return { "message": err }
     }
@@ -715,7 +717,6 @@ gitAuthMutation.prototype.starRepository = async (root, params, context) => {
         // Access_token and Git Node ID
         var gitNodeID = user[0].gitNodeID;
         var access_token = user[0].access_Token;
-        console.log(typeof (process.env.GIT_ID));
 
 
 
@@ -731,7 +732,7 @@ gitAuthMutation.prototype.starRepository = async (root, params, context) => {
             query: `mutation {addStar(input: {starrableId: "${process.env.GIT_ID}" clientMutationId:"${gitNodeID}"}) { clientMutationId}}`,
         })
 
-        console.log("res", res)
+        logger.info("res", res)
 
         //return the response
         return {
@@ -740,6 +741,7 @@ gitAuthMutation.prototype.starRepository = async (root, params, context) => {
         }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error", err)
         return { "message": err }
     }
@@ -806,6 +808,7 @@ gitAuthMutation.prototype.removeStarRepository = async (root, params, context) =
         }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error", err)
         return { "message": err }
     }
@@ -850,7 +853,7 @@ gitAuthMutation.prototype.createGitRepository = async (root, params, context) =>
 
         // Access_token
         var access_token = user[0].access_Token
-        console.log("access_token", access_token)
+        logger.info("access_token", access_token)
 
 
         /**
@@ -869,14 +872,15 @@ gitAuthMutation.prototype.createGitRepository = async (root, params, context) =>
         //send to axios_services and take response from it
         var res = await axios_service('POST', url, access_token, data)
 
-        console.log("\nRepository Branch Response Data : ", res);
-        console.log("\nRepository Branch Object Data : ", res.data[0]);
+        logger.info("\nRepository Branch Response Data : ", res);
+        logger.info("\nRepository Branch Object Data : ", res.data[0]);
 
 
         //return the response
         return { "message": "Repository created Successfully" }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error in catch : ", err)
         return { "message": "This Repository is already present" }
     }
@@ -921,7 +925,7 @@ gitAuthMutation.prototype.removeGitRepository = async (root, params, context) =>
 
         // Access_token
         var access_token = process.env.DELETE_TOKEN
-        console.log("access_token", access_token)
+        logger.info("access_token", access_token)
 
 
         /**
@@ -936,14 +940,15 @@ gitAuthMutation.prototype.removeGitRepository = async (root, params, context) =>
         //send to axios_services and take response from it
         var res = await axios_service('DELETE', url, access_token)
 
-        console.log("\nRepository Branch Response Data : ", res);
-        console.log("\nRepository Branch Object Data : ", res.data[0]);
+        logger.info("\nRepository Branch Response Data : ", res);
+        logger.info("\nRepository Branch Object Data : ", res.data[0]);
 
 
         //return the response
         return { "message": "Repository deleted Successfully" }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error in catch : ", err)
         return { "message": "This Repository is not present" }
     }
@@ -1003,7 +1008,7 @@ gitAuthMutation.prototype.changeStatusInGithub = async (root, params, context) =
             query: `mutation {changeUserStatus(input:{message:${params.status}}){status{message}}}`,
         })
 
-        console.log("res", res)
+        logger.info("res", res)
 
         //return the response
         return {
@@ -1011,6 +1016,7 @@ gitAuthMutation.prototype.changeStatusInGithub = async (root, params, context) =
         }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error", err)
         return { "message": err }
     }
@@ -1067,13 +1073,13 @@ gitAuthMutation.prototype.gitRepoCommits = async (root, params, context) => {
         //send to axios_services and take response from it
         var res = await axios_service('GET', url, access_token)
 
-        console.log("res", res.data[0]);
+       logger.info("res", res.data[0]);
 
 
         //create a for loop for seprate data
         for (var i = 0; i < res.data.length; i++) {
-            console.log("\nRepository Commits Details  : ", res.data[i].commit.committer)
-            console.log("Repository Commits message  : ", res.data[i].commit.message);
+            logger.info("\nRepository Commits Details  : ", res.data[i].commit.committer)
+            logger.info("Repository Commits message  : ", res.data[i].commit.message);
         }
 
         //return the response
@@ -1082,6 +1088,7 @@ gitAuthMutation.prototype.gitRepoCommits = async (root, params, context) => {
             "data": res.data
         }
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error in catch : ", err)
         return { "message": "Repository commits fetch UnSuccessfully" }
     }
@@ -1126,7 +1133,7 @@ gitAuthMutation.prototype.gitRepoWebhook = async (root, params, context) => {
 
         // Access_token
         var access_token = process.env.GIT_REPO_TOKEN
-        console.log(access_token);
+        logger.info(access_token);
 
 
         /**
@@ -1154,13 +1161,14 @@ gitAuthMutation.prototype.gitRepoWebhook = async (root, params, context) => {
         //send to axios_services and take response from it
         var res = await axios_service('POST', url, access_token, data)
 
-        console.log("\nGithub response : ", res)
+        logger.info("\nGithub response : ", res)
         //return the response
         return {
             "message": "Repository webhook response successfully",
         }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error in catch : ", err)
         return { "message": "Repository webhook response Unsuccessfully" }
     }

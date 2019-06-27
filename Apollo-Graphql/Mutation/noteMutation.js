@@ -18,6 +18,7 @@
 var noteModel = require('../../model/noteSchema')
 var labelModel = require('../../model/labelSchema')
 var tokenVerify = require('../../Authentication/authenticationUser')
+var logger = require('../../services/logger');
 
 //create a empty function
 var noteMutation = function () { }
@@ -332,7 +333,7 @@ noteMutation.prototype.Reminder = async (root, params) => {
 
         //set a date for reminder
         var date = new Date(params.reminder)
-        console.log(date)
+        logger.info(date)
 
 
         //find id from noteModel and update(push) into notes
@@ -391,7 +392,7 @@ noteMutation.prototype.deleteReminder = async (root, params) => {
 
         //find id from noteModel and update(push) into notes
         var note = await noteModel.findOneAndUpdate({ _id: params.noteID }, { $set: { reminder: "" } })
-        console.log(note);
+        logger.info(note)
 
 
         /**
@@ -443,7 +444,7 @@ noteMutation.prototype.Archieve = async (root, params, context) => {
 
         //find that id id presen or not
         var checkNote = await noteModel.find({ _id: params.noteID })
-        console.log(checkNote);
+        logger.info(checkNote)
 
 
         //check whether is false or true in database

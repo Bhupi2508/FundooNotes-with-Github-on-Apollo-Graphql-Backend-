@@ -19,6 +19,7 @@ var model = require('../../model/userSchema')
 var tokenVerify = require('../../Authentication/authenticationUser')
 var issueModel = require('../../model/gitIssueSchema')
 var axios_data = require('../../services/axios-services').axiosService
+var logger = require('../../services/logger');
 
 
 //create a empty function
@@ -60,7 +61,7 @@ userAddLabelMutation.prototype.createIssueForGit = async (root, params, context)
 
         // Access_token
         var access_token = user[0].access_Token
-        console.log("access_token", access_token)
+        logger.info("access_token", access_token)
 
 
 
@@ -77,8 +78,7 @@ userAddLabelMutation.prototype.createIssueForGit = async (root, params, context)
         })
 
 
-
-        console.log("res", res.data)
+        logger.info("res", res.data)
         var assignees = [];
 
 
@@ -103,7 +103,7 @@ userAddLabelMutation.prototype.createIssueForGit = async (root, params, context)
 
         //issue saved in database
         var savedIssues = await issueSave.save()
-        console.log(savedIssues)
+        logger.info("savedIssues: ", savedIssues)
 
         //return the response
         return {
@@ -111,6 +111,7 @@ userAddLabelMutation.prototype.createIssueForGit = async (root, params, context)
         }
 
     } catch (err) {
+        logger.error("savedIssues: ", savedIssues)
         console.log("!Error", err)
         return { "message": "issue not created" }
     }
@@ -155,7 +156,7 @@ userAddLabelMutation.prototype.updateIssueForGit = async (root, params, context)
 
         // Access_token
         var access_token = user[0].access_Token
-        console.log("access_token", access_token)
+        logger.info("access_token", access_token)
 
 
 
@@ -172,7 +173,7 @@ userAddLabelMutation.prototype.updateIssueForGit = async (root, params, context)
         })
 
 
-        console.log("res", res.data)
+        logger.info("res", res.data)
 
 
         /**
@@ -180,7 +181,7 @@ userAddLabelMutation.prototype.updateIssueForGit = async (root, params, context)
       * @return {String} message
       */
         var issueFind = await issueModel.find({ issueID: params.issueId })
-        console.log("data", issueFind)
+        logger.info("data", issueFind)
         if (!issueFind.length > 0) {
             return { "message": "issue is not present in database" }
         }
@@ -205,6 +206,7 @@ userAddLabelMutation.prototype.updateIssueForGit = async (root, params, context)
         }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error", err)
         return { "message": "issue not created" }
     }
@@ -249,7 +251,7 @@ userAddLabelMutation.prototype.deleteIssueForGit = async (root, params, context)
 
         // Access_token
         var access_token = user[0].access_Token
-        console.log("access_token", access_token)
+        logger.info("access_token", access_token)
 
 
 
@@ -272,6 +274,7 @@ userAddLabelMutation.prototype.deleteIssueForGit = async (root, params, context)
         }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error", err)
         return { "message": "issue not deleted" }
     }
@@ -316,7 +319,7 @@ userAddLabelMutation.prototype.addIssueCommentForGit = async (root, params, cont
 
         // Access_token
         var access_token = user[0].access_Token
-        console.log("access_token", access_token)
+        logger.info("access_token", access_token)
 
 
 
@@ -333,7 +336,7 @@ userAddLabelMutation.prototype.addIssueCommentForGit = async (root, params, cont
         })
 
 
-        console.log("res", res.data)
+        logger.info("res", res.data)
 
 
         // label update in mongodb
@@ -357,6 +360,7 @@ userAddLabelMutation.prototype.addIssueCommentForGit = async (root, params, cont
         }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error", err)
         return { "message": "comment not added" }
     }
@@ -402,7 +406,7 @@ userAddLabelMutation.prototype.deleteIssueCommentForGit = async (root, params, c
 
         // Access_token
         var access_token = user[0].access_Token
-        console.log("access_token", access_token)
+        logger.info("access_token", access_token)
 
 
 
@@ -418,7 +422,7 @@ userAddLabelMutation.prototype.deleteIssueCommentForGit = async (root, params, c
         })
 
 
-        console.log("res", res.data)
+        logger.info("res", res.data)
 
 
         //comments deleted from mongodb
@@ -426,7 +430,7 @@ userAddLabelMutation.prototype.deleteIssueCommentForGit = async (root, params, c
 
         for (let i = 0; i < updateComment[0].issueComment.length; i++) {
             if (updateComment[0].issueComment[i].commentId === params.commentId) {
-               var index = updateComment[0].issueComment.indexOf(updateComment[0].issueComment[i]);
+                var index = updateComment[0].issueComment.indexOf(updateComment[0].issueComment[i]);
             }
         }
 
@@ -456,6 +460,7 @@ userAddLabelMutation.prototype.deleteIssueCommentForGit = async (root, params, c
         }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error", err)
         return { "message": "comment not deleted" }
     }
@@ -511,7 +516,7 @@ userAddLabelMutation.prototype.createLabelInGit = async (root, params, context) 
 
         // Access_token
         var access_token = user[0].access_Token
-        console.log("access_token", access_token)
+        logger.info("access_token", access_token)
 
 
         /**
@@ -532,7 +537,7 @@ userAddLabelMutation.prototype.createLabelInGit = async (root, params, context) 
         //send to axios_services and take response from it
         var res = await axios_data('POST', url, access_token, data)
 
-        console.log("res", res)
+        logger.info("res", res)
 
 
         //return the response
@@ -541,6 +546,7 @@ userAddLabelMutation.prototype.createLabelInGit = async (root, params, context) 
         }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error", err)
         return { "message": "label is not created+" }
     }
@@ -591,7 +597,7 @@ userAddLabelMutation.prototype.updateLabelInGit = async (root, params, context) 
 
         // Access_token
         var access_token = user[0].access_Token
-        console.log("access_token", access_token)
+        logger.info("access_token", access_token)
 
 
         /**
@@ -614,7 +620,7 @@ userAddLabelMutation.prototype.updateLabelInGit = async (root, params, context) 
         var res = await axios_data('PATCH', url, access_token, data)
 
 
-        console.log("res", res.data)
+        logger.info("res", res.data)
 
 
         /**
@@ -645,6 +651,7 @@ userAddLabelMutation.prototype.updateLabelInGit = async (root, params, context) 
         }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error", err)
         return { "message": "Label is not updated" }
     }
@@ -689,7 +696,7 @@ userAddLabelMutation.prototype.deleteLabelInGit = async (root, params, context) 
 
         // Access_token
         var access_token = user[0].access_Token
-        console.log("access_token", access_token)
+        logger.info("access_token", access_token)
 
 
         /**
@@ -704,7 +711,7 @@ userAddLabelMutation.prototype.deleteLabelInGit = async (root, params, context) 
         //send to axios_services and take response from it
         var res = await axios_data('DELETE', url, access_token)
 
-        console.log("res", res)
+        logger.info("res", res)
 
         //return the response
         return {
@@ -712,6 +719,7 @@ userAddLabelMutation.prototype.deleteLabelInGit = async (root, params, context) 
         }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error", err)
         return { "message": "Label is not deleted" }
     }
@@ -757,7 +765,7 @@ userAddLabelMutation.prototype.GetLabelList = async (root, params, context) => {
 
         // Access_token
         var access_token = user[0].access_Token
-        console.log("access_token", access_token)
+        logger.info("access_token", access_token)
 
 
         /**
@@ -772,7 +780,7 @@ userAddLabelMutation.prototype.GetLabelList = async (root, params, context) => {
         //send to axios_services and take response from it
         var res = await axios_data('GET', url, access_token)
 
-        console.log("res", res)
+        logger.info("res", res)
 
         //return the response
         return {
@@ -781,6 +789,7 @@ userAddLabelMutation.prototype.GetLabelList = async (root, params, context) => {
         }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error", err)
         return { "message": "Label data not fetch successfully" }
     }
@@ -824,7 +833,7 @@ userAddLabelMutation.prototype.addLabelInIssue = async (root, params, context) =
 
         // Access_token
         var access_token = user[0].access_Token
-        console.log("access_token", access_token)
+        logger.info("access_token", access_token)
 
 
         /**
@@ -844,7 +853,8 @@ userAddLabelMutation.prototype.addLabelInIssue = async (root, params, context) =
         //send to axios_services and take response from it
         var res = await axios_data('POST', url, access_token, data)
 
-        console.log("res", res.data)
+        //print
+        logger.info("res", res.data)
 
 
         /**
@@ -852,7 +862,7 @@ userAddLabelMutation.prototype.addLabelInIssue = async (root, params, context) =
          * @return {String} message
          */
         var labelFind = await issueModel.find({ label: params.labelName[0], issueNumber: params.issueNumber })
-        console.log(labelFind)
+        logger.info("findLabel : ",labelFind)
         if (labelFind.length > 0) {
             return { "message": "label is already present in database" }
         }
@@ -877,6 +887,7 @@ userAddLabelMutation.prototype.addLabelInIssue = async (root, params, context) =
         }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error", err)
         return { "message": "label not added in issue" }
     }
@@ -920,7 +931,7 @@ userAddLabelMutation.prototype.removeLabelFromIssue = async (root, params, conte
 
         // Access_token
         var access_token = user[0].access_Token
-        console.log("access_token", access_token)
+        logger.info("access_token", access_token)
 
 
         /**
@@ -942,6 +953,7 @@ userAddLabelMutation.prototype.removeLabelFromIssue = async (root, params, conte
         }
 
     } catch (err) {
+        logger.error("!Error", err)
         console.log("!Error", err)
         return { "message": "label not removed from issue" }
     }

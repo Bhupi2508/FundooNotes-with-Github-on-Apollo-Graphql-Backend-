@@ -218,9 +218,6 @@ userMutation.prototype.login = async (root, params, context) => {
          * @return {String} message
          */
         if (!emailformat.test(params.email)) {
-            var logger = require('../../services/logger');
-            logger(verify)
-            logger.info('log to file');
             throw new AuthenticationError('not valid email');
             //return { "message": "not valid email" }
         }

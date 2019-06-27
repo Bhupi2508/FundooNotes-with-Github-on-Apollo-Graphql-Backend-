@@ -18,6 +18,7 @@ var model = require('../../model/userSchema')
 var axios = require('axios')
 var jwt = require('jsonwebtoken')
 var tokenVerify = require('../../Authentication/authenticationUser')
+var logger = require('../../services/logger');
 
 //create a empty function
 var userAddInCollaborator = function () { }
@@ -77,7 +78,6 @@ userAddInCollaborator.prototype.addCollaboratorGithub = async (root, params, con
                 Authorization: `Bearer ${access_token}`
             }
         })
-        //console.log("\nRepository collaborators Details : ", res);
 
         //return the response
         return { "message": "user collaborators added successfully" }
@@ -142,7 +142,6 @@ userAddInCollaborator.prototype.removeCollaboratorGithub = async (root, params, 
                 Authorization: `Bearer ${access_token}`
             }
         })
-        //console.log("\nRepository collaborators Details : ", res);
 
         //return the response
         return { "message": "collborators remove successfully" }
@@ -207,12 +206,13 @@ userAddInCollaborator.prototype.gitCollaboratorsList = async (root, params, cont
             }
         })
 
-        console.log("res", res.data);
+        //print the res in a file
+        logger.info("res.Data".res.data)
 
         //create a array
         var array = [];
         for (var i = 0; i < res.data.length; i++) {
-            console.log("\nRepository collaborators Details : ", res.data[i].login);
+            logger.info("\nRepository collaborators Details : ", res.data[i].login)
             array.push(res.data[i].login)
         }
 

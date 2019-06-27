@@ -19,6 +19,7 @@
 var userModel = require('../../model/userSchema')
 var labelModel = require('../../model/labelSchema')
 var notesModel = require('../../model/noteSchema')
+var logger = require('../../services/logger');
 var colabModel = require('../../model/collabatorsSchema')
 var tokenVerify = require('../../Authentication/authenticationUser')
 
@@ -40,7 +41,7 @@ userQueries.prototype.user = async (root, params, context) => {
     }
     var payload = tokenVerify.verification(context.token)
     var user = await userModel.find({ _id: payload.userID }).limit(params.first).skip(params.offset)
-    console.log(user);
+    logger.info("user", user)
     return user
 }
 
@@ -53,7 +54,7 @@ userQueries.prototype.user = async (root, params, context) => {
  */
 userQueries.prototype.labelUser = async (root, params) => {
     var label_User = await labelModel.find().sort({ "labelName": 1 }).limit(params.first).skip(params.offset)
-    console.log(label_User);
+    logger.info("user", label_User)
     return label_User
 }
 
@@ -68,7 +69,7 @@ userQueries.prototype.notesUser = async (root, params) => {
     var regex1 = new RegExp(params.title)
     var regex2 = new RegExp(params.description)
     var notes_User = await notesModel.find({ title: regex1, description: regex2 }).limit(params.first).skip(params.offset)
-    console.log(notes_User[0]);
+    logger.info("notes_User", notes_User[0]);
     return notes_User
 }
 
@@ -95,7 +96,7 @@ userQueries.prototype.colabUser = async (root, params) => {
  */
 userQueries.prototype.gitRepo = async (root, params) => {
     var git_User = await notesModel.find().exec()
-    console.log(git_User[0]);
+    logger.info("git_User", git_User[0]);
     return git_User
 }
 
@@ -111,7 +112,7 @@ userQueries.prototype.gitRepo = async (root, params) => {
 userQueries.prototype.searchNoteByTitle = async (root, params) => {
     var regex1 = new RegExp(params.title)
     var notes_User = await notesModel.find({ title: regex1 }).limit(params.first).skip(params.offset)
-    console.log("notes_user", notes_User[0]);
+    logger.info("notes_user", notes_User[0]);
     return notes_User
 }
 
@@ -127,7 +128,7 @@ userQueries.prototype.searchNoteByTitle = async (root, params) => {
 userQueries.prototype.searchNoteByDescription = async (root, params) => {
     var regex2 = new RegExp(params.description)
     var notes_User = await notesModel.find({ description: regex2 }).limit(params.first).skip(params.offset)
-    console.log("notes_user", notes_User[0]);
+    logger.info("notes_user", notes_User[0]);
     return notes_User
 }
 
