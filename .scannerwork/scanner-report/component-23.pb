@@ -1,1 +1,1 @@
-*Apollo-Graphql/Mutation/gitAuthMutation.js 2jsXš	h
+*Apollo-Graphql/Mutation/gitAuthMutation.js 2jsXš	h

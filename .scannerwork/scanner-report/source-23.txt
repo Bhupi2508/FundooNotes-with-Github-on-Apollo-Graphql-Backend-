@@ -575,10 +575,10 @@ gitAuthMutation.prototype.deleteGitBranch = async (root, params, context) => {
         var url = `${process.env.DELETE_BRANCH}${params.gitUsername}/${params.repoName}/git/refs/heads/${params.DeleteBranch}`
 
         //send to axios_services and take response from it
-        var res = await axios_service('DELETE', url, access_token)
+        await axios_service('DELETE', url, access_token)
 
 
-        console.log("\nRepository Branch Response Data : ", res);
+        //console.log("\nRepository Branch Response Data : ", res);
 
         //return the response
         return { "message": "git branch delete Successfully" }

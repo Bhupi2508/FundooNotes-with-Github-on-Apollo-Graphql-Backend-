@@ -1,4 +1,4 @@
-ºÍñùπ-fundoo_Apollo_GraphqL(:2
+÷π‹†π-fundoo_Apollo_GraphqL(:2
 cs,
 AWreIaZMlcvLErbzIWnw	Sonar waycs ‡…ÜÒ≠-:6
 java.

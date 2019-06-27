@@ -1,1 +1,1 @@
-2ElasticSearch/elastic.js 2jsX$h
+2#ElasticSearch/elasticDeleteIndex.js 2jsXh

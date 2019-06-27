@@ -1,8 +1,8 @@
 /******************************************************************************
- *  @Execution      : default node          : cmd> nodemon elastic.js
+ *  @Execution      : default node          : cmd> nodemon elasticDeleteIndex.js
  *                      
  * 
- *  @Purpose        : Elastic search 
+ *  @Purpose        : Elastic search de;lete data 
  * 
  *  @description    : Using ElasticSearch we can search anything from DataBase 
  * 
@@ -13,24 +13,15 @@
  *
  ******************************************************************************/
 /**
- * @requires, the Elasticsearch librray
+ * @requires files
  */
-var elasticsearch = require('elasticsearch');
+var client = require('./elastic');
 
-// instantiate an Elasticsearch client
-var client = new elasticsearch.Client(
+//delete the index tjhat is already present
+client.indices.delete(
     {
-        host: process.env.ELASTIC_PORT,
-        log: 'trace',
-        keepAlive: false
-    }
-);
-
-console.log('#####################################################################################');
-console.log('##############                 Elastic Search Connected                ##############');
-console.log('#####################################################################################');
-
-/**
- * @exports client
- */
-module.exports = client;  
+        index: 'project'
+    },
+    function (err, resp, status) {
+        console.log("delete : ", resp);
+    });

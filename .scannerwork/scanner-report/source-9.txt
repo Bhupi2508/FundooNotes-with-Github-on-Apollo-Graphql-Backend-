@@ -1,15 +1,15 @@
 /******************************************************************************
- *  @Execution      : default node          : cmd> labelSchema.js
+ *  @Execution      : default node          : cmd> gitIssueSchema.js
  *                      
  * 
- *  @Purpose        : MongoDB schema for labels
+ *  @Purpose        : MongoDB schema for git issues
  * 
  *  @description    : using this schema we store labels data in database
  * 
  *  @overview       : fundoo application
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
  *  @version        : 1.0
- *  @since          : 29-april-2019
+ *  @since          : 11-june-2019
  *
  ******************************************************************************/
 /**
@@ -23,19 +23,42 @@ var mongoSchema = mongoose.Schema;
 
 /**
  * @purpose : store data in database based on this schema
- * @param {number} userID
- * @param {String} labelName
+ * @param {String} title
+ * @param {String} description
+ * @param {number} issueNumber
+ * @param {String} issueID
+ * @param {Array} assignees
+ * @param {Array} label
+ * @param {Array} issueComment
  * @param {timestamps} timestamps
  */
-var labelSchema = new mongoSchema({
-    userID: {
-        type: mongoSchema.Types.ObjectId,
-        ref: 'schemaData'
+var IssueSchema = new mongoSchema({
+    title: {
+        type: String
     },
-    labelName: {
+    description: {
+        type: String
+    },
+    issueID: {
         type: String,
-        required: [true, "labelName is required"],
-    }
+    },
+    issueNumber: {
+        type: Number
+    },
+    assignees: [{
+        type: String
+    }],
+    label: [{
+        type: String
+    }],
+    issueComment: [{
+        commentId: {
+            type: String
+        },
+        commentIssue: {
+            type: String
+        }
+    }]
 },
     {
         timestamps: true
@@ -43,5 +66,5 @@ var labelSchema = new mongoSchema({
 
 
 //connect database using mongoose
-var userLabel = mongoose.model('label', labelSchema);
-module.exports = userLabel
+var userIssue = mongoose.model('gitIssue', IssueSchema);
+module.exports = userIssue

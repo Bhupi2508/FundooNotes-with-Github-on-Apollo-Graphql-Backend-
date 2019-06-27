@@ -1,1 +1,1 @@
-'Apollo-Graphql/Mutation/noteMutation.js 2jsX²h
+Apollo-Graphql/Types/types.js 2jsXÁh

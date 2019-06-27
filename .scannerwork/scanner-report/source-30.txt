@@ -1,40 +1,20 @@
 /******************************************************************************
- *  @Execution      : default node          : cmd> redis.js
+ *  @Execution      : default node          : cmd> nodemon dbConfig.js
  *                      
  * 
- *  @Purpose        : connect server to redis
+ *  @Purpose        : connect mongoDB
  * 
- *  @description    : Connected with mongoDB database
+ *  @description    : Using this database we connect mondodb to server
  * 
- *  @overview       : Redis connections
+ *  @overview       : MongoDB connections
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
  *  @version        : 1.0
- *  @since          : 03-june-2019
+ *  @since          : 27-april-2019
  *
  ******************************************************************************/
 /**
- * @requires files
+ * @exports
  */
-const redis = require("async-redis");
-const client = redis.createClient({
-    host: 'localhost',
-    port: process.env.REDIS_PORT
-})
-
-/**
- * @param{} create a empty function and export
- * @retutn connectivity
- * @exports function{}
- */
-module.exports = function () {
-
-    client.on('connect', function () {
-        //console.log('#####################################################################################');
-        console.log('##############                 connected with redis                    ##############');
-        //console.log('#####################################################################################');
-    });
-
-    client.on('error', function (err) {
-        console.log('Something went wrong ' + err);
-    });
-};
+module.exports = {
+    db: process.env.MONGO_PORT,
+}

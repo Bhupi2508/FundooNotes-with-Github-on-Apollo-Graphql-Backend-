@@ -1,1 +1,1 @@
-model/gitIssueSchema.js 2jsXFh
+model/labelSchema.js 2jsX/h

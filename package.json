@@ -4,7 +4,7 @@
   "description": "Fundoo application using apollo graphql",
   "main": "index.js",
   "scripts": {
-    "test": "nyc --reporter=lcov --reporter=text-lcov mocha testing/test.js",
+    "test": "nyc --reporter=lcov --reporter=text-lcov mocha testing/test.js || true",
     "coverage": "./node_modules/.bin/nyc -r cobertura -r text-summary -r html npm test",
     "nodemon": "nodemon server.js",
     "dev": "nodemon server.js",
@@ -38,6 +38,7 @@
     "nyc": "^14.1.1",
     "redis": "^2.8.0",
     "request-promise": "^4.2.4",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "winston": "^3.2.1"
   }
 }

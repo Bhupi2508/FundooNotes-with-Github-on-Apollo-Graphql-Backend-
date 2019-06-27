@@ -1,15 +1,15 @@
 /******************************************************************************
- *  @Execution      : default node          : cmd> gitIssueSchema.js
+ *  @Execution      : default node          : cmd> labelSchema.js
  *                      
  * 
- *  @Purpose        : MongoDB schema for git issues
+ *  @Purpose        : MongoDB schema for labels
  * 
  *  @description    : using this schema we store labels data in database
  * 
  *  @overview       : fundoo application
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
  *  @version        : 1.0
- *  @since          : 11-june-2019
+ *  @since          : 29-april-2019
  *
  ******************************************************************************/
 /**
@@ -23,42 +23,19 @@ var mongoSchema = mongoose.Schema;
 
 /**
  * @purpose : store data in database based on this schema
- * @param {String} title
- * @param {String} description
- * @param {number} issueNumber
- * @param {String} issueID
- * @param {Array} assignees
- * @param {Array} label
- * @param {Array} issueComment
+ * @param {number} userID
+ * @param {String} labelName
  * @param {timestamps} timestamps
  */
-var IssueSchema = new mongoSchema({
-    title: {
-        type: String
+var labelSchema = new mongoSchema({
+    userID: {
+        type: mongoSchema.Types.ObjectId,
+        ref: 'schemaData'
     },
-    description: {
-        type: String
-    },
-    issueID: {
+    labelName: {
         type: String,
-    },
-    issueNumber: {
-        type: Number
-    },
-    assignees: [{
-        type: String
-    }],
-    label: [{
-        type: String
-    }],
-    issueComment: [{
-        commentId: {
-            type: String
-        },
-        commentIssue: {
-            type: String
-        }
-    }]
+        required: [true, "labelName is required"],
+    }
 },
     {
         timestamps: true
@@ -66,5 +43,5 @@ var IssueSchema = new mongoSchema({
 
 
 //connect database using mongoose
-var userIssue = mongoose.model('gitIssue', IssueSchema);
-module.exports = userIssue
+var userLabel = mongoose.model('label', labelSchema);
+module.exports = userLabel

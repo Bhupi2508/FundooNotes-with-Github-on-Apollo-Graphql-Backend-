@@ -1,40 +1,32 @@
 /******************************************************************************
- *  @Execution      : default node          : cmd> nodemon authenticationUser.js
+ *  @Execution      : default node          : cmd> nodemon elasticCreateIndex.js
  *                      
  * 
- *  @Purpose        : verification 
+ *  @Purpose        : Elastic search create a new data 
  * 
- *  @description    : token verification by using jsonWebToken
+ *  @description    : Using ElasticSearch we can search anything from DataBase 
  * 
- *  @overview       : fundoo application
+ *  @overview       : ElasticSearch connections
  *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
  *  @version        : 1.0
- *  @since          : 27-april-2019
+ *  @since          : 08-jun-2019
  *
  ******************************************************************************/
 /**
  * @requires files
  */
-var jwt = require('jsonwebtoken');
+var client = require('./elastic');
 
-
-/**
- * @exports verification
- */
-exports.verification = (token) => {
-    try {
-
-        /**
-         * @param {String}, secretKey is string used for hidden data
-         * @return {String}, value of verify token
-         * @param {String}, secretKey
-         */
-        var value = jwt.verify(token, process.env.SECRET_KEY)
-        return value
-    }
-
-    catch (err) {
-        console.log("Error during Authentication time (Token Verification Time)")
-        return { "message": err }
-    }
-}
+//create client index
+client.indices.create(
+    {
+        index: 'data'
+    },
+    function (err, resp, status) {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            console.log("create : ", resp);
+        }
+    });
