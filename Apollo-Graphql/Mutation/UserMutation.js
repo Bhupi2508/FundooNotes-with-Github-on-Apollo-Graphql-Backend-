@@ -22,6 +22,7 @@ var jsonwebtoken = require('jsonwebtoken')
 var userModel = require('../../model/userSchema')
 var labelModel = require('../../model/labelSchema')
 var sendMail = require('../../sendMailer/sendMail')
+var logger = require('../../services/logger');
 var tokenVerify = require('../../Authentication/authenticationUser')
 
 //create a redis client
@@ -218,6 +219,7 @@ userMutation.prototype.login = async (root, params, context) => {
          * @return {String} message
          */
         if (!emailformat.test(params.email)) {
+            logger.error("not valid email")
             throw new AuthenticationError('not valid email');
             //return { "message": "not valid email" }
         }
