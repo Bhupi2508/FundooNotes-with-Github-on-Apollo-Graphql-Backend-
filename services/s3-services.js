@@ -7,7 +7,7 @@
  *  @description    : using apollo-graphql upload a pic in s3 services for gitHub
  * 
  *  @overview       : fundoo application  
- *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
+ *  @author         : Bhupendra Singh
  *  @version        : 1.0
  *  @since          : 30-april-2019
  *

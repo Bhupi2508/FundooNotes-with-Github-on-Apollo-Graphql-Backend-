@@ -7,7 +7,7 @@
  *  @description    : test code with the help of mocha, chai, supertest
  * 
  *  @overview       : fundoo application  
- *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
+ *  @author         : Bhupendra Singh <test.user@example.com>
  *  @version        : 1.0
  *  @since          : 30-april-2019
  *
@@ -18,12 +18,15 @@
 const { describe, it } = require('mocha')
 const { expect } = require('chai')
 const request = require('supertest')
+require('dotenv').config()
 var server = require('../server')
 var fs = require('fs')
 var access_token = "";
 var signUp_token = "";
 var forgotPassword_token = "";
-var git_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI1Y2VlMzNjYzFmZTljZjNlNThkNGJlNzEiLCJpZCI6NDc2Mzk2MzYsImxvZ2luIjoiQmh1cGkyNTA4IiwiaWF0IjoxNTU5MTE0NzAwLCJleHAiOjE2NDU1MTQ3MDB9.I4HHmI6FdABmiL5qaoevyTXA3UsGQ6J9Iy8RZsXpff8";
+// Test-only token signed with the local SECRET_KEY (previously a real signed JWT was hard-coded here).
+// It carries no real GitHub account; tests that call GitHub with it are expected to be skipped/mocked.
+var git_token = require('jsonwebtoken').sign({ userID: '000000000000000000000000', id: 0, login: 'test-user' }, process.env.SECRET_KEY || 'test-secret', { expiresIn: '1d' });
 
 
 /**
@@ -31,7 +34,7 @@ var git_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI1Y2VlMzNjYz
  */
 function testJSON() {
 
-    var data = fs.readFileSync('/home/admin1/Desktop/fundoo(apollo)/testing/testFile.json');
+    var data = fs.readFileSync(require('path').join(__dirname, 'testFile.json'));
     var data1 = JSON.parse(data);
     return data1;
 }
@@ -1503,7 +1506,7 @@ describe('Apollo-GraphQL GithubAith APIs', () => {
             .post('/graphql ')
 
             //write your data for checking by giving mutation
-            .query({ 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI1Y2Q0MDY1MDI1ZDA4ZjNjODg0MjUzOTUiLCJpZCI6NDc2Mzk2MzYsImxvZ2luIjoiQmh1cGkyNTA4IiwiaWF0IjoxNTU3Mzk5MTIwLCJleHAiOjE2NDM3OTkxMjB9.nidKhPCHXubIosxpueDGynYMMv5qtpd5oDCHKediXo8' })
+            .query({ 'token': git_token })
             .send({ query: testJSON().codeVerify })
             .expect(200)
             .end((err, res) => {

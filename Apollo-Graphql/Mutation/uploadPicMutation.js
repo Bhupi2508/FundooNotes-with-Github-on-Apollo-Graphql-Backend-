@@ -1,65 +1,31 @@
-/********************************************************************************************************************
- *  @Execution      : default node          : cmd> uploadPicMutation.js
- *                      
- * 
- *  @Purpose        : upload pic on s3-aws storage using apollo-graphql 
- * 
- *  @description    : By mutation upload a pic on AWS-s3
- * 
- *  @overview       : fundoo application  
- *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
- *  @version        : 1.0
- *  @since          : 29-april-2019
+/******************************************************************************
+ *  @Purpose        : profile picture upload (AWS S3)
+ *  @overview       : fundoo application
+ *  @author         : Bhupendra Singh
  *
- *******************************************************************************************************************/
-/**
- * @requires files
- */
+ *  NOTE: this resolver needs the multer-s3 middleware from services/s3-services.js to run
+ *  *before* GraphQL so that `req.file.location` exists. That middleware is currently commented
+ *  out in server.js (Apollo Server 2's `listen()` has no Express hook), so the mutation reports
+ *  that uploads are not enabled instead of crashing.
+ ******************************************************************************/
 var userModel = require('../../model/userSchema');
 var verifyToken = require('../../Authentication/authenticationUser')
+var { errorResponse } = require('../../services/errors');
 
-
-
-//create a empty function
 var uploadPicMutation = function () { }
 
-
-
-/**
- * @param {*} root
- * @param {*} args
- * @param {*} context
- */
 uploadPicMutation.prototype.picUpload = async (root, args, context) => {
-    if (context.token) {
-
-
-
-        //verify token 
-        var afterVerify = verifyToken.verification(context.token)
-        if (!afterVerify > 0) {
-            return { "message": "token is not verify" }
+    try {
+        var payload = verifyToken.requireUser(context)
+        var file = context.req && context.req.file
+        if (!file || !file.location) {
+            return { "uploadURL": "profile Pic is not set" }
         }
-        logger.info(context.req.file.location)
-
-
-
-        //find in database and then update
-        var updateurl = await userModel.findOneAndUpdate({ _id: afterVerify.userID }, { $set: { ProfilePicUrl: context.req.file.location } })
-        if (updateurl) {
-            return {
-                "uploadURL": context.req.file.location,
-                "message": "Upload pic successfully"
-            }
-        }
-    }
-    else {
-        return { "uploadURL": "profile Pic is not set" }
+        await userModel.findOneAndUpdate({ _id: payload.userID }, { $set: { ProfilePicUrl: file.location } })
+        return { "uploadURL": file.location, "Key": file.key }
+    } catch (err) {
+        return errorResponse(err)
     }
 }
 
-
-/**
-* @exports uploadPicMutation
-*/
 module.exports = new uploadPicMutation()

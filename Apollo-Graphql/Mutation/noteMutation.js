@@ -7,7 +7,7 @@
  *  @description    : By using mutation create a new files and fetch the data
  * 
  *  @overview       : fundoo application  
- *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
+ *  @author         : Bhupendra Singh
  *  @version        : 1.0
  *  @since          : 29-april-2019
  *
@@ -19,14 +19,11 @@ var noteModel = require('../../model/noteSchema')
 var labelModel = require('../../model/labelSchema')
 var tokenVerify = require('../../Authentication/authenticationUser')
 var logger = require('../../services/logger');
+var { errorResponse } = require('../../services/errors');
 
 //create a empty function
 var noteMutation = function () { }
 
-//error message
-var errorMessage = {
-    "message": "Something bad happend",
-}
 
 
 /******************************************************   createNote   *************************************************************/
@@ -39,6 +36,7 @@ var errorMessage = {
  */
 noteMutation.prototype.createNote = async (root, params, context) => {
     try {
+        var payload = tokenVerify.requireUser(context)
 
 
         /**
@@ -48,7 +46,7 @@ noteMutation.prototype.createNote = async (root, params, context) => {
         if (params.title.length < 3) {
             return { "message": "Enter title length min 3 letter " }
         }
-        if (params.description.length < 4) {
+        if (!params.description || params.description.length < 4) {
             return { "message": "Enter description length min 4 letter " }
         }
 
@@ -59,15 +57,11 @@ noteMutation.prototype.createNote = async (root, params, context) => {
          * @condition if present or not
          * @returns {String} message
          */
-        var payload = tokenVerify.verification(context.token)
-        if (!payload) {
-            return { "message": "token is not verify" }
-        }
 
 
 
         //find title from database
-        var notefind = await noteModel.find({ title: params.title })
+        var notefind = await noteModel.find({ title: params.title, userID: payload.userID })
 
         /**
          * @param {number} notefind.length, check the label name already present or not
@@ -91,7 +85,7 @@ noteMutation.prototype.createNote = async (root, params, context) => {
         })
 
         //save data in dataBase
-        const note = model.save()
+        const note = await model.save()
 
 
         /**
@@ -105,13 +99,7 @@ noteMutation.prototype.createNote = async (root, params, context) => {
 
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 
@@ -124,12 +112,13 @@ noteMutation.prototype.createNote = async (root, params, context) => {
  * @purpose : update title or description from database
  * @param {params} params
  */
-noteMutation.prototype.editNote = async (root, params) => {
+noteMutation.prototype.editNote = async (root, params, context) => {
     try {
+        var payload = tokenVerify.requireUser(context)
 
 
         //find id from users models
-        var note = await noteModel.findOneAndUpdate({ _id: params.noteID },
+        var note = await noteModel.findOneAndUpdate({ _id: params.noteID, userID: payload.userID },
             {
                 $set: {
                     title: params.editTitle,
@@ -150,13 +139,7 @@ noteMutation.prototype.editNote = async (root, params) => {
 
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 
@@ -168,8 +151,9 @@ noteMutation.prototype.editNote = async (root, params) => {
  * @param {*} root
  * @param {*} params
  */
-noteMutation.prototype.removeNote = async (root, params) => {
+noteMutation.prototype.removeNote = async (root, params, context) => {
     try {
+        var payload = tokenVerify.requireUser(context)
 
 
         /**
@@ -177,7 +161,7 @@ noteMutation.prototype.removeNote = async (root, params) => {
          * @param {String} id
          * @returns {String} message
          */
-        var note = await noteModel.findOneAndRemove({ _id: params.noteID })
+        var note = await noteModel.findOneAndRemove({ _id: params.noteID, userID: payload.userID })
         if (!note) {
             return { "message": "note is not present" }
         } else {
@@ -186,13 +170,7 @@ noteMutation.prototype.removeNote = async (root, params) => {
 
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 
@@ -205,8 +183,9 @@ noteMutation.prototype.removeNote = async (root, params) => {
  * @param {*} root
  * @param {*} params 
  */
-noteMutation.prototype.saveLabelToNote = async (root, params) => {
+noteMutation.prototype.saveLabelToNote = async (root, params, context) => {
     try {
+        var payload = tokenVerify.requireUser(context)
 
 
         //find labelID from noteModel Schema
@@ -222,7 +201,7 @@ noteMutation.prototype.saveLabelToNote = async (root, params) => {
 
 
         //find id from noteModel and update(push) into notes
-        var note = await noteModel.findOneAndUpdate({ _id: params.noteID },
+        var note = await noteModel.findOneAndUpdate({ _id: params.noteID, userID: payload.userID },
             {
                 $push: {
                     labelID: params.label_ID
@@ -238,13 +217,7 @@ noteMutation.prototype.saveLabelToNote = async (root, params) => {
 
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 
@@ -258,12 +231,13 @@ noteMutation.prototype.saveLabelToNote = async (root, params) => {
  * @param {*} root
  * @param {*} params
  */
-noteMutation.prototype.removeLabelFromNote = async (root, params) => {
+noteMutation.prototype.removeLabelFromNote = async (root, params, context) => {
     try {
+        var payload = tokenVerify.requireUser(context)
 
 
         //find labelID from noteModel Schema
-        var id = await noteModel.find({ "labelID": params.label_ID })
+        var id = await noteModel.find({ _id: params.noteID, userID: payload.userID, "labelID": params.label_ID })
 
 
 
@@ -275,7 +249,7 @@ noteMutation.prototype.removeLabelFromNote = async (root, params) => {
 
 
         //find id from noteModel and update(push) into notes
-        var note = await noteModel.findOneAndUpdate({ _id: params.noteID },
+        var note = await noteModel.findOneAndUpdate({ _id: params.noteID, userID: payload.userID },
             {
                 $pull: {
                     labelID: params.label_ID
@@ -298,13 +272,7 @@ noteMutation.prototype.removeLabelFromNote = async (root, params) => {
 
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 
@@ -317,12 +285,13 @@ noteMutation.prototype.removeLabelFromNote = async (root, params) => {
  * @description : set Reminder APIs in notes for using apollo-graphql
  * @purpose : For fetch data by using CURD operation
  */
-noteMutation.prototype.Reminder = async (root, params) => {
+noteMutation.prototype.Reminder = async (root, params, context) => {
     try {
+        var payload = tokenVerify.requireUser(context)
 
 
         //find noteID from noteModel Schema
-        var id = await noteModel.find({ "_id": params.noteID })
+        var id = await noteModel.find({ _id: params.noteID, userID: payload.userID })
 
 
         //if id is already present
@@ -337,7 +306,7 @@ noteMutation.prototype.Reminder = async (root, params) => {
 
 
         //find id from noteModel and update(push) into notes
-        var note = await noteModel.findOneAndUpdate({ _id: params.noteID },
+        var note = await noteModel.findOneAndUpdate({ _id: params.noteID, userID: payload.userID },
             {
                 $set: {
                     reminder: date
@@ -359,13 +328,7 @@ noteMutation.prototype.Reminder = async (root, params) => {
 
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 
@@ -376,12 +339,13 @@ noteMutation.prototype.Reminder = async (root, params) => {
  * @description : deleteReminder APIs from notes for using apollo-graphql
  * @purpose : For fetch data by using CURD operation
  */
-noteMutation.prototype.deleteReminder = async (root, params) => {
+noteMutation.prototype.deleteReminder = async (root, params, context) => {
     try {
+        var payload = tokenVerify.requireUser(context)
 
 
         //find noteID from noteModel Schema
-        var id = await noteModel.find({ "_id": params.noteID })
+        var id = await noteModel.find({ _id: params.noteID, userID: payload.userID })
 
         //if id is already present
         if (!id.length > 0) {
@@ -391,7 +355,7 @@ noteMutation.prototype.deleteReminder = async (root, params) => {
 
 
         //find id from noteModel and update(push) into notes
-        var note = await noteModel.findOneAndUpdate({ _id: params.noteID }, { $set: { reminder: "" } })
+        var note = await noteModel.findOneAndUpdate({ _id: params.noteID, userID: payload.userID }, { $set: { reminder: "" } })
         logger.info(note)
 
 
@@ -407,13 +371,7 @@ noteMutation.prototype.deleteReminder = async (root, params) => {
 
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 
@@ -428,6 +386,7 @@ noteMutation.prototype.deleteReminder = async (root, params) => {
  */
 noteMutation.prototype.Archieve = async (root, params, context) => {
     try {
+        var payload = tokenVerify.requireUser(context)
 
 
         /**
@@ -435,19 +394,18 @@ noteMutation.prototype.Archieve = async (root, params, context) => {
          * @condition if present or not
          * @returns {String} message
          */
-        var payload = tokenVerify.verification(context.token)
-        if (!payload) {
-            return { "message": "token is not verify" }
-        }
 
 
 
         //find that id id presen or not
-        var checkNote = await noteModel.find({ _id: params.noteID })
+        var checkNote = await noteModel.find({ _id: params.noteID, userID: payload.userID })
         logger.info(checkNote)
 
 
         //check whether is false or true in database
+        if (!checkNote[0]) {
+            return { "message": "note not found" }
+        }
         if (checkNote[0].archieve == false) {
 
             /**
@@ -455,7 +413,7 @@ noteMutation.prototype.Archieve = async (root, params, context) => {
              * @param {ID}, userID
              * @returns {String}, message
              */
-            await noteModel.updateOne({ _id: params.noteID },
+            await noteModel.updateOne({ _id: params.noteID, userID: payload.userID },
                 {
                     $set:
                     {
@@ -471,13 +429,7 @@ noteMutation.prototype.Archieve = async (root, params, context) => {
 
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 
@@ -495,6 +447,7 @@ noteMutation.prototype.Archieve = async (root, params, context) => {
  */
 noteMutation.prototype.ArchieveRemove = async (root, params, context) => {
     try {
+        var payload = tokenVerify.requireUser(context)
 
 
         /**
@@ -502,15 +455,14 @@ noteMutation.prototype.ArchieveRemove = async (root, params, context) => {
          * @condition if present or not
          * @returns {String} message
          */
-        var payload = tokenVerify.verification(context.token)
-        if (!payload) {
-            return { "message": "token is not verify" }
-        }
 
         //find that id id presen or not
-        var checkNote = await noteModel.find({ _id: params.noteID })
+        var checkNote = await noteModel.find({ _id: params.noteID, userID: payload.userID })
 
         //check whether is false or true in database
+        if (!checkNote[0]) {
+            return { "message": "note not found" }
+        }
         if (checkNote[0].archieve == false) {
 
             return { "message": "This note is not Archieve" }
@@ -522,7 +474,7 @@ noteMutation.prototype.ArchieveRemove = async (root, params, context) => {
             * @param {ID}, userID
             * @returns {String}, message
             */
-            await noteModel.updateOne({ _id: params.noteID },
+            await noteModel.updateOne({ _id: params.noteID, userID: payload.userID },
                 {
                     $set:
                     {
@@ -536,13 +488,7 @@ noteMutation.prototype.ArchieveRemove = async (root, params, context) => {
 
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 
@@ -560,6 +506,7 @@ noteMutation.prototype.ArchieveRemove = async (root, params, context) => {
  */
 noteMutation.prototype.Trash = async (root, params, context) => {
     try {
+        var payload = tokenVerify.requireUser(context)
 
 
         /**
@@ -567,15 +514,14 @@ noteMutation.prototype.Trash = async (root, params, context) => {
          * @condition if present or not
          * @returns {String} message
          */
-        var payload = tokenVerify.verification(context.token)
-        if (!payload) {
-            return { "message": "token is not verify" }
-        }
 
         //find that id id presen or not
-        var checkNote = await noteModel.find({ _id: params.noteID })
+        var checkNote = await noteModel.find({ _id: params.noteID, userID: payload.userID })
 
         //check whether is false or true in database
+        if (!checkNote[0]) {
+            return { "message": "note not found" }
+        }
         if (checkNote[0].trash == false) {
 
 
@@ -584,7 +530,7 @@ noteMutation.prototype.Trash = async (root, params, context) => {
              * @param {ID}, userID
              * @returns {String}, message
              */
-            await noteModel.updateOne({ _id: params.noteID },
+            await noteModel.updateOne({ _id: params.noteID, userID: payload.userID },
                 {
                     $set:
                     {
@@ -601,13 +547,7 @@ noteMutation.prototype.Trash = async (root, params, context) => {
 
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 
@@ -626,6 +566,7 @@ noteMutation.prototype.Trash = async (root, params, context) => {
  */
 noteMutation.prototype.TrashRemove = async (root, params, context) => {
     try {
+        var payload = tokenVerify.requireUser(context)
 
 
         /**
@@ -633,19 +574,18 @@ noteMutation.prototype.TrashRemove = async (root, params, context) => {
          * @condition if present or not
          * @returns {String} message
          */
-        var payload = tokenVerify.verification(context.token)
-        if (!payload) {
-            return { "message": "token is not verify" }
-        }
 
 
 
         //find that id id presen or not
-        var checkNote = await noteModel.find({ _id: params.noteID })
+        var checkNote = await noteModel.find({ _id: params.noteID, userID: payload.userID })
 
 
 
         //check whether is false or true in database
+        if (!checkNote[0]) {
+            return { "message": "note not found" }
+        }
         if (checkNote[0].trash == false) {
 
             return { "message": "This not is not in trash" }
@@ -657,7 +597,7 @@ noteMutation.prototype.TrashRemove = async (root, params, context) => {
             * @param {ID}, userID
             * @returns {String}, message
             */
-            await noteModel.updateOne({ _id: params.noteID },
+            await noteModel.updateOne({ _id: params.noteID, userID: payload.userID },
                 {
                     $set:
                     {
@@ -670,13 +610,7 @@ noteMutation.prototype.TrashRemove = async (root, params, context) => {
 
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 

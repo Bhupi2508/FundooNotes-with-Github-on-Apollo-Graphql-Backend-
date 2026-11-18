@@ -7,7 +7,7 @@
  *  @description    : By mutation give path for github server a new files
  * 
  *  @overview       : fundoo application  
- *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
+ *  @author         : Bhupendra Singh
  *  @version        : 1.0
  *  @since          : 29-april-2019
  *
@@ -20,10 +20,10 @@ var sendMail = require('../../sendMailer/sendMail')
 var model = require('../../model/userSchema')
 var noteModel = require('../../model/noteSchema')
 var axios = require('axios')
-var jwt = require('jsonwebtoken')
 var tokenVerify = require('../../Authentication/authenticationUser')
 var axios_service = require('../../services/axios-services').axiosService
 var logger = require('../../services/logger');
+var { errorResponse } = require('../../services/errors');
 
 //create a empty function
 var gitAuthMutation = function () { }
@@ -48,8 +48,8 @@ gitAuthMutation.prototype.GithubAuth = async (root, params) => {
 
 
         //sent mail to the mail id
-        var mail = sendMail.sendEmailFunction(url, params.email)
-        if (!mail) {
+        var mail = await sendMail.sendEmailFunction(url, params.email)
+        if (!mail.sent) {
             return { "message": "mail not sent" }
         }
 
@@ -59,8 +59,7 @@ gitAuthMutation.prototype.GithubAuth = async (root, params) => {
         }
 
     } catch (err) {
-        logger.error("!Error")
-        console.log("!Error")
+        return errorResponse(err)
     }
 }
 
@@ -76,105 +75,61 @@ gitAuthMutation.prototype.GithubAuth = async (root, params) => {
  * @param {*} root
  */
 gitAuthMutation.prototype.codeVerify = async (root, params, context) => {
-
-    /**
-     * @function (Axios), which is used to handle http request
-     * @method (get), Get data from response when hit the url
-     * @param {String}, post a url and then response will given token
-     * @headers : application/json
-     * @function getToken, has token
-     */
-    axios({
-        method: 'post',
-        url: `${process.env.GIT_ACCESS}client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}&code=${context.code}`,
-        headers: {
-            accept: 'application/json',
+    try {
+        if (!context.code) {
+            return { "message": "GitHub code not provided (?code=...)" }
         }
 
-    }).then(response => {
-
-        // Once we get the response, extract the access token from
-        const access_token = response.data.access_token
-
-        //function for access token
-        getToken(access_token)
-        logger.info("Access token : ", access_token)
-
-    })
-        .catch(error => {
-            logger.error(error)
-            console.log(error)
-        })
-
-
-    //use the access_token in another function, which is came from previous function
-    /**
-     * @param {*} access_token 
-     * @headers : application/json
-     */
-    function getToken(access_token) {
-
-        /**
-       * @function (Axios), which is used to handle http request
-       * @method (get), Get data from response when hit the url
-       * @param {headers}
-       * @purpose : get response from given url
-       */
-        axios({
-            method: 'get',
-            url: `${process.env.GET_RESPONSE}access_token=${access_token}`,
-            headers: {
-                accept: 'application/json',
+        // 1. exchange the one-time OAuth code for an access token
+        var tokenResponse = await axios({
+            method: 'post',
+            url: process.env.GIT_ACCESS,
+            headers: { accept: 'application/json' },
+            data: {
+                client_id: process.env.CLIENT_ID,
+                client_secret: process.env.CLIENT_SECRET,
+                code: context.code
             }
         })
-            .then(async response => {
-                logger.info("\nResponse.Data : \n", response.data)
-                logger.info("\nRepository details", response.data.repos_url);
+        var access_token = tokenResponse.data.access_token
+        if (!access_token) {
+            return { "message": "GitHub did not return an access token (code expired or invalid)" }
+        }
 
+        // 2. fetch the GitHub profile with that token (sent as a header, never in the URL)
+        var profile = await axios({
+            method: 'get',
+            url: process.env.GET_RESPONSE,
+            headers: { accept: 'application/json', Authorization: `Bearer ${access_token}` }
+        })
 
-                //save those data in user database
-                var gituser = new model({
-                    loginName: response.data.login,
-                    gitID: response.data.id,
-                    gitNodeID: response.data.node_id,
+        // 3. create the user on first login, refresh the token afterwards
+        var saveuser = await model.findOneAndUpdate(
+            { gitID: String(profile.data.id) },
+            {
+                $set: {
+                    loginName: profile.data.login,
+                    gitNodeID: profile.data.node_id,
                     access_Token: access_token
-
-                });
-
-
-                //save data into database
-                var saveuser = await gituser.save();
-                logger.info("\nData : ", saveuser)
-
-
-
-                //token created for gitAuth login verification and send to git mail
-                var token = await jwt.sign({ "userID": saveuser.id, "id": response.data.id, "login": response.data.login }, process.env.SECRET_KEY, { expiresIn: 86400000 })
-
-
-                //send mail to the given mail id
-                var url = `http://localhost:4000?token=${token}`
-                sendMail.sendEmailFunction(url, response.data.email)
-
-
-                if (!saveuser.id.length > 0) {
-                    return { "message": "data not save successfully" }
                 }
+            },
+            { upsert: true, new: true, setDefaultsOnInsert: true }
+        )
 
-                //return the response
-                return {
-                    "message": "Data save successfully",
-                    "token": token
-                }
-            })
-            .catch(error => {
-                logger.error(error)
-                console.log(error)
-            })
+        // 4. app token, mailed as a link; GitAuthTokenVerify marks the account as verified
+        var token = tokenVerify.sign({ "userID": saveuser.id, "id": profile.data.id, "login": profile.data.login }, '1d')
+        var url = `${process.env.APP_URL || 'http://localhost:' + process.env.PORT}?token=${token}`
+        var recipient = profile.data.email || params.email
+        if (recipient) {
+            await sendMail.sendEmailFunction(url, recipient)
+        }
+        return {
+            "message": "Data save successfully",
+            "token": tokenVerify.tokenForResponse(token)
+        }
+    } catch (err) {
+        return errorResponse(err)
     }
-
-    //return the response
-    return { "message": "Data save successfully" }
 }
 
 
@@ -225,7 +180,7 @@ gitAuthMutation.prototype.GitAuthTokenVerify = async (root, params, context) => 
     } catch (err) {
         logger.error("!Error", err)
         console.log("!Error", err)
-        return { "message": err }
+        return errorResponse(err)
     }
 
 }
@@ -258,7 +213,7 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -275,9 +230,10 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
         */
         axios({
             method: 'get',
-            url: `${process.env.GIT_REPOSITORY}access_token=${access_token}`,
+            url: process.env.GIT_REPOSITORY,
             headers: {
-                accept: 'application/json'
+                accept: 'application/json',
+                Authorization: `Bearer ${access_token}`
             }
 
         }).then(async (res) => {
@@ -312,7 +268,7 @@ gitAuthMutation.prototype.pullGitRepository = async (root, params, context) => {
     } catch (err) {
         logger.error("!Error", err)
         console.log("!Error", err)
-        return { "message": err }
+        return errorResponse(err)
     }
 }
 
@@ -344,14 +300,13 @@ gitAuthMutation.prototype.addWatchInGitRepo = async (root, params, context) => {
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
 
         // Access_token
         var access_token = user[0].access_Token;
-        logger.info("access_token", access_token)
 
 
         /**
@@ -410,14 +365,13 @@ gitAuthMutation.prototype.deleteWatchInGitRepo = async (root, params, context) =
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
 
         // Access_token
         var access_token = user[0].access_Token
-        logger.info("access_token", access_token)
 
 
         /**
@@ -477,7 +431,7 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -485,7 +439,6 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
 
         // Access_token
         var access_token = user[0].access_Token
-        logger.info("access_token", access_token)
 
 
         /**
@@ -498,7 +451,7 @@ gitAuthMutation.prototype.createGitBranch = async (root, params, context) => {
 
 
         //send to axios_services and take response from it
-        await axios_service('GET', url, access_token)
+        var res = await axios_service('GET', url, access_token)
         var access_token1 = user[0].access_Token
 
         /**
@@ -559,7 +512,7 @@ gitAuthMutation.prototype.deleteGitBranch = async (root, params, context) => {
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -567,7 +520,6 @@ gitAuthMutation.prototype.deleteGitBranch = async (root, params, context) => {
 
         // Access_token
         var access_token = user[0].access_Token
-        logger.info("access_token", access_token)
 
 
 
@@ -622,7 +574,7 @@ gitAuthMutation.prototype.fetchRepository = async (root, params, context) => {
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -630,13 +582,14 @@ gitAuthMutation.prototype.fetchRepository = async (root, params, context) => {
 
         // Access_token
         var access_token = user[0].access_Token;
-        logger.info("acccess_token", access_token);
 
 
 
         //get response from given url
-        const fetch = createApolloFetch({
-            uri: `${process.env.GIT_FETCH_REPO}${access_token}`
+        const fetch = createApolloFetch({ uri: process.env.GIT_FETCH_REPO });
+        fetch.use(({ options }, next) => {
+            options.headers = Object.assign({}, options.headers, { Authorization: `Bearer ${access_token}` });
+            next();
         });
 
         const res = await fetch({
@@ -674,7 +627,7 @@ gitAuthMutation.prototype.fetchRepository = async (root, params, context) => {
     } catch (err) {
         logger.error("!Error", err)
         console.log("!Error", err)
-        return { "message": err }
+        return errorResponse(err)
     }
 }
 
@@ -708,7 +661,7 @@ gitAuthMutation.prototype.starRepository = async (root, params, context) => {
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -721,8 +674,10 @@ gitAuthMutation.prototype.starRepository = async (root, params, context) => {
 
 
         //fetch repository data from github
-        const fetch = createApolloFetch({
-            uri: `${process.env.GIT_FETCH_REPO}${access_token}`
+        const fetch = createApolloFetch({ uri: process.env.GIT_FETCH_REPO });
+        fetch.use(({ options }, next) => {
+            options.headers = Object.assign({}, options.headers, { Authorization: `Bearer ${access_token}` });
+            next();
         });
 
 
@@ -743,7 +698,7 @@ gitAuthMutation.prototype.starRepository = async (root, params, context) => {
     } catch (err) {
         logger.error("!Error", err)
         console.log("!Error", err)
-        return { "message": err }
+        return errorResponse(err)
     }
 }
 
@@ -777,7 +732,7 @@ gitAuthMutation.prototype.removeStarRepository = async (root, params, context) =
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -790,8 +745,10 @@ gitAuthMutation.prototype.removeStarRepository = async (root, params, context) =
 
 
         //fetch repository data from github
-        const fetch = createApolloFetch({
-            uri: `${process.env.APOLLO_REPO_FETCH}${access_token}`
+        const fetch = createApolloFetch({ uri: process.env.APOLLO_REPO_FETCH });
+        fetch.use(({ options }, next) => {
+            options.headers = Object.assign({}, options.headers, { Authorization: `Bearer ${access_token}` });
+            next();
         });
 
 
@@ -810,7 +767,7 @@ gitAuthMutation.prototype.removeStarRepository = async (root, params, context) =
     } catch (err) {
         logger.error("!Error", err)
         console.log("!Error", err)
-        return { "message": err }
+        return errorResponse(err)
     }
 }
 
@@ -845,7 +802,7 @@ gitAuthMutation.prototype.createGitRepository = async (root, params, context) =>
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -853,7 +810,6 @@ gitAuthMutation.prototype.createGitRepository = async (root, params, context) =>
 
         // Access_token
         var access_token = user[0].access_Token
-        logger.info("access_token", access_token)
 
 
         /**
@@ -917,15 +873,14 @@ gitAuthMutation.prototype.removeGitRepository = async (root, params, context) =>
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
 
 
         // Access_token
-        var access_token = process.env.DELETE_TOKEN
-        logger.info("access_token", access_token)
+        var access_token = user[0].access_Token
 
 
         /**
@@ -985,20 +940,22 @@ gitAuthMutation.prototype.changeStatusInGithub = async (root, params, context) =
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
 
 
         // Access_token from github
-        var access_token = process.env.USER_TOKEN_FOR_STATUS
+        var access_token = user[0].access_Token
 
 
 
         //fetch github data from github
-        const fetch = createApolloFetch({
-            uri: `${process.env.GIT_FETCH_REPO}${access_token}`
+        const fetch = createApolloFetch({ uri: process.env.GIT_FETCH_REPO });
+        fetch.use(({ options }, next) => {
+            options.headers = Object.assign({}, options.headers, { Authorization: `Bearer ${access_token}` });
+            next();
         });
 
 
@@ -1018,7 +975,7 @@ gitAuthMutation.prototype.changeStatusInGithub = async (root, params, context) =
     } catch (err) {
         logger.error("!Error", err)
         console.log("!Error", err)
-        return { "message": err }
+        return errorResponse(err)
     }
 }
 
@@ -1051,7 +1008,7 @@ gitAuthMutation.prototype.gitRepoCommits = async (root, params, context) => {
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -1125,15 +1082,14 @@ gitAuthMutation.prototype.gitRepoWebhook = async (root, params, context) => {
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
 
 
         // Access_token
-        var access_token = process.env.GIT_REPO_TOKEN
-        logger.info(access_token);
+        var access_token = user[0].access_Token
 
 
         /**

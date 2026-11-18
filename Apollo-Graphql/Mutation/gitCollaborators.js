@@ -6,7 +6,7 @@
  *  @description    : By using mutation we can manipulate the data (CURD)
  *
  *  @overview       : fundoo application
- *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
+ *  @author         : Bhupendra Singh
  *  @version        : 1.0
  *  @since          : 04-june-2019
  *
@@ -19,15 +19,12 @@ var axios = require('axios')
 var jwt = require('jsonwebtoken')
 var tokenVerify = require('../../Authentication/authenticationUser')
 var logger = require('../../services/logger');
+var { errorResponse } = require('../../services/errors');
 
 //create a empty function
 var userAddInCollaborator = function () { }
 
 
-//error message
-var errorMessage = {
-    "message": "Something bad happend",
-}
 
 
 /********************************************************  addCollaboratorGithub  ***********************************************************/
@@ -55,7 +52,7 @@ userAddInCollaborator.prototype.addCollaboratorGithub = async (root, params, con
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -83,13 +80,7 @@ userAddInCollaborator.prototype.addCollaboratorGithub = async (root, params, con
         return { "message": "user collaborators added successfully" }
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 
@@ -121,7 +112,7 @@ userAddInCollaborator.prototype.removeCollaboratorGithub = async (root, params, 
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -147,13 +138,7 @@ userAddInCollaborator.prototype.removeCollaboratorGithub = async (root, params, 
         return { "message": "collborators remove successfully" }
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 
@@ -184,7 +169,7 @@ userAddInCollaborator.prototype.gitCollaboratorsList = async (root, params, cont
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -223,13 +208,7 @@ userAddInCollaborator.prototype.gitCollaboratorsList = async (root, params, cont
         }
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 

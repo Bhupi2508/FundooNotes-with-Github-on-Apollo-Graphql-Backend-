@@ -7,7 +7,7 @@
  *  @description    : Using ElasticSearch we can search anything from DataBase 
  * 
  *  @overview       : ElasticSearch connections
- *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
+ *  @author         : Bhupendra Singh
  *  @version        : 1.0
  *  @since          : 13-jun-2019
  *

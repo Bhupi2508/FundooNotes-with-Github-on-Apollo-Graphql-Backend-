@@ -1,4 +1,15 @@
+# secrets
 .env
-docker-compose.yml
+.env.*
+!.env.example
+
+# dependencies, logs, tooling output
+node_modules/
+npm-debug.log*
+*.log
+services/*.log
+coverage/
+.nyc_output/
+.scannerwork/
 sonar-project.properties
-/node_modules
+docker-compose.yml

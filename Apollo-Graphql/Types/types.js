@@ -7,7 +7,7 @@
  *                    users or do some CURD operation for manipulate data.
  * 
  *  @overview       : fundoo application 
- *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
+ *  @author         : Bhupendra Singh
  *  @version        : 1.0
  *  @since          : 27-april-2019
  *
@@ -33,7 +33,6 @@ type User {
     firstName : String!
     lastName : String!
     email : String!
-    password : String!
     message : String!
     token : String
     labels(first:Int, offset: Int) : [Label]
@@ -62,14 +61,12 @@ type User {
    type repo {
        name : String!
        description : String
-       access_Token: String
    }
 
    type GitHub {
       _id: ID!
       loginName: String!
       gitID: String!
-      access_Token: String!
       message: String!
       token : String
       clientMutationId : String

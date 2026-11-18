@@ -7,7 +7,7 @@
  *  @description    : Using this database we connect mondodb to server
  * 
  *  @overview       : MongoDB connections
- *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
+ *  @author         : Bhupendra Singh
  *  @version        : 1.0
  *  @since          : 27-april-2019
  *

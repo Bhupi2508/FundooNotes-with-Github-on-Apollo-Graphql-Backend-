@@ -7,7 +7,7 @@
  *  @description    : using this schema we store labels data in database
  * 
  *  @overview       : fundoo application
- *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
+ *  @author         : Bhupendra Singh
  *  @version        : 1.0
  *  @since          : 11-june-2019
  *

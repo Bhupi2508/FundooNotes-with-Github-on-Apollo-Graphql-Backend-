@@ -5,7 +5,7 @@
  *  @description    : By using mutation we can manipulate the data (CURD)
  *
  *  @overview       : fundoo application
- *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
+ *  @author         : Bhupendra Singh
  *  @version        : 1.0
  *  @since          : 10-june-2019
  *
@@ -53,7 +53,7 @@ userAddLabelMutation.prototype.createIssueForGit = async (root, params, context)
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -61,13 +61,14 @@ userAddLabelMutation.prototype.createIssueForGit = async (root, params, context)
 
         // Access_token
         var access_token = user[0].access_Token
-        logger.info("access_token", access_token)
 
 
 
         //fetch github data from github
-        const fetch = createApolloFetch({
-            uri: `${process.env.GIT_FETCH_REPO}${access_token}`
+        const fetch = createApolloFetch({ uri: process.env.GIT_FETCH_REPO });
+        fetch.use(({ options }, next) => {
+            options.headers = Object.assign({}, options.headers, { Authorization: `Bearer ${access_token}` });
+            next();
         });
 
 
@@ -148,7 +149,7 @@ userAddLabelMutation.prototype.updateIssueForGit = async (root, params, context)
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -156,13 +157,14 @@ userAddLabelMutation.prototype.updateIssueForGit = async (root, params, context)
 
         // Access_token
         var access_token = user[0].access_Token
-        logger.info("access_token", access_token)
 
 
 
         //fetch github data from github
-        const fetch = createApolloFetch({
-            uri: `${process.env.GIT_FETCH_REPO}${access_token}`
+        const fetch = createApolloFetch({ uri: process.env.GIT_FETCH_REPO });
+        fetch.use(({ options }, next) => {
+            options.headers = Object.assign({}, options.headers, { Authorization: `Bearer ${access_token}` });
+            next();
         });
 
 
@@ -243,7 +245,7 @@ userAddLabelMutation.prototype.deleteIssueForGit = async (root, params, context)
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -251,13 +253,14 @@ userAddLabelMutation.prototype.deleteIssueForGit = async (root, params, context)
 
         // Access_token
         var access_token = user[0].access_Token
-        logger.info("access_token", access_token)
 
 
 
         //fetch github data from github
-        const fetch = createApolloFetch({
-            uri: `${process.env.GIT_FETCH_REPO}${access_token}`
+        const fetch = createApolloFetch({ uri: process.env.GIT_FETCH_REPO });
+        fetch.use(({ options }, next) => {
+            options.headers = Object.assign({}, options.headers, { Authorization: `Bearer ${access_token}` });
+            next();
         });
 
 
@@ -311,7 +314,7 @@ userAddLabelMutation.prototype.addIssueCommentForGit = async (root, params, cont
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -319,13 +322,14 @@ userAddLabelMutation.prototype.addIssueCommentForGit = async (root, params, cont
 
         // Access_token
         var access_token = user[0].access_Token
-        logger.info("access_token", access_token)
 
 
 
         //fetch github data from github
-        const fetch = createApolloFetch({
-            uri: `${process.env.GIT_FETCH_REPO}${access_token}`
+        const fetch = createApolloFetch({ uri: process.env.GIT_FETCH_REPO });
+        fetch.use(({ options }, next) => {
+            options.headers = Object.assign({}, options.headers, { Authorization: `Bearer ${access_token}` });
+            next();
         });
 
 
@@ -398,7 +402,7 @@ userAddLabelMutation.prototype.deleteIssueCommentForGit = async (root, params, c
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -406,13 +410,14 @@ userAddLabelMutation.prototype.deleteIssueCommentForGit = async (root, params, c
 
         // Access_token
         var access_token = user[0].access_Token
-        logger.info("access_token", access_token)
 
 
 
         //fetch github data from github
-        const fetch = createApolloFetch({
-            uri: `${process.env.GIT_FETCH_REPO}${access_token}`
+        const fetch = createApolloFetch({ uri: process.env.GIT_FETCH_REPO });
+        fetch.use(({ options }, next) => {
+            options.headers = Object.assign({}, options.headers, { Authorization: `Bearer ${access_token}` });
+            next();
         });
 
 
@@ -498,7 +503,7 @@ userAddLabelMutation.prototype.createLabelInGit = async (root, params, context) 
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -516,7 +521,6 @@ userAddLabelMutation.prototype.createLabelInGit = async (root, params, context) 
 
         // Access_token
         var access_token = user[0].access_Token
-        logger.info("access_token", access_token)
 
 
         /**
@@ -582,7 +586,7 @@ userAddLabelMutation.prototype.updateLabelInGit = async (root, params, context) 
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -597,7 +601,6 @@ userAddLabelMutation.prototype.updateLabelInGit = async (root, params, context) 
 
         // Access_token
         var access_token = user[0].access_Token
-        logger.info("access_token", access_token)
 
 
         /**
@@ -688,7 +691,7 @@ userAddLabelMutation.prototype.deleteLabelInGit = async (root, params, context) 
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -696,7 +699,6 @@ userAddLabelMutation.prototype.deleteLabelInGit = async (root, params, context) 
 
         // Access_token
         var access_token = user[0].access_Token
-        logger.info("access_token", access_token)
 
 
         /**
@@ -757,7 +759,7 @@ userAddLabelMutation.prototype.GetLabelList = async (root, params, context) => {
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -765,7 +767,6 @@ userAddLabelMutation.prototype.GetLabelList = async (root, params, context) => {
 
         // Access_token
         var access_token = user[0].access_Token
-        logger.info("access_token", access_token)
 
 
         /**
@@ -825,7 +826,7 @@ userAddLabelMutation.prototype.addLabelInIssue = async (root, params, context) =
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -833,7 +834,6 @@ userAddLabelMutation.prototype.addLabelInIssue = async (root, params, context) =
 
         // Access_token
         var access_token = user[0].access_Token
-        logger.info("access_token", access_token)
 
 
         /**
@@ -923,7 +923,7 @@ userAddLabelMutation.prototype.removeLabelFromIssue = async (root, params, conte
 
         //find token from dataBase
         var user = await model.find({ _id: afterVerify.userID })
-        if (!user) {
+        if (!user || !user.length || !user[0].access_Token) {
             return { "message": "user not verified" }
         }
 
@@ -931,7 +931,6 @@ userAddLabelMutation.prototype.removeLabelFromIssue = async (root, params, conte
 
         // Access_token
         var access_token = user[0].access_Token
-        logger.info("access_token", access_token)
 
 
         /**

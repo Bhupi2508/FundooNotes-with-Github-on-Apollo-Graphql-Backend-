@@ -8,7 +8,7 @@
  *                    the same shape as request.
  * 
  *  @overview       : fundoo application 
- *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
+ *  @author         : Bhupendra Singh
  *  @version        : 1.0
  *  @since          : 28-april-2019
  *
@@ -22,6 +22,7 @@ var notesModel = require('../../model/noteSchema')
 var logger = require('../../services/logger');
 var colabModel = require('../../model/collabatorsSchema')
 var tokenVerify = require('../../Authentication/authenticationUser')
+var escapeRegex = tokenVerify.escapeRegex
 
 //create a empty function
 var userQueries = function () { }
@@ -29,110 +30,62 @@ var userQueries = function () { }
 
 /***********************************************************************************/
 /**
- * @purpose : for user Query
- * @param {args}
- * @param {context}
+ * Every query below requires a login token and only ever returns the caller's own data.
+ * `first` / `offset` paginate; they are clamped so a client cannot request unbounded pages.
  */
+const page = (params) => ({
+    limit: Math.min(Math.max(params.first || 50, 1), 100),
+    skip: Math.max(params.offset || 0, 0)
+})
+
+/** @purpose : the logged-in user (password hash is never part of the GraphQL schema) */
 userQueries.prototype.user = async (root, params, context) => {
-    if (!context.token) {
-        return {
-            "message": "token not provided"
-        }
-    }
-    var payload = tokenVerify.verification(context.token)
-    var user = await userModel.find({ _id: payload.userID }).limit(params.first).skip(params.offset)
-    logger.info("user", user)
-    return user
+    var payload = tokenVerify.requireUser(context)
+    var { limit, skip } = page(params)
+    return userModel.find({ _id: payload.userID }).limit(limit).skip(skip)
 }
 
-
-/***********************************************************************************/
-/**
- * @purpose : for labelUser Query
- * @param {args}
- * @param {context}
- */
-userQueries.prototype.labelUser = async (root, params) => {
-    var label_User = await labelModel.find().sort({ "labelName": 1 }).limit(params.first).skip(params.offset)
-    logger.info("user", label_User)
-    return label_User
+/** @purpose : labels of the logged-in user */
+userQueries.prototype.labelUser = async (root, params, context) => {
+    var payload = tokenVerify.requireUser(context)
+    var { limit, skip } = page(params)
+    return labelModel.find({ userID: payload.userID }).sort({ "labelName": 1 }).limit(limit).skip(skip)
 }
 
-
-/***********************************************************************************/
-/**
- * @purpose : for notesUser Query
- * @param {args}
- * @param {context}
- */
-userQueries.prototype.notesUser = async (root, params) => {
-    var regex1 = new RegExp(params.title)
-    var regex2 = new RegExp(params.description)
-    var notes_User = await notesModel.find({ title: regex1, description: regex2 }).limit(params.first).skip(params.offset)
-    logger.info("notes_User", notes_User[0]);
-    return notes_User
+/** @purpose : notes of the logged-in user, optionally filtered by title / description (substring match) */
+userQueries.prototype.notesUser = async (root, params, context) => {
+    var payload = tokenVerify.requireUser(context)
+    var { limit, skip } = page(params)
+    var filter = { userID: payload.userID }
+    if (params.title) filter.title = new RegExp(escapeRegex(params.title))
+    if (params.description) filter.description = new RegExp(escapeRegex(params.description))
+    return notesModel.find(filter).limit(limit).skip(skip)
 }
 
-
-
-/***********************************************************************************/
-/**
- * @purpose : for colaborators Query
- * @param {args}
- * @param {context}
- */
-userQueries.prototype.colabUser = async (root, params) => {
-    var colab_User = await colabModel.find().exec()
-    return colab_User
+/** @purpose : collaborations created by the logged-in user or that include them */
+userQueries.prototype.colabUser = async (root, params, context) => {
+    var payload = tokenVerify.requireUser(context)
+    var { limit, skip } = page(params)
+    return colabModel.find({ $or: [{ userID: payload.userID }, { collaboratorID: payload.userID }] }).limit(limit).skip(skip)
 }
 
-
-
-/***********************************************************************************/
-/**
- * @purpose : for gituser Query
- * @param {args}
- * @param {context}
- */
-userQueries.prototype.gitRepo = async (root, params) => {
-    var git_User = await notesModel.find().exec()
-    logger.info("git_User", git_User[0]);
-    return git_User
+/** @purpose : notes that were imported from the user's GitHub repositories (see pullGitRepository) */
+userQueries.prototype.gitRepo = async (root, params, context) => {
+    var payload = tokenVerify.requireUser(context)
+    return notesModel.find({ userID: payload.userID }).exec()
 }
 
-
-
-
-/***********************************************************************************/
-/**
- * @purpose : for searchNoteByTitle Query 
- * @param {args}
- * @param {context}
- */
-userQueries.prototype.searchNoteByTitle = async (root, params) => {
-    var regex1 = new RegExp(params.title)
-    var notes_User = await notesModel.find({ title: regex1 }).limit(params.first).skip(params.offset)
-    logger.info("notes_user", notes_User[0]);
-    return notes_User
+/** @purpose : search the caller's notes by title */
+userQueries.prototype.searchNoteByTitle = async (root, params, context) => {
+    var payload = tokenVerify.requireUser(context)
+    return notesModel.find({ userID: payload.userID, title: new RegExp(escapeRegex(params.title), 'i') }).limit(100)
 }
 
-
-
-
-/***********************************************************************************/
-/**
- * @purpose : for searchNoteByDescription Query 
- * @param {args}
- * @param {context}
- */
-userQueries.prototype.searchNoteByDescription = async (root, params) => {
-    var regex2 = new RegExp(params.description)
-    var notes_User = await notesModel.find({ description: regex2 }).limit(params.first).skip(params.offset)
-    logger.info("notes_user", notes_User[0]);
-    return notes_User
+/** @purpose : search the caller's notes by description */
+userQueries.prototype.searchNoteByDescription = async (root, params, context) => {
+    var payload = tokenVerify.requireUser(context)
+    return notesModel.find({ userID: payload.userID, description: new RegExp(escapeRegex(params.description), 'i') }).limit(100)
 }
-
-
 
 
 /**

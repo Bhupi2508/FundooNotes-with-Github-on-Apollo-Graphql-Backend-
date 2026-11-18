@@ -7,7 +7,7 @@
  *  @description    : create a labels APIs using apollo-graphql 
  * 
  *  @overview       : fundoo application 
- *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
+ *  @author         : Bhupendra Singh
  *  @version        : 1.0
  *  @since          : 29-april-2019
  *
@@ -15,9 +15,10 @@
 /**
  * @requires files
  */
+var { errorResponse } = require('../../services/errors');
 const redis = require("async-redis");
 const client = redis.createClient({
-    host: 'localhost',
+    host: process.env.REDIS_HOST || 'localhost',
     port: process.env.REDIS_PORT
 })
 var labelModel = require('../../model/labelSchema')
@@ -26,10 +27,6 @@ var tokenVerify = require('../../Authentication/authenticationUser')
 //create a empty function
 var labelMutation = function () { }
 
-//error message
-var errorMessage = {
-    "message": "Something bad happend",
-}
 
 /******************************************************   createLabel   *************************************************************/
 /**
@@ -42,6 +39,7 @@ var errorMessage = {
 */
 labelMutation.prototype.createLabel = async (root, params, context) => {
     try {
+        var payload = tokenVerify.requireUser(context)
 
 
         /**
@@ -57,11 +55,7 @@ labelMutation.prototype.createLabel = async (root, params, context) => {
          * @payload send token for verification
          * @condition if present or not
          */
-        var payload = tokenVerify.verification(context.token)
-        if (!payload) {
-            return { "message": "token is not verify" }
-        }
-        var labelfind = await labelModel.find({ labelName: params.labelName })
+        var labelfind = await labelModel.find({ labelName: params.labelName, userID: payload.userID })
 
 
 
@@ -76,11 +70,11 @@ labelMutation.prototype.createLabel = async (root, params, context) => {
 
         //find id from users models
         const model = new labelModel({ labelName: params.labelName, userID: payload.userID })
-        const label = model.save()
+        const label = await model.save()
 
 
         // delete labels from redis
-        client.del("labels" + payload.userID)
+        await client.del("labels" + payload.userID)
 
 
         /**
@@ -94,13 +88,7 @@ labelMutation.prototype.createLabel = async (root, params, context) => {
 
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 
@@ -118,32 +106,25 @@ labelMutation.prototype.createLabel = async (root, params, context) => {
 */
 labelMutation.prototype.editLabel = async (root, params, context) => {
     try {
+        var payload = tokenVerify.requireUser(context)
 
 
         /**
          * @payload send token for verification
          * @condition if present or not
          */
-        var payload = tokenVerify.verification(context.token)
-        if (!payload) {
-            return { "message": "token is not verify" }
-        }
 
 
 
         //find id from users models
-        var model = await labelModel.findOneAndUpdate({ _id: params.labelID },
+        var model = await labelModel.findOneAndUpdate({ _id: params.labelID, userID: payload.userID },
             {
                 $set: {
                     labelName: params.editlabelName
                 }
             })
+        await client.del("labels" + payload.userID)
 
-
-
-        /**
-         * @return {String} message
-         */
         if (!model) {
             return { "message": "label is not updated" }
         } else {
@@ -152,13 +133,7 @@ labelMutation.prototype.editLabel = async (root, params, context) => {
 
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 
@@ -174,16 +149,13 @@ labelMutation.prototype.editLabel = async (root, params, context) => {
 */
 labelMutation.prototype.removeLabel = async (root, params, context) => {
     try {
+        var payload = tokenVerify.requireUser(context)
 
 
         /**
          * @payload send token for verification
          * @condition if present or not
          */
-        var payload = tokenVerify.verification(context.token)
-        if (!payload) {
-            return { "message": "token is not verify" }
-        }
 
 
 
@@ -192,7 +164,8 @@ labelMutation.prototype.removeLabel = async (root, params, context) => {
          * @param {String} id
          * @returns {String} message
          */
-        var model = await labelModel.findOneAndRemove({ _id: params.labelID })
+        var model = await labelModel.findOneAndRemove({ _id: params.labelID, userID: payload.userID })
+        await client.del("labels" + payload.userID)
         if (!model) {
             return { "message": "label is already removed" }
         } else {
@@ -201,13 +174,7 @@ labelMutation.prototype.removeLabel = async (root, params, context) => {
 
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 

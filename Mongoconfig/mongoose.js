@@ -7,7 +7,7 @@
  *  @description    : Connected with mongoDB database
  * 
  *  @overview       : MongoDB connections
- *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
+ *  @author         : Bhupendra Singh
  *  @version        : 1.0
  *  @since          : 03-april-2019
  *
@@ -28,7 +28,10 @@ module.exports = function () {
     mongoose.set('useCreateIndex', true)
 
     //connect to the database by given url
-    var db = mongoose.connect(config.db, { useNewUrlParser: true });
+    var db = mongoose.connect(config.db, { useNewUrlParser: true }).catch(function (err) {
+        console.log('Error: Could not connect to MongoDB:', err.message);
+        process.exit(1)
+    });
 
     mongoose.connection.on('open', function () {
       //console.log('#####################################################################################');
@@ -36,10 +39,10 @@ module.exports = function () {
         console.log('#####################################################################################\n');
     })
     mongoose.connection.on('error', function (err) {
-        console.log('Error: Could not connect to MongoDB. Did you forget to run `mongod`?'.err);
-        process.exit()
+        console.log('Error: MongoDB connection error:', err.message);
+        process.exit(1)
     })
-    mongoose.connection.on('disconnect', function () {
+    mongoose.connection.on('disconnected', function () {
         console.log('MongoDB Disconnected');
         process.exit(1)
     })

@@ -9,7 +9,7 @@
  *  @description    : using logger instance we can show or print the value
  * 
  *  @overview       : fundoo application  
- *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
+ *  @author         : Bhupendra Singh
  *  @version        : 1.0
  *  @since          : 27-june-2019
  *

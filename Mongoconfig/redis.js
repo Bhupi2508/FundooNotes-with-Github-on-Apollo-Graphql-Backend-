@@ -7,7 +7,7 @@
  *  @description    : Connected with mongoDB database
  * 
  *  @overview       : Redis connections
- *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
+ *  @author         : Bhupendra Singh
  *  @version        : 1.0
  *  @since          : 03-june-2019
  *
@@ -17,7 +17,7 @@
  */
 const redis = require("async-redis");
 const client = redis.createClient({
-    host: 'localhost',
+    host: process.env.REDIS_HOST || 'localhost',
     port: process.env.REDIS_PORT
 })
 

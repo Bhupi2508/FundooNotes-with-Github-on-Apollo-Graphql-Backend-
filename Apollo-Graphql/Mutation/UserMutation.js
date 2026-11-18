@@ -7,7 +7,7 @@
  *  @description    : By using mutation we can manipulate the data (CURD)
  * 
  *  @overview       : fundoo application  
- *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
+ *  @author         : Bhupendra Singh
  *  @version        : 1.0
  *  @since          : 27-april-2019
  *
@@ -18,18 +18,23 @@
 const { AuthenticationError } = require('apollo-server')
 var redis = require('async-redis')
 var bcrypt = require('bcrypt')
-var jsonwebtoken = require('jsonwebtoken')
 var userModel = require('../../model/userSchema')
 var labelModel = require('../../model/labelSchema')
 var sendMail = require('../../sendMailer/sendMail')
 var logger = require('../../services/logger');
+var { errorResponse } = require('../../services/errors');
 var tokenVerify = require('../../Authentication/authenticationUser')
 
 //create a redis client
 var client = redis.createClient({
-    host: 'localhost',
+    host: process.env.REDIS_HOST || 'localhost',
     port: process.env.REDIS_PORT
 })
+
+//base URL put into emailed links (override with APP_URL)
+function appUrl(context) {
+    return process.env.APP_URL || (context && context.origin) || `http://localhost:${process.env.PORT}`
+}
 
 //saltrounds for hash password
 var saltRounds = 10;
@@ -37,10 +42,6 @@ var saltRounds = 10;
 //create a empty function
 var userMutation = function () { }
 
-//error message
-var errorMessage = {
-    "message": "Something bad happend",
-}
 
 
 
@@ -86,13 +87,13 @@ userMutation.prototype.signup = async (root, params, context) => {
 
 
         //for bcrypt password
-        params.password = await bcrypt.hashSync(params.password, saltRounds)
+        params.password = await bcrypt.hash(params.password, saltRounds)
         var usersMdl = new userModel(params)
 
 
 
         //save in database
-        const uModel = usersMdl.save();
+        const uModel = await usersMdl.save();
         if (!uModel) {
             //throw new AuthenticationError('Register unsuccessfull');
             return { "message": "Register unsuccessfull" }
@@ -101,7 +102,7 @@ userMutation.prototype.signup = async (root, params, context) => {
             /**
              * @param {token}, a token and send for verification
              */
-            var token = jsonwebtoken.sign({ email: params.email }, process.env.SECRET_KEY, { expiresIn: 86400000 })
+            var token = tokenVerify.sign({ email: params.email }, '1d')
 
 
 
@@ -111,30 +112,24 @@ userMutation.prototype.signup = async (root, params, context) => {
              *             query, instead of hard code
              * @param {String} token
              */
-            var url = `${context.origin}?token=${token}`
+            var url = `${appUrl(context)}?token=${token}`
 
 
             //send mail
-            sendMail.sendEmailFunction(url, params.email)
+            await sendMail.sendEmailFunction(url, params.email)
 
 
             //return the response
             return {
-                "message": "Register successfull",
-                "token": token
+                "message": "Register successfull, check your mail to verify the email",
+                "token": tokenVerify.tokenForResponse(token)
             }
         }
 
 
     }
     catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 
 }
@@ -159,7 +154,7 @@ userMutation.prototype.emailVerify = async (root, params, context) => {
          * @returns {String} message, token verification
          */
         var afterVerify = tokenVerify.verification(context.token)
-        if (!afterVerify > 0) {
+        if (!afterVerify || !afterVerify.email) {
             //throw new AuthenticationError('token is not verify');
             return { "message": "token is not verify" }
         }
@@ -186,13 +181,7 @@ userMutation.prototype.emailVerify = async (root, params, context) => {
 
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 
@@ -243,12 +232,12 @@ userMutation.prototype.login = async (root, params, context) => {
         /**
          * @param {token}, generate a token with expire time and provide a secret key
          */
-        var token = jsonwebtoken.sign({ email: params.email, userID: user[0].id }, process.env.SECRET_KEY, { expiresIn: 86400000 })
+        var token = tokenVerify.sign({ email: params.email, userID: user[0].id })
 
 
 
         //create a url
-        //var url = `${context.origin}?token=${token}`
+        //var url = `${appUrl(context)}?token=${token}`
 
 
 
@@ -286,13 +275,7 @@ userMutation.prototype.login = async (root, params, context) => {
     }
 
     catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 
@@ -341,12 +324,12 @@ userMutation.prototype.forgotPassword = async (root, params, context) => {
         /**
          * @purpose : generate a token for send a mail
          */
-        var token = jsonwebtoken.sign({ email: params.email }, process.env.SECRET_KEY, { expiresIn: 86400000 });
+        var token = tokenVerify.sign({ email: params.email }, '1h');
 
 
 
         //send token to sendmail function, which is send to the link(token)
-        var url = `http://localhost:4000/?token=${token}`
+        var url = `${appUrl(context)}?token=${token}`
         //var url = `${context.origin}/graphql?token=${token}`
 
 
@@ -355,28 +338,21 @@ userMutation.prototype.forgotPassword = async (root, params, context) => {
          * @param {token}, for sending mail to the mail
          * @returns {String} message
          */
-        var mail = sendMail.sendEmailFunction(url, params.email)
-        if (!mail > 0) {
-            //throw new AuthenticationError('!Error, mail not send ');
-            return { "mesage": "!Error, mail not send " }
+        var mail = await sendMail.sendEmailFunction(url, params.email)
+        if (!mail.sent && process.env.NODE_ENV !== "test") {
+            return { "message": "!Error, mail not send " }
         }
 
         //return the response
         return {
             "message": "Mail sent to your given email id",
-            "token": token
+            "token": tokenVerify.tokenForResponse(token)
         }
 
 
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 
@@ -400,7 +376,7 @@ userMutation.prototype.resetPassword = async (root, params, context) => {
          * @returns {String} message
          */
         var afterVerify = tokenVerify.verification(context.token)
-        if (!afterVerify > 0) {
+        if (!afterVerify || !afterVerify.email) {
             //throw new AuthenticationError('token is not verify');
             return { "message": "token is not verify" }
         }
@@ -416,7 +392,7 @@ userMutation.prototype.resetPassword = async (root, params, context) => {
 
 
         //bcrypt new password
-        params.newPassword = await bcrypt.hashSync(params.newPassword, saltRounds)
+        params.newPassword = await bcrypt.hash(params.newPassword, saltRounds)
 
 
 
@@ -439,13 +415,7 @@ userMutation.prototype.resetPassword = async (root, params, context) => {
         return { "message": "resetPassword Successfully" }
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 
@@ -462,6 +432,7 @@ userMutation.prototype.resetPassword = async (root, params, context) => {
 userMutation.prototype.update = async (root, params, context) => {
 
     try {
+        tokenVerify.requireUser(context)
 
 
         /** 
@@ -494,13 +465,7 @@ userMutation.prototype.update = async (root, params, context) => {
 
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 
@@ -515,9 +480,14 @@ userMutation.prototype.update = async (root, params, context) => {
  * @param {*} params
  * @returns {number} remove user id
  */
-userMutation.prototype.remove = async (root, params) => {
+userMutation.prototype.remove = async (root, params, context) => {
 
     try {
+        //only the account owner may delete the account
+        var payload = tokenVerify.requireUser(context)
+        if (String(params.id) !== String(payload.userID)) {
+            return { "message": "You can only delete your own account" }
+        }
 
 
         //find id and remove from the user Data
@@ -533,13 +503,7 @@ userMutation.prototype.remove = async (root, params) => {
 
 
     } catch (err) {
-        if (err instanceof ReferenceError || err instanceof SyntaxError || err instanceof TypeError || err instanceof RangeError) {
-            return errorMessage;
-        }
-        else {
-            errorMessage.message = err.message;
-            return errorMessage
-        }
+        return errorResponse(err)
     }
 }
 

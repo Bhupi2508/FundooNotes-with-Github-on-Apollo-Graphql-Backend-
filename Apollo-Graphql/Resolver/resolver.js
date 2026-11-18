@@ -6,7 +6,7 @@
  *  @description    : Inseide resolvers we write business logics and also fetch data
  * 
  *  @overview       : fundoo application 
- *  @author         : Bhupendra Singh <bhupendrasingh.ec18@gmail.com>
+ *  @author         : Bhupendra Singh
  *  @version        : 1.0
  *  @since          : 27-april-2019
  *
@@ -16,9 +16,10 @@
  */
 const redis = require("async-redis");
 const client = redis.createClient({
-    host: 'localhost',
+    host: process.env.REDIS_HOST || 'localhost',
     port: process.env.REDIS_PORT
 })
+const { escapeRegex } = require('../../Authentication/authenticationUser')
 const labelModel = require('../../model/labelSchema')  //labelModels  
 const noteModel = require('../../model/noteSchema')   //noteModel
 const colabModel = require('../../model/collabatorsSchema')   //colabModel
@@ -188,16 +189,15 @@ userResolver.prototype.resolvers = {
 
         //notes retrive for active users
         async notes(root, params, context) {
-            var regex1 = new RegExp(params.title)
-            var regex2 = new RegExp(params.description)
-            var notes = await noteModel.find({ userID: root._id, title: regex1, description: regex2 }).limit(params.first).skip(params.offset)
-            return notes
+            var filter = { userID: root._id }
+            if (params.title) filter.title = new RegExp(escapeRegex(params.title))
+            if (params.description) filter.description = new RegExp(escapeRegex(params.description))
+            return noteModel.find(filter).limit(Math.min(params.first || 100, 100)).skip(params.offset || 0)
         },
 
         //collabortaors for active users
         async colabs(root, params, context) {
-            var colabs = await colabModel.find()
-            return colabs
+            return colabModel.find({ $or: [{ userID: root._id }, { collaboratorID: root._id }] })
 
         },
     }
